@@ -19,18 +19,11 @@
     </div>
     <!-- This UI is a placeholder for QA purposes.
          It is not intended to set any precedent. -->
-    <h3>Walk through report types API</h3>
-    <div id="select-container" class="row">
-        <div class="span12">
-            <div id="select-content"></div>
+    <div class="row">
+        <div id="reporting-app" class="span12">
         </div>
     </div>
 
-    <div class="row">
-        <div class="span12">
-            <ul id='report-links-list'></ul>
-        </div>
-    </div>
 {% endblock %}
 
 {% block extra-js %}
@@ -38,6 +31,7 @@
 <script type="text/javascript">
     var states = {{ states }};
 </script>
+<!--
 <script type="text/javascript">
 var csrf = read_cookie("csrftoken");
 
@@ -199,16 +193,8 @@ $(document).on('ready', function() {
     resetReportingTypes();
 });
 </script>
+-->
 {% endautoescape %}
-<!--[if IE]>
-<script src="{{ STATIC_URL }}es5-sham.min.js"></script>
-<![endif]-->
-<script src="{{ STATIC_URL }}bootstrap/bootstrap-modalmanager.js"></script>
-<script src="{{ STATIC_URL }}bootstrap/bootstrap-modal.js"></script>
-<script src="{{ STATIC_URL }}reporting.167-25.js"></script>
-<script src="{{ STATIC_URL }}pickadate/picker.js"></script>
-<script src="{{ STATIC_URL }}pickadate/picker.date.js"></script>
-<script src="{{ STATIC_URL }}pickadate/legacy.js"></script>
-<!-- SteelToe: https://github.com/jclem/steeltoe -->
-<script src="{{ STATIC_URL }}steeltoe.js"></script>
+<script src="{{ STATIC_URL }}vendor.js"></script>
+<script src="{{ STATIC_URL }}app.js"></script>
 {% endblock %}

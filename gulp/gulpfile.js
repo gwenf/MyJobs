@@ -17,6 +17,8 @@ var vendor_libs = [
     'es6-promise',
 ];
 
+var dest = '../static';
+
 // Splitting vendor libs into a separate bundle improves rebuild time from 8
 // seconds to <500ms.
 gulp.task('vendor', function() {
@@ -31,12 +33,12 @@ gulp.task('vendor', function() {
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(uglify({ mangle: false }))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest(dest));
 });
 
-// If the app task starts logging that it is including packages, add those
+// If an app task starts logging that it is including packages, add those
 // packages to vendor_libs.
-gulp.task('app', function() {
+gulp.task('reporting', function() {
     return browserify([], {
         debug: true,
         paths: ['./src'],
@@ -53,20 +55,20 @@ gulp.task('app', function() {
     .on('package', function(pkg) {
         util.log("Including package:", pkg.name)
     })
-    .pipe(source('app.js'))
+    .pipe(source('reporting.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     // Do we want this in production builds?
     //.pipe(uglify({ mangle: false }))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest(dest));
 });
 
-gulp.task('build', ['vendor', 'app']);
+gulp.task('build', ['vendor', 'reporting']);
 
 // Leave this running in development for a pleasant experience.
 gulp.task('watch', function() {
-    gulp.watch('src/**/*', ['app']);
+    gulp.watch('src/**/*', ['reporting']);
 });
 
 gulp.task('default', ['build']);

@@ -12,12 +12,11 @@ var vendor_libs = [
     'react-dom',
     'redux',
     'react-redux',
-    'immutable',
     'babel/polyfill',
     'es6-promise',
 ];
 
-var dest = '../static';
+var dest = '../static/bundle';
 
 // Splitting vendor libs into a separate bundle improves rebuild time from 8
 // seconds to <500ms.

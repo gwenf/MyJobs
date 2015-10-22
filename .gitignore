@@ -18,8 +18,7 @@ static/redirect.css
 
 # Gulp stuff
 gulp/node_modules/
-static/reporting.js*
-static/vendor.js*
+static/bundle/
 
 # Editor aritfacts
 *~

@@ -56,7 +56,7 @@ def get_report_query(report_query_name):
 
 
 def list_of_str(qs):
-    return [str(f) for f in qs.all()]
+    return [unicode(f) for f in qs.all()]
 
 
 @report_query("Contacts")
@@ -70,7 +70,7 @@ class ContactReportType(object):
         return qs
 
     def extract(self, rec):
-        result = dict((f, str(getattr(rec, f, None)))
+        result = dict((f, unicode(getattr(rec, f, None)))
                       for f in self.fields)
         result['tags'] = list_of_str(rec.tags)
         result['locations'] = list_of_str(rec.locations)

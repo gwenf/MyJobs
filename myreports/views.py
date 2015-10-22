@@ -494,7 +494,7 @@ def download_dynamic_report(request):
     columns = Column.objects.active_for_configuration(configuration)
     values = [c.column_name for c in columns]
 
-    records = (dict((v, repr(rec.get(v))) for v in values)
+    records = (dict((v, unicode(rec.get(v))) for v in values)
                for rec in report.python)
 
     response = HttpResponse(content_type='text/csv')

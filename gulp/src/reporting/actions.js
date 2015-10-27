@@ -1,118 +1,136 @@
-import Immutable from 'immutable';
-import {get_csrf} from 'util/cookie.js';
-import {registerAction} from './store.js';
+import {deepFreeze} from '../util/freeze';
 
-var csrf = get_csrf();
+export var initialState = deepFreeze({
+    reportingTypes: {},
+    selectedReportingType: null,
 
-// This is the last bit of jquery left, afaik. We should use the
-// ES6 fetch polyfill instead.
-function load(url, formData = {}) {
-    var data = {...formData, csrfmiddlewaretoken: csrf};
-    return new Promise(function(resolve, reject) {
-        $.ajax({
-            url: url,
-            type: "POST",
-            dataType: "json",
-            data: data,
-            withCredentials: true,
-        }).then(resolve, reject);
-    });
-}
+    reportTypes: {},
+    selectedReportType: null,
 
+    dataTypes: {},
+    selectedDataType: null,
 
-// This is the view independent business logic of the application. It is
-// critical that we like what we see here. I'm not entirely happy with it yet
-// for a few reasons:
-//
-// * It more or less forms a state machine, which can be tough to follow. Can't
-//   do too much about that.
-// * It is heavily entangled with Facebook's Immutable library. That is a good
-//   library but I'd rather write my business logic in JavaScript. The ES6 spread
-//   operator provides an easy way to comply with the requirements of redux
-//   reducers so it might be worth trying that. The ES6 spread operator is JS.
-// * You _really_ have to understand how registerAction works to have any sense
-//   of what is going on here. Splitting registerAction into syncronous and
-//   async versions might help.
+    presentationTypes: {},
+    selectedPresentationType: null,
 
-var Actions = {
-    loadReportingTypes: registerAction('LOAD_REPORTING_TYPES',
-        () => load("/reports/api/reporting_types"),
-        function (state, payload) {
-            var newState = state.set('reportingTypes',
-                                     Immutable.fromJS(payload['reporting_type'])).
-                           set('pageIndex', 'reportingTypes');
-            return newState;
-        },
-        function(state, error) {
-            return state.set('error', true);
-        }),
+    pageIndex: 'reportingTypes',
 
-    selectReportingType: registerAction('SELECT_REPORTING_TYPE',
-        i => i,
-        (s, p) => s.set('selectedReportingType', p)),
+    loading: false,
 
-    loadReportTypes: registerAction('LOAD_REPORT_TYPES',
-        (reportingType) => load("/reports/api/report_types",
-                                {reporting_type_id: reportingType}),
-        function (state, payload) {
-            var newState = state.set('reportTypes',
-                                     Immutable.fromJS(payload['report_type'])).
-                           set('pageIndex', 'reportTypes');
-            return newState;
-        },
-        function(state, error) {
-            return state.set('error', true);
-        }),
+    error: "",
+    reports: [],
+});
 
-    selectReportType: registerAction('SELECT_REPORT_TYPE',
-        i => i,
-        (s, p) => s.set('selectedReportType', p)),
+export class ActionCreators {
+    constructor(api, dispatch) {
+        this.api = api;
+        this.dispatch = dispatch;
+    }
 
-    loadDataTypes: registerAction('LOAD_DATA_TYPES',
-        (reportType) => load("/reports/api/data_types",
-                             {report_type_id: reportType}),
-        function (state, payload) {
-            var newState = state.set('dataTypes',
-                                     Immutable.fromJS(payload['data_type'])).
-                           set('pageIndex', 'dataTypes');
-            return newState;
-        },
-        function(state, error) {
-            return state.set('error', true);
-        }),
+    async reset() {
+        this.dispatch(Actions.loading(true));
+        try {
+            const rts = await this.api.getReportingTypes();
+            this.dispatch(Actions.nextPage("reportingTypes", rts, "reportingTypes"));
+        } catch(e) {
+            console.error(e);
+            console.error(e.stack);
+            this.dispatch(Actions.unexpectedError("Error while getting reporting types."));
+        }
+    }
 
-    selectDataType: registerAction('SELECT_DATA_TYPE', i => i,
-        (s, p) => s.set('selectedDataType', p)),
+    async nextAfterReportingType(reportingTypeId) {
+        try {
+            this.dispatch(Actions.select("selectedReportingType", reportingTypeId));
+            this.dispatch(Actions.loading(true));
+            const rts = await this.api.getReportTypes(reportingTypeId)
+            this.dispatch(Actions.nextPage("reportTypes", rts, "reportTypes"));
+        } catch(e) {
+            console.error(e.stack);
+            this.dispatch(Actions.unexpectedError("Error while getting report types."));
+        }
+    }
 
-    loadPresentationTypes: registerAction('LOAD_PRESENTATION_TYPES',
-        (reportType, dataType) => load("/reports/api/report_presentations",
-                                        {data_type_id: dataType,
-                                         report_type_id: reportType}),
-        function (state, payload) {
-            var newState = state.set('presentationTypes',
-                                     Immutable.fromJS(payload['report_presentation'])).
-                           set('pageIndex', 'presentationTypes');
-            return newState;
-        },
-        function(state, error) {
-            return state.set('error', true);
-        }),
+    async nextAfterReportType(reportTypeId) {
+        try {
+            this.dispatch(Actions.select("selectedReportType", reportTypeId));
+            this.dispatch(Actions.loading(true));
+            const dts = await this.api.getDataTypes(reportTypeId)
+            this.dispatch(Actions.nextPage("dataTypes", dts, "dataTypes"));
+        } catch(e) {
+            console.error(e.stack);
+            this.dispatch(Actions.unexpectedError("Error while getting data types."));
+        }
+    }
 
-    selectPresentationType: registerAction('SELECT_PRESENTATION_TYPE',
-        i => i,
-        (s, p) => s.set('selectedPresentationType', p)),
+    async nextAfterDataType(reportTypeId, dataTypeId) {
+        try {
+            this.dispatch(Actions.select("selectedDataType", dataTypeId));
+            this.dispatch(Actions.loading(true));
+            const dts = await this.api.getPresentationTypes(reportTypeId, dataTypeId)
+            this.dispatch(Actions.nextPage("presentationTypes", dts, "presentationTypes"));
+        } catch(e) {
+            console.error(e.stack);
+            this.dispatch(Actions.unexpectedError("Error while getting presentationTypes types."));
+        }
+    }
 
-    runReport: registerAction('RUN_REPORT',
-        (reportPresentation) => load("/reports/api/run_report",
-                                     {rp_id: reportPresentation}),
-    function (state, payload) {
-        var newState = state.update('reports', v => v.push(payload.id));
-        return newState;
-    },
-    function (state, error) {
-        return state.set('error', true);
-    }),
+    async nextAfterPresentationType(reportPresentationId) {
+        try {
+            this.dispatch(Actions.select("selectedPresentationType", reportPresentationId));
+            this.dispatch(Actions.loading(true));
+            const report = await this.api.runReport(reportPresentationId)
+            this.dispatch(Actions.receiveReport(report));
+            return this.reset()
+        } catch(e) {
+            console.error(e.stack);
+            this.dispatch(Actions.unexpectedError("Error while getting presentationTypes types."));
+        }
+    }
 };
 
-export { Actions as default };
+export const Actions = {
+    loading: (val) => ({type: 'LOADING', loading: val}),
+    select: (key, id) => ({type: 'SELECT', key: key, id: id}),
+    nextPage: (dataKey, newData, newPage) =>
+        ({
+            type: 'NEXT_PAGE',
+            dataKey: dataKey,
+            newData: newData,
+            newPage: newPage,
+        }),
+    receiveReport: (report) => ({type: 'REPORT', report: report}),
+    unexpectedError: (message) => ({type: 'ERROR', message: message}),
+};
 
+export function reduce(state, action) {
+    switch(action.type) {
+        case 'NEXT_PAGE': {
+            const {dataKey, newData, newPage} = action;
+            const newState = {
+                ...state,
+                pageIndex: newPage,
+                loading: false,
+            };
+            newState[dataKey] = newData;
+            return Object.freeze(newState);
+        }
+        case 'SELECT': {
+            const {key, id} = action;
+            const newState = {...state};
+            newState[key] = parseInt(id);
+            return Object.freeze(newState);
+        }
+        case 'REPORT': {
+            const {report} = action;
+            const reportList = [report, ...state.reports];
+            return Object.freeze({...state, reports: reportList});
+        }
+        case 'LOADING':
+            return Object.freeze({...state, loading: action.loading});
+        case 'ERROR':
+            return Object.freeze({...state, error: action.message});
+        default:
+            return state;
+    }
+}

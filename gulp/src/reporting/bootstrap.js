@@ -1,4 +1,5 @@
 import {polyfill as es6PromisePolyfill} from 'es6-promise';
+import 'fetch-polyfill';
 
 // Put as many polyfills here as we can.
 //

@@ -1,18 +1,30 @@
 import {bootstrap} from "./bootstrap.js";
-import Actions from "./actions.js";
+import Api from './api';
+import {getCsrf} from 'util/cookie';
+import {initialState, ActionCreators, reduce} from './actions';
 import {DynamicReportApp} from "./view.js";
-import {store} from "./store.js";
+
+import {createStore, applyMiddleware} from "redux";
 import React from "react";
 import ReactDOM from "react-dom";
 import {Provider, connect} from "react-redux";
 
-// This is the entry point of the application. Bundling begins here.
-
-// Take care of fundamental browser stuff.
 bootstrap();
 
+const api = new Api(getCsrf());
+
+const loggingMiddleware = store => next => action => {
+    console.log("Dispatching action:", action.type, action);
+    return next(action);
+};
+
+const store = applyMiddleware(loggingMiddleware)(createStore)(reduce, initialState);
+window.store = store;
+
+const creators = new ActionCreators(api, store.dispatch.bind(store));
+
 // Hook react up to redux and start react.
-var Connected = connect(s => s.toObject())(DynamicReportApp);
+var Connected = connect(s => ({...s, creators}))(DynamicReportApp);
 
 ReactDOM.render(
     <div>
@@ -24,6 +36,4 @@ ReactDOM.render(
     document.getElementById("reporting-app")
 );
 
-// Kick off our redux application.
-Actions.loadReportingTypes();
-
+creators.reset();

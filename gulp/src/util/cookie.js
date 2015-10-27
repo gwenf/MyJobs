@@ -14,6 +14,6 @@ function read_cookie(cookie) {
 }
 
 // Only exporting this for now since it is what is actually needed.
-export function get_csrf() {
+export function getCsrf() {
     return read_cookie("csrftoken");
 }

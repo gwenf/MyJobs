@@ -319,6 +319,7 @@ class SeoSiteForm(RowPermissionsForm):
 
     class Meta:
         model = SeoSite
+        exclude = []
 
 
 class SiteRowPermissionsForm(RowPermissionsForm):
@@ -483,6 +484,7 @@ class CustomPageForm(SiteRowPermissionsForm):
 
     class Meta:
         model = CustomPage
+        exclude = []
 
 
 class BillboardImageForm(SiteRowPermissionsForm):
@@ -523,6 +525,7 @@ class BillboardImageForm(SiteRowPermissionsForm):
 
     class Meta:
         model = BillboardImage
+        exclude = []
 
 
 class ConfigurationForm(RowPermissionsForm):
@@ -605,6 +608,7 @@ class ConfigurationForm(RowPermissionsForm):
 class BusinessUnitForm(SeoSiteReverseForm):
     class Meta:
         model = BusinessUnit
+        exclude = []
 
     def __init__(self, *args, **kwargs):
         super(BusinessUnitForm, self).__init__(*args, **kwargs)
@@ -671,31 +675,37 @@ class CompanyForm(SeoSiteReverseForm):
                                                 widget=job_source_ids_widget)
     class Meta:
         model = Company
+        exclude = []
 
 
 class SpecialCommitmentForm(SeoSiteReverseForm):
     class Meta:
         model = SpecialCommitment
+        exclude = []
 
 
 class SiteTagForm(forms.ModelForm):
     class Meta:
         model = SiteTag
+        exclude = []
 
 
 class GoogleAnalyticsCampaignForm(SeoSiteReverseForm):
     class Meta:
         model = GoogleAnalyticsCampaign
+        exclude = []
 
 
 class ATSSourceCodeForm(SeoSiteReverseForm):
     class Meta:
         model = ATSSourceCode
+        exclude = []
 
 
 class ViewSourceForm(SeoSiteReverseForm):
     class Meta:
         model = ViewSource
+        exclude = []
 
 
 class UploadJobFileForm(forms.Form):

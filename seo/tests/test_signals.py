@@ -10,7 +10,9 @@ class SignalsTestCase(DirectSEOBase):
         super(SignalsTestCase, self).setUp()
         self.prod_configuration = factories.ConfigurationFactory.build(status=2)
         self.staging_configuration = factories.ConfigurationFactory.build(status=1)
+        self.prod_configuration.group.save()
         self.prod_configuration.save()
+        self.staging_configuration.group.save()
         self.staging_configuration.save()
 
         self.company = factories.CompanyFactory.build(canonical_microsite='http://buckconsultants.jobs')

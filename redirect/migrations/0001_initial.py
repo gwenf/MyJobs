@@ -1,114 +1,172 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Redirect'
-        db.create_table(u'redirect_redirect', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('guid', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32)),
-            ('canonical_microsite', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['redirect.CanonicalMicrosite'])),
-            ('uid', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('new_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('expired_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'redirect', ['Redirect'])
+    dependencies = [
+    ]
 
-        # Adding model 'ATSSourceCode'
-        db.create_table(u'redirect_atssourcecode', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('ats_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('parameter_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('parameter_value', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal(u'redirect', ['ATSSourceCode'])
-
-        # Adding model 'CanonicalMicrosite'
-        db.create_table(u'redirect_canonicalmicrosite', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('buid', self.gf('django.db.models.fields.IntegerField')()),
-            ('canonical_microsite_url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-        ))
-        db.send_create_signal(u'redirect', ['CanonicalMicrosite'])
-
-        # Adding model 'RedirectAction'
-        db.create_table(u'redirect_redirectaction', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('canonical_microsite', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['redirect.CanonicalMicrosite'])),
-            ('view_source', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['redirect.ViewSource'])),
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal(u'redirect', ['RedirectAction'])
-
-        # Adding model 'ViewSource'
-        db.create_table(u'redirect_viewsource', (
-            ('viewsource_id', self.gf('django.db.models.fields.IntegerField')(default=0, primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('microsite', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal(u'redirect', ['ViewSource'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Redirect'
-        db.delete_table(u'redirect_redirect')
-
-        # Deleting model 'ATSSourceCode'
-        db.delete_table(u'redirect_atssourcecode')
-
-        # Deleting model 'CanonicalMicrosite'
-        db.delete_table(u'redirect_canonicalmicrosite')
-
-        # Deleting model 'RedirectAction'
-        db.delete_table(u'redirect_redirectaction')
-
-        # Deleting model 'ViewSource'
-        db.delete_table(u'redirect_viewsource')
-
-
-    models = {
-        u'redirect.atssourcecode': {
-            'Meta': {'object_name': 'ATSSourceCode'},
-            'ats_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parameter_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'parameter_value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        u'redirect.canonicalmicrosite': {
-            'Meta': {'object_name': 'CanonicalMicrosite'},
-            'buid': ('django.db.models.fields.IntegerField', [], {}),
-            'canonical_microsite_url': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        u'redirect.redirect': {
-            'Meta': {'object_name': 'Redirect'},
-            'canonical_microsite': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['redirect.CanonicalMicrosite']"}),
-            'expired_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'guid': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'new_date': ('django.db.models.fields.DateTimeField', [], {}),
-            'uid': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200'})
-        },
-        u'redirect.redirectaction': {
-            'Meta': {'object_name': 'RedirectAction'},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'canonical_microsite': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['redirect.CanonicalMicrosite']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'view_source': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['redirect.ViewSource']"})
-        },
-        u'redirect.viewsource': {
-            'Meta': {'object_name': 'ViewSource'},
-            'microsite': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'viewsource_id': ('django.db.models.fields.IntegerField', [], {'default': '0', 'primary_key': 'True'})
-        }
-    }
-
-    complete_apps = ['redirect']
+    operations = [
+        migrations.CreateModel(
+            name='ATSSourceCode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('buid', models.IntegerField(default=0)),
+                ('ats_name', models.CharField(max_length=255)),
+                ('parameter_name', models.CharField(max_length=255)),
+                ('parameter_value', models.CharField(max_length=255)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='CanonicalMicrosite',
+            fields=[
+                ('buid', models.IntegerField(default=0, serialize=False, primary_key=True)),
+                ('canonical_microsite_url', models.URLField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='CompanyEmail',
+            fields=[
+                ('buid', models.IntegerField(serialize=False, primary_key=True)),
+                ('email', models.EmailField(max_length=254)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='CustomExcludedViewSource',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('buid', models.IntegerField(help_text='Business unit id that wants a custom exclusion')),
+                ('view_source', models.IntegerField(help_text='View source that should be excluded')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DestinationManipulation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('action_type', models.IntegerField(help_text='Always 1 or 2')),
+                ('buid', models.IntegerField(help_text='Business unit ID that owns this manipulation')),
+                ('view_source', models.IntegerField(help_text='View source ID for aparticular manipulation')),
+                ('action', models.CharField(default=b'sourcecodetag', choices=[(b'sourcecodetag', b'sourcecodetag'), (b'amptoamp', b'amptoamp'), (b'cframe', b'cframe'), (b'anchorredirectissue', b'anchorredirectissue'), (b'urlswap', b'urlswap'), (b'replacethenadd', b'replacethenadd'), (b'replacethenaddpre', b'replacethenaddpre'), (b'sourceurlwrapappend', b'sourceurlwrapappend'), (b'sourcecodeinsertion', b'sourcecodeinsertion'), (b'sourceurlwrapunencoded', b'sourceurlwrapunencoded'), (b'sourceurlwrapunencodedappend', b'sourceurlwrapunencodedappend'), (b'switchlastinstance', b'switchlastinstance'), (b'switchlastthenadd', b'switchlastthenadd'), (b'sourcecodeswitch', b'sourcecodeswitch'), (b'doubleclickunwind', b'doubleclickunwind'), (b'fixurl', b'fixurl')], max_length=255, blank=True, help_text='String describing what type of manipulation is to occur', null=True)),
+                ('value_1', models.TextField(blank=True)),
+                ('value_2', models.TextField(blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='EmailRedirectLog',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('from_addr', models.EmailField(max_length=254)),
+                ('to_guid', models.CharField(max_length=38)),
+                ('buid', models.IntegerField()),
+                ('to_addr', models.EmailField(max_length=254)),
+                ('sent', models.DateTimeField(auto_now_add=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ExcludedViewSource',
+            fields=[
+                ('view_source', models.IntegerField(help_text='This view source will not redirect to a microsite', serialize=False, primary_key=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Redirect',
+            fields=[
+                ('guid', models.CharField(help_text='42-character hex string', max_length=42, serialize=False, primary_key=True, db_index=True)),
+                ('buid', models.IntegerField(default=0, help_text='Business unit ID for a given job provider')),
+                ('uid', models.IntegerField(help_text="Unique id on partner's ATS or other job repository", unique=True, null=True, blank=True)),
+                ('url', models.TextField(help_text='URL being manipulated')),
+                ('new_date', models.DateTimeField(help_text='Date that this job was added')),
+                ('expired_date', models.DateTimeField(help_text='Date that this job was marked as expired', null=True, db_index=True, blank=True)),
+                ('job_location', models.CharField(max_length=255, blank=True)),
+                ('job_title', models.CharField(max_length=255, blank=True)),
+                ('company_name', models.TextField(blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='RedirectAction',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('buid', models.IntegerField(default=0)),
+                ('action', models.IntegerField(default=0, choices=[(0, b'sourcecodetag'), (1, b'amptoamp'), (2, b'cframe'), (3, b'anchorredirectissue'), (4, b'urlswap'), (5, b'replacethenadd'), (6, b'replacethenaddpre'), (7, b'sourceurlwrapappend'), (8, b'sourcecodeinsertion'), (9, b'sourceurlwrapunencoded'), (10, b'sourceurlwrapunencodedappend'), (11, b'switchlastinstance'), (12, b'switchlastthenadd'), (13, b'sourcecodeswitch'), (14, b'doubleclickunwind'), (15, b'fixurl')])),
+            ],
+        ),
+        migrations.CreateModel(
+            name='RedirectArchive',
+            fields=[
+                ('guid', models.CharField(help_text='42-character hex string', max_length=42, serialize=False, primary_key=True, db_index=True)),
+                ('buid', models.IntegerField(default=0, help_text='Business unit ID for a given job provider')),
+                ('uid', models.IntegerField(help_text="Unique id on partner's ATS or other job repository", unique=True, null=True, blank=True)),
+                ('url', models.TextField(help_text='URL being manipulated')),
+                ('new_date', models.DateTimeField(help_text='Date that this job was added')),
+                ('expired_date', models.DateTimeField(help_text='Date that this job was marked as expired', null=True, db_index=True, blank=True)),
+                ('job_location', models.CharField(max_length=255, blank=True)),
+                ('job_title', models.CharField(max_length=255, blank=True)),
+                ('company_name', models.TextField(blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='ViewSource',
+            fields=[
+                ('view_source_id', models.IntegerField(default=None, serialize=False, primary_key=True, blank=True)),
+                ('name', models.CharField(max_length=255, blank=True)),
+                ('friendly_name', models.CharField(max_length=255, blank=True)),
+                ('microsite', models.BooleanField(default=False, help_text='Defunct; Use CanonicalMicrosite')),
+                ('include_ga_params', models.BooleanField(default=False, help_text='Enables addition of Google Analytics parameters')),
+                ('view_source_type', models.IntegerField(default=0)),
+            ],
+            options={
+                'get_latest_by': 'view_source_id',
+            },
+        ),
+        migrations.CreateModel(
+            name='ViewSourceGroup',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='Name of this view source group')),
+                ('view_source', models.ManyToManyField(to='redirect.ViewSource')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='redirectaction',
+            name='view_source',
+            field=models.ForeignKey(to='redirect.ViewSource'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='destinationmanipulation',
+            unique_together=set([('action_type', 'buid', 'view_source')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='customexcludedviewsource',
+            unique_together=set([('buid', 'view_source')]),
+        ),
+        migrations.AlterIndexTogether(
+            name='customexcludedviewsource',
+            index_together=set([('buid', 'view_source')]),
+        ),
+        migrations.AddField(
+            model_name='atssourcecode',
+            name='view_source',
+            field=models.ForeignKey(to='redirect.ViewSource', null=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='redirectaction',
+            unique_together=set([('buid', 'view_source', 'action')]),
+        ),
+        migrations.AlterIndexTogether(
+            name='redirectaction',
+            index_together=set([('buid', 'view_source')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='atssourcecode',
+            unique_together=set([('ats_name', 'parameter_name', 'parameter_value', 'buid', 'view_source')]),
+        ),
+    ]

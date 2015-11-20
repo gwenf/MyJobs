@@ -48,6 +48,7 @@ def generate_custom_widgets(model):
 
 class NameForm(BaseUserForm):
     class Meta:
+        exclude = []
         # form_name is used in the templates to render the form header
         form_name = _("Personal Information")
         model = Name
@@ -56,6 +57,7 @@ class NameForm(BaseUserForm):
 
 class SecondaryEmailForm(BaseUserForm):
     class Meta:
+        exclude = []
         form_name = _("Secondary Email")
         model = SecondaryEmail
         widgets = generate_custom_widgets(model)
@@ -75,6 +77,7 @@ class EducationForm(BaseUserForm):
         self.fields['end_date'].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
+        exclude = []
         form_name = _("Education")
         model = Education
         widgets = generate_custom_widgets(model)
@@ -89,6 +92,7 @@ class EmploymentHistoryForm(BaseUserForm):
         self.fields['end_date'].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
+        exclude = []
         form_name = _("Most Recent Work History")
         model = EmploymentHistory
         widgets = generate_custom_widgets(model)
@@ -109,6 +113,7 @@ class TelephoneForm(BaseUserForm):
         return country_dial
 
     class Meta:
+        exclude = []
         form_name = _("Phone Number")
         model = Telephone
         widgets = generate_custom_widgets(model)
@@ -124,6 +129,7 @@ class TelephoneForm(BaseUserForm):
 
 class AddressForm(BaseUserForm):
     class Meta:
+        exclude = []
         form_name = _("Address")
         model = Address
         widgets = generate_custom_widgets(model)
@@ -136,6 +142,7 @@ class MilitaryServiceForm(BaseUserForm):
         self.fields['service_end_date'].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
+        exclude = []
         form_name = _("Military Service History")
         model = MilitaryService
         widgets = generate_custom_widgets(model)
@@ -157,6 +164,7 @@ class MilitaryServiceForm(BaseUserForm):
 
 class LicenseForm(BaseUserForm):
     class Meta:
+        exclude = []
         form_name = _("License")
         model = License
         widgets = generate_custom_widgets(model)
@@ -164,6 +172,7 @@ class LicenseForm(BaseUserForm):
 
 class WebsiteForm(BaseUserForm):
     class Meta:
+        exclude = []
         form_name = _('Website')
         model = Website
         widgets = generate_custom_widgets(model)
@@ -172,6 +181,7 @@ class WebsiteForm(BaseUserForm):
 
 class SummaryForm(BaseUserForm):
     class Meta:
+        exclude = []
         form_name = _('Summary')
         model = Summary
         widgets = generate_custom_widgets(model)
@@ -185,6 +195,7 @@ class VolunteerHistoryForm(BaseUserForm):
         self.fields['end_date'].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
+        exclude = []
         form_name = _("Most Recent Volunteer History")
         model = VolunteerHistory
         widgets = generate_custom_widgets(model)
@@ -204,6 +215,7 @@ class InitialForm(BaseUserForm):
 
 class InitialNameForm(InitialForm):
     class Meta:
+        exclude = []
         model = Name
         fields = ['given_name', 'family_name']
 

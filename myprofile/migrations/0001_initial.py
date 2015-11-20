@@ -1,376 +1,186 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+import datetime
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'ProfileUnits'
-        db.create_table(u'myprofile_profileunits', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('date_updated', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'], null=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['myjobs.User'])),
-        ))
-        db.send_create_signal(u'myprofile', ['ProfileUnits'])
+    dependencies = [
+        ('contenttypes', '0002_remove_content_type_name'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Name'
-        db.create_table(u'myprofile_name', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('given_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('family_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('primary', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal(u'myprofile', ['Name'])
-
-        # Adding model 'Education'
-        db.create_table(u'myprofile_education', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('organization_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('degree_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('city_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('country_sub_division_code', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('education_level_code', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('start_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('education_score', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('degree_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('degree_major', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('degree_minor', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['Education'])
-
-        # Adding model 'Address'
-        db.create_table(u'myprofile_address', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=60, blank=True)),
-            ('address_line_one', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('address_line_two', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('city_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('country_sub_division_code', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('postal_code', self.gf('django.db.models.fields.CharField')(max_length=12, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['Address'])
-
-        # Adding model 'Telephone'
-        db.create_table(u'myprofile_telephone', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('channel_code', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-            ('country_dialing', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('area_dialing', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('number', self.gf('django.db.models.fields.CharField')(max_length=10, blank=True)),
-            ('extension', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('use_code', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['Telephone'])
-
-        # Adding model 'EmploymentHistory'
-        db.create_table(u'myprofile_employmenthistory', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('position_title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('organization_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('start_date', self.gf('django.db.models.fields.DateField')()),
-            ('current_indicator', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('city_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('country_sub_division_code', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3, null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('industry_code', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('job_category_code', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('onet_code', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['EmploymentHistory'])
-
-        # Adding model 'SecondaryEmail'
-        db.create_table(u'myprofile_secondaryemail', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('email', self.gf('django.db.models.fields.EmailField')(unique=True, max_length=255)),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
-            ('verified', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('verified_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['SecondaryEmail'])
-
-        # Adding model 'MilitaryService'
-        db.create_table(u'myprofile_militaryservice', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('branch', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('department', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('division', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('expertise', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('service_start_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('service_end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('start_rank', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('end_rank', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('campaign', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('honor', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['MilitaryService'])
-
-        # Adding model 'Website'
-        db.create_table(u'myprofile_website', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('display_text', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('uri', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('uri_active', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('description', self.gf('django.db.models.fields.TextField')(max_length=500, blank=True)),
-            ('site_type', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['Website'])
-
-        # Adding model 'License'
-        db.create_table(u'myprofile_license', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('license_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('license_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['License'])
-
-        # Adding model 'Summary'
-        db.create_table(u'myprofile_summary', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('headline', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('the_summary', self.gf('django.db.models.fields.TextField')(max_length=2000, blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['Summary'])
-
-        # Adding model 'VolunteerHistory'
-        db.create_table(u'myprofile_volunteerhistory', (
-            (u'profileunits_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['myprofile.ProfileUnits'], unique=True, primary_key=True)),
-            ('position_title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('organization_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('start_date', self.gf('django.db.models.fields.DateField')()),
-            ('current_indicator', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('city_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('country_sub_division_code', self.gf('django.db.models.fields.CharField')(max_length=5, blank=True)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal(u'myprofile', ['VolunteerHistory'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'ProfileUnits'
-        db.delete_table(u'myprofile_profileunits')
-
-        # Deleting model 'Name'
-        db.delete_table(u'myprofile_name')
-
-        # Deleting model 'Education'
-        db.delete_table(u'myprofile_education')
-
-        # Deleting model 'Address'
-        db.delete_table(u'myprofile_address')
-
-        # Deleting model 'Telephone'
-        db.delete_table(u'myprofile_telephone')
-
-        # Deleting model 'EmploymentHistory'
-        db.delete_table(u'myprofile_employmenthistory')
-
-        # Deleting model 'SecondaryEmail'
-        db.delete_table(u'myprofile_secondaryemail')
-
-        # Deleting model 'MilitaryService'
-        db.delete_table(u'myprofile_militaryservice')
-
-        # Deleting model 'Website'
-        db.delete_table(u'myprofile_website')
-
-        # Deleting model 'License'
-        db.delete_table(u'myprofile_license')
-
-        # Deleting model 'Summary'
-        db.delete_table(u'myprofile_summary')
-
-        # Deleting model 'VolunteerHistory'
-        db.delete_table(u'myprofile_volunteerhistory')
-
-
-    models = {
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'myjobs.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deactivate_type': ('django.db.models.fields.CharField', [], {'default': "'none'", 'max_length': '11'}),
-            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'gravatar': ('django.db.models.fields.EmailField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_disabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_verified': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'last_response': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'opt_in_employers': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'opt_in_myjobs': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'password_change': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'profile_completion': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'source': ('django.db.models.fields.CharField', [], {'default': "'https://secure.my.jobs'", 'max_length': '255'}),
-            'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/New_York'", 'max_length': '255'}),
-            'user_guid': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100', 'db_index': 'True'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"})
-        },
-        u'myprofile.address': {
-            'Meta': {'object_name': 'Address', '_ormbases': [u'myprofile.ProfileUnits']},
-            'address_line_one': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'address_line_two': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'city_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
-            'country_sub_division_code': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'label': ('django.db.models.fields.CharField', [], {'max_length': '60', 'blank': 'True'}),
-            'postal_code': ('django.db.models.fields.CharField', [], {'max_length': '12', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        u'myprofile.education': {
-            'Meta': {'object_name': 'Education', '_ormbases': [u'myprofile.ProfileUnits']},
-            'city_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
-            'country_sub_division_code': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'degree_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'degree_major': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'degree_minor': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'degree_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'education_level_code': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'education_score': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'organization_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'})
-        },
-        u'myprofile.employmenthistory': {
-            'Meta': {'object_name': 'EmploymentHistory', '_ormbases': [u'myprofile.ProfileUnits']},
-            'city_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'null': 'True', 'blank': 'True'}),
-            'country_sub_division_code': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'current_indicator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'industry_code': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'job_category_code': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'onet_code': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'organization_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'position_title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {})
-        },
-        u'myprofile.license': {
-            'Meta': {'object_name': 'License', '_ormbases': [u'myprofile.ProfileUnits']},
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'license_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'license_type': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        u'myprofile.militaryservice': {
-            'Meta': {'object_name': 'MilitaryService', '_ormbases': [u'myprofile.ProfileUnits']},
-            'branch': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'campaign': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
-            'department': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'division': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'end_rank': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'expertise': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'honor': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'service_end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'service_start_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'start_rank': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
-        },
-        u'myprofile.name': {
-            'Meta': {'object_name': 'Name', '_ormbases': [u'myprofile.ProfileUnits']},
-            'family_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'given_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'primary': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        u'myprofile.profileunits': {
-            'Meta': {'object_name': 'ProfileUnits'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']", 'null': 'True'}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'date_updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['myjobs.User']"})
-        },
-        u'myprofile.secondaryemail': {
-            'Meta': {'object_name': 'SecondaryEmail', '_ormbases': [u'myprofile.ProfileUnits']},
-            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '255'}),
-            'label': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'verified': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'verified_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
-        },
-        u'myprofile.summary': {
-            'Meta': {'object_name': 'Summary', '_ormbases': [u'myprofile.ProfileUnits']},
-            'headline': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'the_summary': ('django.db.models.fields.TextField', [], {'max_length': '2000', 'blank': 'True'})
-        },
-        u'myprofile.telephone': {
-            'Meta': {'object_name': 'Telephone', '_ormbases': [u'myprofile.ProfileUnits']},
-            'area_dialing': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'channel_code': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'country_dialing': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
-            'extension': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'use_code': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'})
-        },
-        u'myprofile.volunteerhistory': {
-            'Meta': {'object_name': 'VolunteerHistory', '_ormbases': [u'myprofile.ProfileUnits']},
-            'city_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
-            'country_sub_division_code': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
-            'current_indicator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'organization_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'position_title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {})
-        },
-        u'myprofile.website': {
-            'Meta': {'object_name': 'Website', '_ormbases': [u'myprofile.ProfileUnits']},
-            'description': ('django.db.models.fields.TextField', [], {'max_length': '500', 'blank': 'True'}),
-            'display_text': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            u'profileunits_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['myprofile.ProfileUnits']", 'unique': 'True', 'primary_key': 'True'}),
-            'site_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'uri': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
-            'uri_active': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        }
-    }
-
-    complete_apps = ['myprofile']
+    operations = [
+        migrations.CreateModel(
+            name='ProfileUnits',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date_created', models.DateTimeField(default=datetime.datetime.now, editable=False)),
+                ('date_updated', models.DateTimeField(default=datetime.datetime.now, editable=False)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Address',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('address_line_one', models.CharField(help_text=b'ie 123 Main St', max_length=255, verbose_name='Address Line One', blank=True)),
+                ('address_line_two', models.CharField(help_text=b'ie apartment 1', max_length=255, verbose_name='Address Line Two', blank=True)),
+                ('city_name', models.CharField(help_text=b'ie Chicago, Washington, Dayton', max_length=255, verbose_name='City', blank=True)),
+                ('country_sub_division_code', models.CharField(help_text=b'ie NY, WA, DC', max_length=5, verbose_name='State/Region', blank=True)),
+                ('country_code', models.CharField(default=b'USA', max_length=3, verbose_name='Country', blank=True)),
+                ('postal_code', models.CharField(help_text=b'ie 90210, 12345-7890', max_length=12, verbose_name='Postal Code', blank=True)),
+                ('label', models.CharField(help_text=b'ie Home, Work, etc', max_length=60, verbose_name='Address Name', blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='Education',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('organization_name', models.CharField(max_length=255, verbose_name='institution', blank=True)),
+                ('degree_date', models.DateField(null=True, verbose_name='completion date', blank=True)),
+                ('city_name', models.CharField(max_length=255, verbose_name='city', blank=True)),
+                ('country_sub_division_code', models.CharField(max_length=5, verbose_name='State/Region', blank=True)),
+                ('country_code', models.CharField(max_length=3, verbose_name='country', blank=True)),
+                ('education_level_code', models.IntegerField(blank=True, null=True, verbose_name='education level', choices=[(b'', 'Education Level'), (3, 'High School'), (4, 'Non-Degree Education'), (5, 'Associate'), (6, 'Bachelor'), (7, 'Master'), (8, 'Doctoral')])),
+                ('start_date', models.DateField(null=True, blank=True)),
+                ('end_date', models.DateField(null=True, blank=True)),
+                ('education_score', models.CharField(max_length=255, verbose_name='GPA', blank=True)),
+                ('degree_name', models.CharField(max_length=255, verbose_name='degree type', blank=True)),
+                ('degree_major', models.CharField(max_length=255, verbose_name='major', blank=True)),
+                ('degree_minor', models.CharField(max_length=255, verbose_name='minor', blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='EmploymentHistory',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('position_title', models.CharField(max_length=255, verbose_name='Position Title')),
+                ('organization_name', models.CharField(max_length=255, verbose_name='Company', blank=True)),
+                ('start_date', models.DateField(verbose_name='Start Date')),
+                ('current_indicator', models.BooleanField(default=False, verbose_name='I still work here')),
+                ('end_date', models.DateField(null=True, blank=True)),
+                ('city_name', models.CharField(max_length=255, null=True, blank=True)),
+                ('country_sub_division_code', models.CharField(max_length=5, verbose_name='State/Region', blank=True)),
+                ('country_code', models.CharField(max_length=3, null=True, verbose_name='country', blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('industry_code', models.CharField(verbose_name='industry', max_length=255, null=True, editable=False, blank=True)),
+                ('job_category_code', models.CharField(verbose_name='job category', max_length=255, null=True, editable=False, blank=True)),
+                ('onet_code', models.CharField(max_length=255, null=True, editable=False, blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='License',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('license_name', models.CharField(max_length=255, verbose_name=b'License Name')),
+                ('license_type', models.CharField(max_length=255, verbose_name=b'License Type')),
+                ('description', models.CharField(max_length=255, verbose_name=b'Description', blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='MilitaryService',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('country_code', models.CharField(max_length=3, verbose_name='Country', blank=True)),
+                ('branch', models.CharField(max_length=255, verbose_name=b'Branch')),
+                ('department', models.CharField(max_length=255, verbose_name=b'Department', blank=True)),
+                ('division', models.CharField(max_length=255, verbose_name=b'Division', blank=True)),
+                ('expertise', models.CharField(max_length=255, verbose_name=b'Expertise', blank=True)),
+                ('service_start_date', models.DateField(null=True, verbose_name='Start Date', blank=True)),
+                ('service_end_date', models.DateField(null=True, verbose_name='End Date', blank=True)),
+                ('start_rank', models.CharField(max_length=50, verbose_name='Start Rank', blank=True)),
+                ('end_rank', models.CharField(max_length=50, verbose_name='End Rank', blank=True)),
+                ('campaign', models.CharField(max_length=255, verbose_name=b'Campaign', blank=True)),
+                ('honor', models.CharField(max_length=255, verbose_name=b'Honors', blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='Name',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('given_name', models.CharField(max_length=30, verbose_name='first name')),
+                ('family_name', models.CharField(max_length=30, verbose_name='last name')),
+                ('primary', models.BooleanField(default=False, verbose_name='Is primary name?')),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='SecondaryEmail',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('email', models.EmailField(unique=True, max_length=255, error_messages={b'unique': b'This email is already registered.'})),
+                ('label', models.CharField(max_length=30, null=True, blank=True)),
+                ('verified', models.BooleanField(default=False, editable=False)),
+                ('verified_date', models.DateTimeField(null=True, editable=False, blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='Summary',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('headline', models.CharField(help_text=b'How you describe your profession. ie "Experienced accounting professional"', max_length=100, verbose_name=b'Headline')),
+                ('the_summary', models.TextField(help_text=b'A short summary of your strength and career to date.', max_length=2000, verbose_name=b'Summary', blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='Telephone',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('channel_code', models.CharField(max_length=30, editable=False, blank=True)),
+                ('country_dialing', models.CharField(max_length=3, verbose_name='Country Code', blank=True)),
+                ('area_dialing', models.CharField(max_length=5, verbose_name='Area Code', blank=True)),
+                ('number', models.CharField(max_length=10, verbose_name='Local Number', blank=True)),
+                ('extension', models.CharField(max_length=5, blank=True)),
+                ('use_code', models.CharField(blank=True, max_length=30, verbose_name='Phone Type', choices=[(b'', b'Phone Type'), (b'Home', b'Home'), (b'Work', b'Work'), (b'Mobile', b'Mobile'), (b'Pager', b'Pager'), (b'Fax', b'Fax'), (b'Other', b'Other')])),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='VolunteerHistory',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('position_title', models.CharField(max_length=255, verbose_name='Position Title')),
+                ('organization_name', models.CharField(max_length=255, verbose_name='Organization')),
+                ('start_date', models.DateField(verbose_name='Start Date')),
+                ('current_indicator', models.BooleanField(default=False, verbose_name='I still volunteer here')),
+                ('end_date', models.DateField(null=True, blank=True)),
+                ('city_name', models.CharField(max_length=255, blank=True)),
+                ('country_sub_division_code', models.CharField(max_length=5, verbose_name='State/Region', blank=True)),
+                ('country_code', models.CharField(max_length=3, verbose_name='country', blank=True)),
+                ('description', models.TextField(blank=True)),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.CreateModel(
+            name='Website',
+            fields=[
+                ('profileunits_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='myprofile.ProfileUnits')),
+                ('display_text', models.CharField(max_length=50, verbose_name=b'Display Text', blank=True)),
+                ('uri', models.URLField(verbose_name=b'Web Address')),
+                ('uri_active', models.BooleanField(default=False, verbose_name=b'Currently active?')),
+                ('description', models.TextField(max_length=500, verbose_name=b'Site Description', blank=True)),
+                ('site_type', models.CharField(blank=True, max_length=50, verbose_name=b'Type of Site', choices=[(b'personal', b'Personal'), (b'portfolio', b'Portfolio of my work'), (b'created', b'Site I created or helped create'), (b'association', b'Group or Association'), (b'social', b'Social media'), (b'other', b'Other')])),
+            ],
+            bases=('myprofile.profileunits',),
+        ),
+        migrations.AddField(
+            model_name='profileunits',
+            name='content_type',
+            field=models.ForeignKey(editable=False, to='contenttypes.ContentType', null=True),
+        ),
+        migrations.AddField(
+            model_name='profileunits',
+            name='user',
+            field=models.ForeignKey(editable=False, to=settings.AUTH_USER_MODEL),
+        ),
+    ]

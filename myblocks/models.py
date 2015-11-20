@@ -12,7 +12,6 @@ from django.db import models
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template import Context, Template, RequestContext
-from django.template.loaders.filesystem import Loader
 from django.utils.safestring import mark_safe
 
 from myblocks import context_tools
@@ -57,8 +56,7 @@ def raw_base_head(obj):
              containing the base_head template. Otherwise a blank string.
     """
     if obj.base_head:
-        loader = Loader()
-        return loader.load_template_source(obj.base_head)[0]
+        return Template(obj.base_head)
     return ''
 
 
@@ -69,8 +67,7 @@ def raw_base_template(obj):
     :param obj: A myblocks object with a valid base_template.
     :return: The base_template as a string.
     """
-    loader = Loader()
-    return loader.load_template_source(obj.base_template)[0]
+    return Template(obj.base_template)
 
 
 class Block(models.Model):

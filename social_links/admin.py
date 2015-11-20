@@ -54,6 +54,7 @@ class SocialLinkForm(ModelForm):
 
     class Meta:
         model = SocialLink
+        exclude = []
 
 
 class SocialLinkAdmin(admin.ModelAdmin):
@@ -160,6 +161,8 @@ class MicrositeCarouselForm(ModelForm):
 
     class Meta:
         model = MicrositeCarousel
+        exclude = []
+
 
 class MicrositeCarouselAdmin(admin.ModelAdmin):
     form = MicrositeCarouselForm

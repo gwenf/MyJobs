@@ -19,11 +19,13 @@ class BlockForm(forms.ModelForm):
 
 class ApplyLinkBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.ApplyLinkBlock
 
 
 class BreadboxBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.BreadboxBlock
 
 
@@ -35,76 +37,91 @@ class ColumnBlockForm(forms.ModelForm):
 
 class ContentBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.ContentBlock
 
 
 class FacetBlurbBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.FacetBlurbBlock
 
 
 class JobDetailBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.JobDetailBlock
 
 
 class JobDetailBreadboxBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.JobDetailBreadboxBlock
 
 
 class JobDetailHeaderBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.JobDetailHeaderBlock
 
 
 class LoginBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.LoginBlock
 
 
 class MoreButtonBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.MoreButtonBlock
 
 
 class RegistrationBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.RegistrationBlock
 
 
 class SavedSearchWidgetBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.SavedSearchWidgetBlock
 
 
 class SearchBoxBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.SearchBoxBlock
 
 
 class SearchFilterBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.SearchFilterBlock
 
 
 class SearchResultBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.SearchResultBlock
 
 
 class SearchResultHeaderBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.SearchResultBlock
 
 
 class ShareBlockForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.ShareBlock
 
 
 class VeteranSearchBoxForm(BlockForm):
     class Meta:
+        exclude = ('updated', )
         model = models.VeteranSearchBox
 
 

@@ -46,8 +46,18 @@ add_introspection_rules([], ["^seo\.models\.CommaSeparatedTextField"])
 
 
 class JobsByBuidManager(models.Manager):
+    def get_queryset(self):
+        print 'yo!'
+        1/0
+        queryset = super(JobsByBuidManager, self).get_queryset()
+        if settings.SITE_BUIDS:
+            return queryset.filter(buid__in=settings.SITE_BUIDS)
+        else:
+            return queryset
     def get_query_set(self):
-        queryset = super(JobsByBuidManager, self).get_query_set()
+        print 'yoo!'
+        2/0
+        queryset = super(JobsByBuidManager, self).get_queryset()
         if settings.SITE_BUIDS:
             return queryset.filter(buid__in=settings.SITE_BUIDS)
         else:

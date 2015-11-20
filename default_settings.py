@@ -74,18 +74,6 @@ STATICFILES_FINDERS = (
 
 ADMIN_MEDIA_PREFIX = '//d2e48ltfsb5exy.cloudfront.net/myjobs/admin/'
 
-TEMPLATE_DIRS = (
-    join(ROOT_PATH, 'templates')
-)
-
-TEMPLATE_LOADERS = (
-    ('django.template.loaders.cached.Loader', (
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
-        'django.template.loaders.eggs.Loader',
-    )),
-)
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -94,6 +82,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',  # http auth
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
@@ -243,18 +232,36 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            join(ROOT_PATH, 'templates'),
+        ],
+        'APP_DIRS': False,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.i18n',
+                'django.core.context_processors.media',
+                'django.core.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.request',
+                'myjobs.context_processors.current_site_info',
+                'myjobs.context_processors.absolute_url',
+            ],
+            'loaders': [
+                ('django.template.loaders.cached.Loader', (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )),
+            ]
+        }
+    }
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.request',
-    'myjobs.context_processors.current_site_info',
-    'myjobs.context_processors.absolute_url',
-)
 
 INTERNAL_IPS = ('127.0.0.1', '216.136.63.6',)
 
@@ -273,7 +280,6 @@ INSTALLED_APPS = (
     'djcelery',
     'django_jenkins',
     'widget_tweaks',
-    'south',
     'django_nose',
     'tastypie',
     'captcha',
@@ -303,7 +309,6 @@ PROJECT_APPS = ('myjobs', 'myprofile', 'mysearches', 'registration',
 INSTALLED_APPS += PROJECT_APPS
 
 JENKINS_TASKS = (
-    'django_jenkins.tasks.with_coverage',
     'django_jenkins.tasks.run_pep8',
     'django_jenkins.tasks.run_pyflakes',
 )
@@ -429,13 +434,6 @@ BOTS = ['agent', 'archive', 'ask', 'auto', 'bot', 'check', 'crawl',
 # A list of proected sites and the groups (by id) that are allowed
 # to access them. Copied from directseo.
 PROTECTED_SITES = {42751: [25803, ]}
-
-
-FIXTURE_DIRS = (
-    # the 'syncdb' command will check each of these directories for
-    # a file named 'initial_data[.json | .xml]' and load it into the DB
-    './deploy/',
-)
 
 
 # Default site settings

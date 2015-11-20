@@ -211,7 +211,7 @@ def save_primary(sender, instance, created, **kwargs):
     user = instance.user
     if len(Name.objects.filter(user=user)) == 1 and created:
         try:
-            user.profileunits_set.get(content_type__name="name",
+            user.profileunits_set.get(content_type__model="name",
                                       name__primary=True)
         except ProfileUnits.DoesNotExist:
             instance.primary = True
@@ -479,12 +479,16 @@ class SecondaryEmail(ProfileUnits):
         """
 
         primary = kwargs.pop('old_primary', None)
+        send = False
         if not self.pk and not self.verified and primary is None:
+            send = True
+        super(SecondaryEmail, self).save(*args, **kwargs)
+
+        if send:
             reg_signals.email_created.send(sender=self, user=self.user,
                                            email=self.email)
             reg_signals.send_activation.send(sender=self, user=self.user,
                                              email=self.email)
-        super(SecondaryEmail, self).save(*args, **kwargs)
 
     def set_as_primary(self):
         """
@@ -655,7 +659,7 @@ class Summary(ProfileUnits):
     def save(self, *args, **kwargs):
         try:
             summary_model = self.user.profileunits_set.get(
-                content_type__name="summary")
+                content_type__model="summary")
         except ProfileUnits.DoesNotExist:
             summary_model = None
 

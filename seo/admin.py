@@ -338,6 +338,7 @@ class GoogleAnalyticsForm(forms.ModelForm):
 
     class Meta:
         model = GoogleAnalytics
+        exclude = []
 
 
 class GoogleAnalyticsAdmin(admin.ModelAdmin):
@@ -418,7 +419,7 @@ class RowPermissionsAdmin(admin.ModelAdmin):
         return self.form
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
         """The 'add' admin view for this model."""
         model = self.model
@@ -469,7 +470,7 @@ class RowPermissionsAdmin(admin.ModelAdmin):
                                        add=True)
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def change_view(self, request, object_id, extra_context=None):
         """The 'change' admin view for this model."""
         model = self.model
@@ -643,7 +644,7 @@ class BillboardImageAdmin(RowPermissionsAdmin):
     )
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
         """The 'add' admin view for this model."""
         model = self.model
@@ -664,7 +665,7 @@ class BillboardImageAdmin(RowPermissionsAdmin):
                 new_object = self.model()
             prefixes = {}
             self.inline_instances = check_inline_instance(self, request)
-            for FormSet, inline in zip(self.get_formsets(request), self.inline_instances):
+            for FormSet, inline in self.get_formsets_with_inlines(request):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
@@ -672,7 +673,7 @@ class BillboardImageAdmin(RowPermissionsAdmin):
                 formset = FormSet(data=request.POST, files=request.FILES,
                                   instance=new_object,
                                   save_as_new="_saveasnew" in request.POST,
-                                  prefix=prefix, queryset=inline.queryset(request))
+                                  prefix=prefix, queryset=inline.get_queryset(request))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, change=False)
@@ -696,14 +697,13 @@ class BillboardImageAdmin(RowPermissionsAdmin):
             form = self.form(user=request.user, initial=initial)
             prefixes = {}
             self.inline_instances = check_inline_instance(self, request)
-            for FormSet, inline in zip(self.get_formsets(request),
-                                       self.inline_instances):
+            for FormSet, inline in self.get_formsets_with_inlines(request):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(instance=self.model(), prefix=prefix,
-                                  queryset=inline.queryset(request))
+                                  queryset=inline.get_queryset(request))
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
@@ -737,7 +737,7 @@ class BillboardImageAdmin(RowPermissionsAdmin):
                                        add=True)
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def change_view(self, request, object_id, extra_context=None):
         """The 'change' admin view for this model."""
         model = self.model
@@ -923,7 +923,7 @@ class SeoSiteAdmin(ForeignKeyAutocompleteAdmin):
         return actions
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
         """The 'add' admin view for this model."""
         model = self.model
@@ -1024,7 +1024,7 @@ class SeoSiteAdmin(ForeignKeyAutocompleteAdmin):
                                        add=True)
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def change_view(self, request, object_id, extra_context=None):
         """The 'change' admin view for this model."""
         model = self.model

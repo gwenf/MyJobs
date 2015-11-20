@@ -141,10 +141,9 @@ class SearchParameterManager(models.Manager):
         """
         super(SearchParameterManager, self).__init__()
         self._archived = archived
-        self._query_set = SearchParameterQuerySet
 
     def get_query_set(self):
-        qs = self._query_set(self.model, using=self._db)
+        qs = SearchParameterQuerySet(model=self.model, using=self._db)
         # At the time of writing, this manager is used on models that don't
         # have the ability to be archived. This isn't a perfect solution
         # but changing everything is a bit out of scope at the moment.
@@ -258,7 +257,7 @@ class Contact(ArchivedModel):
             return self.email
         return 'Contact object'
 
-    natural_key = __unicode__
+    #natural_key = __unicode__
 
     def delete(self, *args, **kwargs):
         pre_delete.send(sender=Contact, instance=self, using='default')
@@ -589,9 +588,8 @@ class ContactRecordQuerySet(SearchParameterQuerySet):
 
 
 class ContactRecordManager(SearchParameterManager):
-    def __init__(self, *args, **kwargs):
-        super(ContactRecordManager, self).__init__(*args, **kwargs)
-        self._query_set = ContactRecordQuerySet
+    def get_queryset(self):
+        return ContactRecordQuerySet(self.model, using=self._db)
 
     def communication_activity(self):
         return self.get_query_set().communication_activity
@@ -727,40 +725,41 @@ MAX_ATTACHMENT_MB = 4
 S3_CONNECTION = 'S3Connection:s3.amazonaws.com'
 
 
-class PRMAttachment(models.Model):
+def get_file_name(self, filename):
+    """
+    Ensures that a file name is unique before uploading.
+    The PRMAttachment instance requires an extra attribute,
+    partner (a Partner instance) to be set in order to create the
+    file name.
 
-    def get_file_name(self, filename):
-        """
-        Ensures that a file name is unique before uploading.
-        The PRMAttachment instance requires an extra attribute,
-        partner (a Partner instance) to be set in order to create the
-        file name.
+    """
+    filename, extension = path.splitext(filename)
+    filename = '.'.join([sub(r'[\W]', '', filename),
+                         sub(r'[\W]', '', extension)])
 
-        """
-        filename, extension = path.splitext(filename)
-        filename = '.'.join([sub(r'[\W]', '', filename),
-                             sub(r'[\W]', '', extension)])
+    # If the uploaded file only contains invalid characters the end
+    # result will be a file named "."
+    if not filename or filename == '.':
+        filename = 'unnamed_file'
 
-        # If the uploaded file only contains invalid characters the end
-        # result will be a file named "."
-        if not filename or filename == '.':
-            filename = 'unnamed_file'
+    uid = uuid4()
+    path_addon = "mypartners/%s/%s/%s" % (self.partner.owner.pk,
+                                          self.partner.pk, uid)
+    name = "%s/%s" % (path_addon, filename)
 
+    # Make sure that in the unlikely event that a filepath/uid/filename
+    # combination isn't actually unique a new unique id
+    # is generated.
+    while default_storage.exists(name):
         uid = uuid4()
-        path_addon = "mypartners/%s/%s/%s" % (self.partner.owner.pk,
-                                              self.partner.pk, uid)
+        path_addon = "mypartners/%s/%s/%s" % (self.partner.owner,
+                                              self.partner.name, uid)
         name = "%s/%s" % (path_addon, filename)
 
-        # Make sure that in the unlikely event that a filepath/uid/filename
-        # combination isn't actually unique a new unique id
-        # is generated.
-        while default_storage.exists(name):
-            uid = uuid4()
-            path_addon = "mypartners/%s/%s/%s" % (self.partner.owner,
-                                                  self.partner.name, uid)
-            name = "%s/%s" % (path_addon, filename)
+    return name
 
-        return name
+
+class PRMAttachment(models.Model):
 
     attachment = models.FileField(upload_to=get_file_name, blank=True,
                                   null=True, max_length=767)

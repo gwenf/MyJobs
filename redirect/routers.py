@@ -37,14 +37,15 @@ class ArchiveRouter(object):
             return False
         return None
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         """
         Make sure the RedirectArchive model only appears in the "archive"
         database.
 
         """
+        is_archive = hints.get('model') == RedirectArchive
         if db == "archive":
-            return model == RedirectArchive
-        elif model == RedirectArchive:
+            return app_label == 'redirect'
+        elif is_archive:
             return False
         return None

@@ -120,6 +120,7 @@ class DigestForm(BaseUserForm):
 
     class Meta:
         model = SavedSearchDigest
+        exclude = []
 
 
 def partner_email_choices(partner):

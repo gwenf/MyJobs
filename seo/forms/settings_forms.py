@@ -8,6 +8,7 @@ from universal.helpers import get_company_or_404
 class SeoSiteSettingsForm(RequestForm):
     class Meta:
         model = SeoSite
+        exclude = []
 
 
 class EmailDomainForm(forms.Form):

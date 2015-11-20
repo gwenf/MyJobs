@@ -387,7 +387,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             color = get_completion(self.profile_completion)
 
             try:
-                text = self.profileunits_set.get(content_type__name="name",
+                text = self.profileunits_set.get(content_type__model="name",
                                                  name__primary=True).name
                 if not text.given_name and not text.family_name:
                     text = self.email[0]
@@ -534,7 +534,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         try:
             name_obj = self.profileunits_set.filter(
-                content_type__name="name").get(name__primary=True)
+                content_type__model="name").get(name__primary=True)
         except ObjectDoesNotExist:
             name_obj = None
 

@@ -134,7 +134,7 @@ def handle_form(request):
             if data_dict['module'] == 'Summary':
                 try:
                     summary = request.user.profileunits_set.get(
-                        content_type__name='summary')
+                        content_type__model='summary')
                 except ProfileUnits.DoesNotExist:
                     summary = None
                 if summary:

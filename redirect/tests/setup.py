@@ -2,7 +2,6 @@ import os
 import sys
 
 from django.core.management import call_command
-from django.core.urlresolvers import clear_url_caches
 from django.db import connections
 from django.test import TransactionTestCase
 from django.conf import settings
@@ -12,6 +11,8 @@ import secrets
 
 
 class RedirectBase(TransactionTestCase):
+    urls = 'redirect_urls'
+
     def setUp(self):
         super(RedirectBase, self).setUp()
         self._middleware_classes = settings.MIDDLEWARE_CLASSES
@@ -19,18 +20,16 @@ class RedirectBase(TransactionTestCase):
 
         # Set some settings that don't get set when not using redirect
         # settings.
-        settings.ROOT_URLCONF = 'redirect_urls'
         settings.PROJECT = 'redirect'
         settings.MIDDLEWARE_CLASSES = redirect_settings.MIDDLEWARE_CLASSES
         settings.SOLR['default'] = 'http://127.0.0.1:8983/solr/seo/'
         settings.options = secrets.options
         settings.my_agent_auth = secrets.my_agent_auth
-        clear_url_caches()
 
         stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
         fixture = os.path.join(settings.PROJECT_PATH,
-                               'redirect/migrations/excluded_view_sources.json')
+                               'redirect/south_migrations/excluded_view_sources.json')
         try:
             # This makes lots of output that we don't care about; suppress it.
             call_command("loaddata",

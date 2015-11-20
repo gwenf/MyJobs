@@ -7,8 +7,8 @@ from selenium import webdriver
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
 from django.core.urlresolvers import reverse
+from django.test import TestCase, skipUnless
 from django.utils import unittest
-from django.utils.unittest.case import TestCase, skipUnless
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions

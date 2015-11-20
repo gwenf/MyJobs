@@ -191,6 +191,7 @@ class ChangePasswordForm(Form):
 class UserAdminForm(ModelForm):
     class Meta:
         model = User
+        exclude = []
 
     # Used to update/change a password.
     new_password = CharField(label='New password', required=False)

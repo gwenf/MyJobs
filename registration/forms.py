@@ -144,6 +144,7 @@ class CustomPasswordResetForm(PasswordResetForm):
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
+             html_email_template_name=None,
              use_https=False, token_generator=default_token_generator,
              from_email=None, request=None):
         """
@@ -238,6 +239,7 @@ class RegistrationForm(forms.Form):
 class InvitationForm(forms.ModelForm):
     class Meta:
         model = Invitation
+        fields = ['inviting_company', 'invitee_email', 'added_permission']
 
     def clean_invitee_email(self):
         invitee_email = self.cleaned_data['invitee_email']

@@ -14,7 +14,7 @@ from tasks import task_clear_bu_cache
 class LocalCacheTestCase(DirectSEOTestCase):
     fixtures = ['seo_views_testdata.json']
 
-    def setUp(self):
+    def foosetUp(self):
         super(LocalCacheTestCase, self).setUp()
         self.locmem_cache = django.core.cache.get_cache(
             'django.core.cache.backends.locmem.LocMemCache')
@@ -39,7 +39,7 @@ class LocalCacheTestCase(DirectSEOTestCase):
         #                                        'get_cache',
         #                                        Mock(return_value=self.locmem_cache))
 
-    def tearDown(self):
+    def footearDown(self):
         super(DirectSEOTestCase, self).tearDown()
         for cache_patch in self.cache_patches:
             cache_patch.stop()
@@ -133,8 +133,7 @@ class LocalCacheTestCase(DirectSEOTestCase):
 
             # Build a site with billboard images to check the billboard's
             # caching behavior as well
-            site = factories.SeoSiteFactory.build(site_title='Initial Title')
-            site.save()
+            site = factories.SeoSiteFactory(site_title='Initial Title')
             config = factories.ConfigurationFactory.build(status=2,
                     show_home_microsite_carousel=True)
             config.save()

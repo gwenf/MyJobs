@@ -144,7 +144,7 @@ class MyProfileTests(MyJobsBase):
         primary_name2 = PrimaryNameFactory(user=self.user)
 
         num_results = self.user.profileunits_set.filter(
-            content_type__name='name').count()
+            content_type__model='name').count()
         self.assertEqual(num_results, 1)
 
     def test_different_primary_name(self):
@@ -258,7 +258,7 @@ class MyProfileTests(MyJobsBase):
         military_service.save()
 
         ms_object = ProfileUnits.objects.filter(
-            content_type__name="military service").count()
+            content_type__model="military service").count()
         self.assertEqual(ms_object, 1)
 
     def test_add_license(self):
@@ -266,7 +266,7 @@ class MyProfileTests(MyJobsBase):
         license_form.save()
 
         ms_object = ProfileUnits.objects.filter(
-            content_type__name="license").count()
+            content_type__model="license").count()
         self.assertEqual(ms_object, 1)
 
     def test_add_website(self):
@@ -274,7 +274,7 @@ class MyProfileTests(MyJobsBase):
         website_instance.save()
 
         ms_object = ProfileUnits.objects.filter(
-            content_type__name="website").count()
+            content_type__model="website").count()
         self.assertEqual(ms_object, 1)
 
     def test_add_summary(self):
@@ -282,7 +282,7 @@ class MyProfileTests(MyJobsBase):
         summary_instance.save()
 
         ms_object = ProfileUnits.objects.filter(
-            content_type__name="summary").count()
+            content_type__model="summary").count()
         self.assertEqual(ms_object, 1)
 
     def test_add_volunteer_history(self):
@@ -290,7 +290,7 @@ class MyProfileTests(MyJobsBase):
         vh_instance.save()
 
         ms_object = ProfileUnits.objects.filter(
-            content_type__name="volunteer history").count()
+            content_type__model="volunteer history").count()
         self.assertEqual(ms_object, 1)
 
 

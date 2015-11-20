@@ -1379,10 +1379,10 @@ class EmailTests(MyPartnersTestCase):
 
 class PartnerLibraryTestCase(MyPartnersTestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         url = 'mypartners/tests/data/library.html'
 
-        super(PartnerLibraryTestCase, cls).setUpClass()
+        super(PartnerLibraryTestCase, self).setUpClass()
         for partner in get_library_partners(url):
             fullname = " ".join(" ".join([partner.first_name,
                                           partner.middle_name,
@@ -1390,7 +1390,7 @@ class PartnerLibraryTestCase(MyPartnersTestCase):
 
             if not PartnerLibrary.objects.filter(
                     contact_name=fullname, st=partner.st, city=partner.city):
-                PartnerLibrary(
+                PartnerLibrary.objects.create(
                     name=partner.organization_name, uri=partner.website,
                     region=partner.region, state=partner.state,
                     area=partner.area, contact_name=fullname,
@@ -1401,8 +1401,8 @@ class PartnerLibraryTestCase(MyPartnersTestCase):
                     zip_code=partner.zip_code, is_minority=partner.minority,
                     is_female=partner.female, is_disabled=partner.disabled,
                     is_disabled_veteran=partner.disabled_veteran,
-                    is_veteran=partner.veteran).save()
-        cls.partner_library = PartnerLibrary.objects.all()
+                    is_veteran=partner.veteran)
+        self.partner_library = PartnerLibrary.objects.all()
 
 
 class PartnerLibraryViewTests(PartnerLibraryTestCase):

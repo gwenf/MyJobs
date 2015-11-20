@@ -391,7 +391,7 @@ def export_csv(request, candidates, models_excluded=[], fields_excluded=[]):
     model_names = [model._meta.module_name for model in models]
     users_units = ProfileUnits.objects.filter(
         user__in=candidates).select_related('user', 'user__id', 'profileunits',
-                                            'content_type__name',
+                                            'content_type__model',
                                             *model_names).order_by('user')
     # Creating header for CSV
     headers = ["primary_email"]
@@ -501,7 +501,7 @@ def export_hr(request, candidates, export_type, models_excluded=[]):
     model_names = [model._meta.module_name for model in models]
     users_units = ProfileUnits.objects.filter(
         user__in=candidates).select_related('user', 'user__id', 'profileunits',
-                                            'content_type__name', *model_names)
+                                            'content_type__model', *model_names)
 
     # initial dict for grouped units
     gu = {}

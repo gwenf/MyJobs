@@ -105,21 +105,29 @@ def get_site_config(request):
     # If the configuration is not in cache, get it and set it for future
     # requests to this site.
     else:
+        kwargs = {}
+        if settings.SITE_BUIDS:
+            kwargs['buid__in'] = settings.SITE_BUIDS
+        import ipdb; ipdb.set_trace()
+        this_site = Configuration.objects.filter(**kwargs)
         if request.user.is_staff:
             try:
                 # if you are logged in as staff, try to grab the staging
                 # configuration
-                site_config = Configuration.this_site.get(status=1)
+                #site_config = Configuration.this_site.get(status=1)
+                site_config = this_site.get(status=1)
             except Configuration.DoesNotExist:
                 try:
                     # if there is no staging configuration, just grab the
                     # production one
-                    site_config = Configuration.this_site.get(status=2)
+                    #site_config = Configuration.this_site.get(status=2)
+                    site_config = this_site.get(status=2)
                 except Configuration.DoesNotExist:
                     # neither staging or production configs exist for this
                     # site so go to the
                     # default staging configuration
-                    site_config = Configuration.objects.get(id=1)
+                    #site_config = Configuration.objects.get(id=1)
+                    site_config = this_site.get(status=1)
         elif request.user.is_anonymous:
             try:
                 # grab the production configuration if the user isn't logged in

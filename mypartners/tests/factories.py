@@ -79,7 +79,7 @@ class ContactLogEntryFactory(factory.django.DjangoModelFactory):
     action_flag = 1
     contact_identifier = "Example Contact Log"
     content_type = factory.LazyAttribute(
-                       lambda a: ContentType.objects.get(name='contact'))
+                       lambda a: ContentType.objects.get(model='contact'))
 
 
 class TagFactory(factory.django.DjangoModelFactory):

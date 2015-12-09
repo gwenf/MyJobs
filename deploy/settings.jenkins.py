@@ -8,6 +8,9 @@ ABSOLUTE_URL = "/"
 PROJECT = 'myjobs'
 ENVIRONMENT = 'Jenkins'
 
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE_MANIFEST = 'manifest.json'
+
 DATABASES = {
     'default': {
         'NAME': 'redirect',

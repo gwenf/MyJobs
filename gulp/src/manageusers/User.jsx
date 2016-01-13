@@ -9,6 +9,7 @@ import {getCsrf} from 'util/cookie';
 
 import RolesMultiselect from './RolesMultiselect';
 import HelpText from './HelpText';
+import {ModalConfirm} from 'common/ui/ModalConfirm';
 
 class User extends React.Component {
   constructor(props) {
@@ -21,6 +22,7 @@ class User extends React.Component {
       availableRoles: [],
       assignedRoles: [],
       api_response_message: '',
+      confirmMessage: '',
     };
     // React components using ES6 no longer autobind 'this' to non React methods
     // Thank you: https://github.com/goatslacker/alt/issues/283
@@ -190,13 +192,23 @@ class User extends React.Component {
     }.bind(this));
   }
   handleDeleteUserClick() {
+    this.setState({
+      confirmMessage: 'Are you sure you want to delete this user?',
+    });
+  }
+  handleRejectedDeleteUser() {
+    this.setState({
+      confirmMessage: '',
+    });
+  }
+  handleConfirmedDeleteUser() {
     const history = this.props.history;
     // Temporary until I replace $.ajax jQuery with vanilla JS ES6 arrow function
     const self = this;
 
-    if (confirm('Are you sure you want to delete this user?') === false) {
-      return;
-    }
+    this.setState({
+      confirmMessage: '',
+    });
 
     const userId = this.props.params.userId;
 
@@ -222,6 +234,17 @@ class User extends React.Component {
         }
       }.bind(this));
   }
+  renderConfirm() {
+    const {confirmMessage} = this.state;
+    return (
+      <ModalConfirm
+        show={Boolean(confirmMessage)}
+        title="Confirmation Required"
+        message={confirmMessage}
+        onConfirm={() => this.handleConfirmedDeleteUser()}
+        onReject={() => this.handleRejectedDeleteUser()}/>
+    );
+  }
   render() {
     let deleteUserButton = '';
 
@@ -242,6 +265,7 @@ class User extends React.Component {
 
     return (
       <div>
+        {this.renderConfirm()}
         <div className="row">
           <div className="col-xs-12">
             <div className="wrapper-header">

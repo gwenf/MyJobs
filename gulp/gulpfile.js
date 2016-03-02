@@ -186,6 +186,8 @@ function lintOptions() {
     rules: {
       "babel/object-curly-spacing": 1,
       "babel/no-await-in-loop": 2,
+      // this allows use of confirm, which is currently acceptable
+      "no-alert": 0,
     },
   };
 }

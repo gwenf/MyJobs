@@ -19,6 +19,7 @@
     "babel-eslint": "^4.1.6",
     "babel-loader": "^5.4.0",
     "babel-runtime": "^5.8.25",
+    "calendar-base": "^0.2.1",
     "classnames": "^2.2.1",
     "es6-promise": "^3.0.2",
     "eslint": "^1.10.2",

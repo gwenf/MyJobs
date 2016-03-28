@@ -9,6 +9,7 @@ import {WizardFilterTags} from './WizardFilterTags';
 import {WizardFilterCollectedItems} from './WizardFilterCollectedItems';
 import {WizardFilterCityState} from './WizardFilterCityState';
 import {SearchInput} from 'common/ui/SearchInput';
+import CalendarPanelTest from 'reporting/CalendarPanelTest';
 
 export class WizardPageFilter extends Component {
   constructor() {
@@ -178,6 +179,7 @@ export class WizardPageFilter extends Component {
     return (
       <form>
         {this.renderRow('', 'head', <h2>Set Up Report</h2>)}
+        <CalendarPanelTest/>
         <hr/>
         {rows}
         <hr/>

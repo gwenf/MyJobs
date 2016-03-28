@@ -4597,3 +4597,29 @@ a.btn.pull-right {
     font-weight: bold;
     border: 2px solid #000;
 }
+
+.calendar-panel {
+  max-width: 300px;
+}
+
+.calendar-table {
+  width: 100%;
+}
+
+.calendar-table thead tr th,
+.calendar-table tbody tr td {
+  padding: 1rem;
+}
+
+
+.calendar-table tbody tr td.dim {
+  color: #888;
+}
+
+.calendar-table tbody tr td.in-range {
+  background-color: #bbb;
+}
+
+.calendar-table tbody tr td.selected {
+  background-color: #C6D6EA;
+}

@@ -669,8 +669,7 @@ class CompanyForm(SeoSiteReverseForm):
                                                 my_model=BusinessUnit,
                                                 required=False,
                                                 widget=job_source_ids_widget)
-    admin_email = forms.fields.EmailField(label='Admin Email',
-                                          required=False)
+    admin_email = forms.fields.EmailField(label='Admin Email', required=False)
 
     class Meta:
         model = Company
@@ -678,18 +677,13 @@ class CompanyForm(SeoSiteReverseForm):
     def __init__(self, *args, **kwargs):
         super(CompanyForm, self).__init__(*args, **kwargs)
         instance = kwargs.get('instance')
-        if instance and instance.first_invitation:
-            text = "Invitation sent to %s." % (
-                instance.first_invitation.invitee_email)
+        if instance and instance.role_set.filter(user__isnull=False).count():
+            attrs = {
+                "style": "border: 0; background: 'transparent'; width: 300px;",
+                "readonly": True, "onfocus": "this.blur()"}
             self.fields['admin_email'] = forms.fields.CharField(
-                initial=text,
-                widget=forms.widgets.TextInput(
-                    attrs={"style": "border: 0; "
-                                    "background: 'transparent'; "
-                                    "width: 300px;",
-                           "readonly": True,
-                           "onfocus": "this.blur()"
-                           }))
+                initial="An admin already exists for this company",
+                widget=forms.widgets.TextInput(attrs=attrs))
 
 
 class SpecialCommitmentForm(SeoSiteReverseForm):

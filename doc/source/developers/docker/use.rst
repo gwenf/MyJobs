@@ -206,16 +206,31 @@ Add other microsites as needed.
 Go to http://secure.my.jobs. You should have to click through a security
 warning.
 
-Run Gulp
-========
+Run Webpack Dev Server
+======================
 
-Gulp processes our JavaScript applications.
+Add to dev_settings.py::
+
+    WEBPACK_DEV_SERVER_BASE_URL = "https://secure.my.jobs:8080"
+    TEMPLATE_CONTEXT_PROCESSORS += (
+        'myjobs.context_processors.webpack_dev_setting',
+    )
+
+Run::
+
+    dkg npm run devserver
+
+Visit the webpack base url above in a browser. Accept the certificate.
+
+Visit a url using one of our JS bundles with a browser.
+
+Change a ``.jsx`` file displayed in the browser. It should auto-reload.
+
+
+Run Tests in the Background
+===========================
 
 From the root::
-
-    dkgg build
-
-To run continuously and build on any save::
 
     dkgg watch-tasks watch
 

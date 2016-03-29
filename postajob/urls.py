@@ -1,6 +1,12 @@
 from django.conf.urls import patterns, url
+from django.http import Http404
 
 from postajob import models, views
+
+
+def raise_404(*args, **kwargs):
+    # TODO: Fix FormViewBase so I don't have to do this
+    raise Http404("postajob.urls: Can't delete products")
 
 
 urlpatterns = patterns(
@@ -71,7 +77,7 @@ urlpatterns = patterns(
     url(r'^admin/product/$',  views.admin_products, name='product'),
     url(r'^admin/product/add/', views.ProductFormView.as_view(),
         name='product_add'),
-    url(r'^admin/product/delete/(?P<pk>\d+)/', views.ProductFormView.as_view(),
+    url(r'^admin/product/delete/(?P<pk>\d+)/', raise_404,
         name='product_delete'),
     url(r'^admin/product/update/(?P<pk>\d+)/', views.ProductFormView.as_view(),
         name='product_update'),

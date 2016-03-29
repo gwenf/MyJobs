@@ -342,13 +342,3 @@ class SeoSitePostAJobFiltersTestCase(DirectSEOBase):
         self.company.app_access.add(app_access)
 
         self.assertItemsEqual(self.company.enabled_access, ['Test Access'])
-
-    def test_first_invitation(self):
-        """
-        `Company.first_invitation` should return the first invitation created
-        for a company.
-
-        """
-        self.assertEqual(
-            self.company.first_invitation, Invitation.objects.filter(
-                inviting_company=self.company).order_by('-invited').first())

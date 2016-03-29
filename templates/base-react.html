@@ -73,6 +73,7 @@
 
   {% compress js %}
   <script type="text/javascript" src="{% static "utils.js" %}"></script>
+  <script type="text/javascript" src="{% static "custom.166-06.js" %}"></script>
   {% endcompress %}
 
 
@@ -82,7 +83,7 @@
 
 
       {% block topbar %}
-      {% include "includes/topbar-new.html" %}
+      {% include "includes/topbar.html" with topbar_class=" topbar-new" pop_menu_class="col-md-4" %}
       {% endblock %}
       <section>
           <div class="section subpage">
@@ -182,7 +183,6 @@
       Both of these contain a lot of custom jQuery. Rewrite using React as needed.
       TODO: Comment these out once the Manage Users app is using Darrin's API Class (then no need for jQuery)
       -->
-      <script type="text/javascript" src="{{ STATIC_URL }}custom.166-06.js{{ gz }}"></script>
 
       <!--
       <script type="text/javascript" src="{{ STATIC_URL }}my.jobs.160-30.js{{ gz }}"></script>

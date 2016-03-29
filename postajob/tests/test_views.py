@@ -9,7 +9,8 @@ from django.core.urlresolvers import reverse
 from seo.tests.setup import DirectSEOBase
 from mydashboard.tests.factories import (BusinessUnitFactory, CompanyFactory,
                                          SeoSiteFactory)
-from myjobs.tests.factories import UserFactory, RoleFactory
+from myjobs.tests.factories import (UserFactory, RoleFactory, AppAccessFactory,
+                                    ActivityFactory)
 from postajob.tests.factories import (ProductFactory,
                                       OfflinePurchaseFactory,
                                       OfflineProductFactory,
@@ -32,10 +33,30 @@ from universal.helpers import build_url
 class PostajobTestBase(DirectSEOBase):
     def setUp(self):
         super(PostajobTestBase, self).setUp()
+        self.posting_access = AppAccessFactory(name='Posting')
+        self.marketplace_access = AppAccessFactory(name='MarketPlace')
         self.user = UserFactory(password='5UuYquA@')
-        self.company = CompanyFactory(product_access=True, posting_access=True)
-        self.role = RoleFactory(company=self.company)
-        self.user.roles.add(self.role)
+        self.company = CompanyFactory(
+            app_access=[self.posting_access, self.marketplace_access],
+            product_access=True, posting_access=True)
+        self.posting_activities = [
+            ActivityFactory(name=activity, app_access=self.posting_access)
+            for activity in [
+                "create job", "read job", "update job",
+            ]
+        ]
+        self.marketplace_activities = [
+            ActivityFactory(name=activity, app_access=self.marketplace_access)
+            for activity in [
+                "create product", "read product", "update product",
+                "create grouping", "read grouping", "update grouping",
+                "delete grouping",
+            ]
+        ]
+        self.admin_role = RoleFactory(
+            company=self.company, name='Admin',
+            activities=self.posting_activities + self.marketplace_activities)
+        self.user.roles.add(self.admin_role)
 
         self.site = SeoSiteFactory(canonical_company=self.company)
         self.bu = BusinessUnitFactory()
@@ -1057,8 +1078,8 @@ class ViewTests(PostajobTestBase):
         Trying to access the admin pages for a site that is a part of a package
         which isn't own by a company to which you belong should raise a 404.
         """
-        self.role.company = CompanyFactory(pk=41, name="Wrong Company")
-        self.role.save()
+        self.admin_role.company = CompanyFactory(pk=41, name="Wrong Company")
+        self.admin_role.save()
 
         for page in ['view_job', 'view_invoice',
                      'purchasedmicrosite_admin_overview', 'admin_products',

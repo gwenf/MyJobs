@@ -127,6 +127,13 @@ class PageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         self.fields['head'].initial = models.raw_base_head(self.Meta.model)
+        # without this, we get two options for ''. Setting blank=False on the
+        # model also gets rid of the second option, but means that the blank
+        # opton can never be chosen
+        doc_type = self.fields['doc_type']
+        language_code = self.fields['language_code']
+        doc_type.choices = doc_type.choices[1:]
+        language_code.choices = language_code.choices[1:]
 
 
 class RowForm(forms.ModelForm):

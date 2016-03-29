@@ -443,7 +443,7 @@ class ToolsWidgetBlock(SecureBlock):
 
     """
     # temporarily use the current topbar template
-    base_template = 'myblocks/blocks/secure_blocks/tools.html'
+    base_template = 'includes/topbar.html'
 
     def context(self, request, **kwargs):
         """
@@ -461,9 +461,25 @@ class ToolsWidgetBlock(SecureBlock):
             except User.DoesNotExist:
                pass
 
+        caller = self.get_caller_info(request, **kwargs)
+        microsite_name = kwargs.get('site_name', caller)
         context['user'] = user
-
+        context['current_microsite_name'] = microsite_name
+        context['current_microsite_url'] = caller
         return context
+
+    def get_caller_info(self, request, **kwargs):
+        """
+        Get site info for caller site
+
+        """
+        caller = None
+        if request.META.get('HTTP_ORIGIN'):
+            caller = request.META.get('HTTP_ORIGIN')
+        elif request.META.get('HTTP_REFERER'):
+            parsed_url =  urlparse(request.META.get('HTTP_REFERER'))
+            caller = "%s://%s" % (parsed_url.scheme, parsed_url.netloc)
+        return caller
 
     def get_cookies(self, request, **kwargs):
         """
@@ -471,13 +487,7 @@ class ToolsWidgetBlock(SecureBlock):
 
         """
         cookies = []
-        caller = None
-        if request.META.get('HTTP_ORIGIN'):
-            caller = request.META.get('HTTP_ORIGIN')
-        elif request.META.get('HTTP_REFERER'):
-            parsed_url =  urlparse(request.META.get('HTTP_REFERER'))
-            caller = "%s://%s" % (parsed_url.scheme, parsed_url.netloc)
-
+        caller = self.get_caller_info(request, **kwargs)
         if caller:
             max_age = 30 * 24 * 60 * 60
             last_name = kwargs.get('site_name', caller)
@@ -489,15 +499,7 @@ class ToolsWidgetBlock(SecureBlock):
                             'value':last_name,
                             'max_age':max_age,
                             'domain':'.my.jobs'})
-
         return cookies
-
-    def required_js(self):
-        """
-        Return a list of all required javascript in URL format
-
-        """
-        return ['%ssecure-blocks/sb-tools.js' % settings.STATIC_URL]
 
 
 class SavedSearchWidgetBlock(SecureBlock):
@@ -785,10 +787,10 @@ class Page(models.Model):
 
     add_blank = lambda choices: (('', 'Inherit from Configuration'),) + choices
 
-    doc_type = models.CharField(max_length=255, blank=False,
+    doc_type = models.CharField(max_length=255, blank=True,
                                 choices=add_blank(DOCTYPE_CHOICES),
                                 default='')
-    language_code = models.CharField(max_length=16, blank=False,
+    language_code = models.CharField(max_length=16, blank=True,
                                      choices=add_blank(LANGUAGE_CODES_CHOICES),
                                      default='')
 

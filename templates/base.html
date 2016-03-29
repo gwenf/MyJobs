@@ -3,7 +3,6 @@
 {% load common_tags %}
 {% load compress %}
 {% load staticfiles %}
-{% gz as gz %}
 
 {% localtime on %}
 <!DOCTYPE html>
@@ -21,15 +20,16 @@
 
     {% block meta-extra %}{% endblock %}
 
-    <link href="{{ STATIC_URL }}def.ui.152-21.css{{ gz }}" rel="stylesheet" type="text/css">
-    <link href="{{ STATIC_URL }}my.jobs.170-2.css{{ gz }}" rel="stylesheet" type="text/css">
+    <link href="{{ STATIC_URL }}def.ui.152-21.css" rel="stylesheet" type="text/css">
+    <link href="{{ STATIC_URL }}my.jobs.170-2.css" rel="stylesheet" type="text/css">
     <!--[if IE]>
-    <link href="{{ STATIC_URL }}my.jobs.ie.163-29.css{{ gz }}" rel="stylesheet" type="text/css">
+    <link href="{{ STATIC_URL }}my.jobs.ie.163-29.css" rel="stylesheet" type="text/css">
     <![endif]-->
-    <link href="{{ STATIC_URL }}bootstrap/bootstrap-modal.css{{ gz }}" rel="stylesheet" type="text/css">
+    <link href="{{ STATIC_URL }}bootstrap/bootstrap-modal.css" rel="stylesheet" type="text/css">
 
     {% compress js %}
       <script type="text/javascript" src="{% static "utils.js" %}"></script>
+      <script type="text/javascript" src="{% static "custom.166-06.js" %}"></script>
     {% endcompress %}
 </head>
 
@@ -127,8 +127,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}es5-shim.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}es5-sham.min.js"></script>
     <![endif]-->
-    <script type="text/javascript" src="{{ STATIC_URL }}custom.166-06.js{{ gz }}"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}my.jobs.160-30.js{{ gz }}"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}my.jobs.160-30.js"></script>
     <script type="text/javascript">
       // check for logout cookie every second
       utils.logoutTimer("{% url 'home' %}");

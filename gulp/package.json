@@ -4,7 +4,8 @@
   "description": "Build system for My.jobs JS clients.",
   "main": "index.js",
   "scripts": {
-    "clean-shrinkwrap": "babel-node clean-shrinkwrap.js"
+    "clean-shrinkwrap": "babel-node clean-shrinkwrap.js",
+    "devserver": "webpack-dev-server -d --progress --config=webpack.dev.config.js --host=0.0.0.0 --https --inline"
   },
   "author": "DirectEmployers Association",
   "license": "(GPL-2.0 OR GPL-3.0 OR MIT)",
@@ -22,12 +23,11 @@
     "es6-promise": "^3.0.2",
     "eslint": "^1.10.2",
     "eslint-config-airbnb": "^1.0.0",
+    "eslint-loader": "^1.2.1",
     "eslint-plugin-babel": "^3.0.0",
     "eslint-plugin-react": "^3.10.0",
     "fetch-polyfill": "^0.8.1",
     "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-if": "^2.0.0",
     "gulp-jasmine": "^2.2.1",
     "gulp-util": "^3.0.7",
     "history": "^1.17.0",
@@ -41,6 +41,7 @@
     "react-router": "^1.0.0",
     "tinycolor2": "~1.3.0",
     "warning": "^2.1.0",
-    "webpack": "^1.12.9"
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.1"
   }
 }

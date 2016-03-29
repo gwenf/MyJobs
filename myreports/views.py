@@ -11,7 +11,6 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.decorators.http import require_http_methods
 
-from myreports.decorators import restrict_to_staff
 from myreports.helpers import humanize, serialize
 from myjobs.decorators import requires
 from myreports.models import (
@@ -21,6 +20,7 @@ from myreports.presentation import presentation_drivers
 from myreports.presentation.disposition import get_content_disposition
 from postajob import location_data
 from universal.helpers import get_company_or_404
+from universal.decorators import restrict_to_staff
 
 from myreports.datasources import ds_json_drivers
 

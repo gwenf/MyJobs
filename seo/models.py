@@ -744,19 +744,6 @@ class Company(models.Model):
 
         return filter(bool, self.app_access.values_list('name', flat=True))
 
-    @property
-    def first_invitation(self):
-        """
-        Returns the first invitation created for this company.
-
-        In most cases (as of 02/02/2016), this should be an invitation for the
-        Admin role of the company.
-
-        """
-        # to prevent multiple queries, we set this up on instantiation instead
-        # of running the query every time the information is asked for
-        return self.invites_sent.order_by('-invited').first()
-
 
 class FeaturedCompany(models.Model):
     """

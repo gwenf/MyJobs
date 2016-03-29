@@ -9,20 +9,15 @@ $(window).ready(function() {
         e.preventDefault();
         if($(window).width() < 994){
             $("#nav").toggleClass("active");
-            $(".company-nav-item").addClass("no-show");
-            $(".settings-nav-item").addClass("no-show");
-            $(".employer-menu").addClass("no-show");
-            $("#back-btn-li").addClass("no-show");
-            $("#account-link").addClass("no-show");
-            $("#logout-link").addClass("no-show");
-            $("#logged-in-li").addClass("no-show");
-            $(".multiple_companies").addClass("no-show");
+            // menus
+            $(".nav-item").removeClass("no-show");
+            // submenus
+            $(".sub-nav-item").addClass("no-show");
 
-            $("#mobile-company-select").removeClass("no-show");
-            $(".seeker-menu").removeClass("no-show");
-            $("#employer-tools").removeClass("no-show");
-            $("#search-jobs").removeClass("no-show");
-            $('#settings-link').removeClass("no-show");
+            $("#back-btn-li").addClass("no-show");
+
+            $(".multiple_companies").addClass("no-show");
+            $("#mobile-company-select").addClass("no-show");
 
             //Not logged in mobile view
             $("#demo-link").removeClass("no-show");
@@ -33,60 +28,33 @@ $(window).ready(function() {
 
     $("#pop-menu").mouseleave(function(){
         $("#back-btn-li").addClass("no-show");
+        $(".nav-item").removeClass("no-show");
+        $(".sub-nav-item").addClass("no-show");
 
-        $("#account-link").removeClass("no-show");
-        $("#logout-link").removeClass("no-show");
-        $("#search-jobs").removeClass("no-show");
-        $("#logged-in-li").removeClass("no-show");
         $("#nav").removeClass("active");
     });
 
-    $("#employer-tools").click(function(e) {
-        $("#back-btn-li").removeClass("no-show");
-        $(".employer-menu").removeClass("no-show");
-
-        $(".seeker-menu").addClass("no-show");
-        $("#mobile-company-select").addClass("no-show");
-        $("#settings-link").addClass("no-show");
-        $("#search-jobs").addClass("no-show");
-        $("#job-tools").addClass("no-show");
-        $("#employer-tools").addClass("no-show");
+    $(".nav-item").click(function(e) {
+      $("#mobile-company-select").removeClass("no-show");
+      $("#back-btn-li").removeClass("no-show");
+      $(".nav-item").addClass("no-show");
+      $(this).nextUntil(".nav-item").removeClass("no-show");
     });
 
-    $('#settings-link').click(function(e) {
-        $(".settings-nav-item").removeClass("no-show");
-        $("#back-btn-li").removeClass("no-show");
-
-        $("#mobile-company-select").addClass("no-show");
-        $("#settings-link").addClass("no-show");
-        $("#job-tools").addClass("no-show");
-        $("#employer-tools").addClass("no-show");
-        $("#search-jobs").addClass("no-show");
-        $("#profile-link").addClass("no-show");
-        $("#savedsearch-link").addClass("no-show");
-        $("#candidate-link").addClass("no-show");
-        $("#partner-link").addClass("no-show");
-        $("#account-link").addClass("no-show");
+    $("#employers-mobile").click(function(e) {
+      $("#company-name-menu").removeClass("no-show");
     });
 
     $("#back-btn").click(function(e){
         e.preventDefault();
 
-        $(".company-nav-item").addClass("no-show");
-        $(".partner-nav-item").addClass("no-show");
-        $(".settings-nav-item").addClass("no-show");
-        $(".employer-menu").addClass("no-show");
+        $(".nav-item").removeClass("no-show");
+        $(".sub-nav-item").addClass("no-show");
         $("#back-btn-li").addClass("no-show");
-        $(".multiple_companies").addClass("no-show");
-
-        $(".seeker-menu").removeClass("no-show");
-        $("#mobile-company-select").removeClass("no-show");
-        $("#job-tools").removeClass("no-show");
-        $("#employer-tools").removeClass("no-show");
-        $("#search-jobs").removeClass("no-show");
-        $("#settings-link").removeClass("no-show");
+        $("#company-name-menu").addClass("no-show");
     });
-    if (tools_companies) {
+
+    if (typeof tools_companies !== 'undefined') {
         get_companies();
     }
 });
@@ -184,21 +152,13 @@ function get_companies() {
     mobile_parent_element.onclick = function() {
         $(".multiple_companies").removeClass("no-show");
         $("#back-btn-li").removeClass("no-show");
+        $(".nav-item").addClass("no-show");
 
         $("#mobile-company-select").addClass("no-show");
-        $("#settings-link").addClass("no-show");
-        $("#job-tools").addClass("no-show");
-        $("#employer-tools").addClass("no-show");
-        $("#search-jobs").addClass("no-show");
-        $("#profile-link").addClass("no-show");
-        $("#savedsearch-link").addClass("no-show");
-        $("#candidate-link").addClass("no-show");
-        $("#partner-link").addClass("no-show");
-        $("#account-link").addClass("no-show");
     };
-    var pop_menu = document.getElementById("pop-menu"),
-        search_item = document.getElementById("search-jobs");
-    pop_menu.insertBefore(mobile_parent_element, search_item.parentNode);
+    var pop_menu = document.getElementById("company-name-menu"),
+        search_item = document.getElementById("employers-mobile");
+    $(pop_menu).append(mobile_parent_element);
 
     for(var j=0; j<tools_companies.length; j++) {
         var mobile_list_item = document.createElement("li");

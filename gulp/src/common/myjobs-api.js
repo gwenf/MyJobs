@@ -28,6 +28,9 @@ export class MyJobsApi {
     const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
     });
     return this.parseJSON(this.checkStatus(response));
   }
@@ -41,6 +44,7 @@ export class MyJobsApi {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-CSRFToken': this.csrf,
+        'Accept': 'application/json',
       },
     });
     return this.parseJSON(this.checkStatus(response));

@@ -273,14 +273,6 @@ class SecureSavedSearchAPITestCase(MyJobsBase):
 
     def test_api_works_with_unauthenticated_user(self):
         """
-        ##
-        TEMPORARY LOGIC
-        ##
-        Invert this when staff_required decorator is removed from API.
-        Currently, this tests that non staff (unauthenticated users) cannot use
-        the API, but in the future, it will verify that they -can- use the API
-        ##
-
         Verifies that the secure saved searched API works properly with
         unauthenticated users when a valid, unclaimed email is provided
 
@@ -292,16 +284,13 @@ class SecureSavedSearchAPITestCase(MyJobsBase):
                                      self.secure_ss_url,
                                      json.dumps(request_data),
                                      http_origin="http://%s" % self.domain)
-        #DELETE BELOW LINE WHEN DEPLOYED TO PRODUCTION
-        self.assertEqual(response.status_code, 302)
-        # UNCOMMENT BELOW THIS LINE WHEN ACTIVATED IN PRODUCTION
-        #
-        # self.assertEqual(response.status_code, 200)
-        # response_msg = json.loads(response.content)
-        # self.assertTrue(response_msg['user_created'],
-        #                  msg="Expected user to be created, but it was not")
-        # self.assertTrue(response_msg['search_activated'],
-        #                  msg="Expected search to be activated, but it was not")
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.content)
+        self.assertTrue(response_msg['user_created'],
+                         msg="Expected user to be created, but it was not")
+        self.assertTrue(response_msg['search_activated'],
+                         msg="Expected search to be activated, but it was not")
 
 
     def test_api_error_if_no_email_provided(self):

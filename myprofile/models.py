@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
@@ -9,9 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 from collections import OrderedDict
 from itertools import chain
 
+from countries import COUNTRIES
 from registration import signals as reg_signals
 from registration.models import ActivationProfile
-from django.core.exceptions import ObjectDoesNotExist
 
 
 class ProfileUnits(models.Model):
@@ -253,7 +254,8 @@ class Education(ProfileUnits):
     country_sub_division_code = models.CharField(max_length=5, blank=True,
                                                  verbose_name=_("State/Region"))
     country_code = models.CharField(max_length=3, blank=True,
-                                    verbose_name=_("country"))  # ISO 3166-1
+                                    verbose_name=_("country"),
+                                    choices=COUNTRIES)  # ISO 3166-1
     # ISCED-2011 Can be [0-8]
     education_level_code = models.IntegerField(choices=EDUCATION_LEVEL_CHOICES,
                                                verbose_name=_("education level"),
@@ -306,7 +308,7 @@ class Address(ProfileUnits):
                                                  help_text='ie NY, WA, DC')
     country_code = models.CharField(max_length=3, blank=True,
                                     verbose_name=_("Country"),
-                                    default='USA')
+                                    default='USA', choices=COUNTRIES)
     postal_code = models.CharField(max_length=12, blank=True,
                                    verbose_name=_("Postal Code"),
                                    help_text='ie 90210, 12345-7890')
@@ -412,7 +414,8 @@ class EmploymentHistory(ProfileUnits):
     country_sub_division_code = models.CharField(max_length=5, blank=True,
                                                  verbose_name=_("State/Region"))
     country_code = models.CharField(max_length=3, blank=True, null=True,
-                                    verbose_name=_("country"))
+                                    verbose_name=_("country"),
+                                    choices=COUNTRIES)
     description = models.TextField(blank=True, null=True)
 
     # Hidden fields
@@ -530,7 +533,8 @@ class SecondaryEmail(ProfileUnits):
 
 class MilitaryService(ProfileUnits):
     country_code = models.CharField(max_length=3, blank=True,
-                                    verbose_name=_("Country"))  # ISO 3166-1
+                                    verbose_name=_("Country"),
+                                    choices=COUNTRIES) # ISO 3166-1
     branch = models.CharField(max_length=255, verbose_name="Branch")
     department = models.CharField(max_length=255, blank=True,
                                   verbose_name="Department")
@@ -701,7 +705,8 @@ class VolunteerHistory(ProfileUnits):
     country_sub_division_code = models.CharField(max_length=5, blank=True,
                                                  verbose_name=_("State/Region"))
     country_code = models.CharField(max_length=3, blank=True,
-                                    verbose_name=_("country"))
+                                    verbose_name=_("country"),
+                                    choices=COUNTRIES)
     description = models.TextField(blank=True)
 
     @classmethod

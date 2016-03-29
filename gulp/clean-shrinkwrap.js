@@ -4,7 +4,7 @@
  *
  * $ npm run clean-shrinkwrap
  *
- * based on "shonkwrap"
+ * adapted from "shonkwrap"
  * https://github.com/skybet/shonkwrap/blob/master/shonkwrap
  */
 import fs from 'fs';

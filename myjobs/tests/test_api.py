@@ -193,7 +193,7 @@ class SavedSearchResourceTests(MyJobsBase):
         override user.source with its value.
         """
         self.client.get(
-            reverse('toolbar') + '?site_name=Indianapolis%20Jobs&site=http%3A%2F%2Findianapolis.jobs&callback=foo',
+            reverse('topbar') + '?site_name=Indianapolis%20Jobs&site=http%3A%2F%2Findianapolis.jobs&callback=foo',
             HTTP_REFERER='http://indianapolis.jobs')
 
         self.client.data['source'] = 'redirect'

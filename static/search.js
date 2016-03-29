@@ -97,10 +97,14 @@ $(document).ready(function(){
 				}
 			});                   
 		},
-        open: function(event, ul) {
-            $(".ui-autocomplete li.ui-menu-item:odd").addClass("ui-menu-item-alternate");
-            $(".ui-autocomplete li.ui-menu-item a").removeClass("ui-corner-all");
-        },
+    open: function(event, ul) {
+        $(".ui-autocomplete li.ui-menu-item:odd").addClass("ui-menu-item-alternate");
+        $(".ui-autocomplete li.ui-menu-item a").removeClass("ui-corner-all");
+    },
+    select: function(event, ui) {
+        $(".micrositeTitleField").val('"' + ui.item.value + '"');
+        return false;
+    },
 		minLength: 2
 	});
     $( ".micrositeMOCField" ).autocomplete({   

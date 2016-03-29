@@ -1,18 +1,34 @@
 {% extends "postajob/dseo/dseo_posting_base.html" %}
 {% load i18n %}
 {% load postajob_tags %}
+{% load common_tags %}
 
 {% block directseo_main_content %}
 {{ block.super }}
 <div id="direct_listingDiv">
-        {% include "postajob/includes/request_formBox.html" with wrapper_title="Recent Requests" wrapper_footer=True %}
-        {% include "postajob/includes/offlinepurchase_formBox.html" with wrapper_title="Recent Offline Purchases" wrapper_footer=True %}
-        {% include "postajob/includes/purchasedproduct_admin_formBox.html" with wrapper_title="Recent Purchased Products" wrapper_footer=True %}
-        {% include "postajob/includes/product_formBox.html" with wrapper_title="Recent Products" wrapper_footer=True %}
-        {% include "postajob/includes/productgroup_formBox.html" with wrapper_title="Top Groupings" order=False wrapper_footer=True %}
+        {% can user company "read request" as can_read_request %}
+        {% if can_read_request %}
+          {% include "postajob/includes/request_formBox.html" with wrapper_title="Recent Requests" wrapper_footer=True %}
+        {% endif %}
+        {% can user company "read offline purchase" as can_read_offline_purchase %}
+        {% if can_read_offline_purchase %}
+          {% include "postajob/includes/offlinepurchase_formBox.html" with wrapper_title="Recent Offline Purchases" wrapper_footer=True %}
+        {% endif %}
+        {% can user company "read purchased product" as can_read_purchased_product %}
+        {% if can_read_purchased_product %}
+          {% include "postajob/includes/purchasedproduct_admin_formBox.html" with wrapper_title="Recent Purchased Products" wrapper_footer=True %}
+        {% endif %}
+        {% can user company "read product" as can_read_product %}
+        {% if can_read_product %}
+          {% include "postajob/includes/product_formBox.html" with wrapper_title="Recent Products" wrapper_footer=True %}
+        {% endif %}
+        {% can user company "read grouping" as can_read_grouping %}
+        {% if can_read_grouping %}
+          {% include "postajob/includes/productgroup_formBox.html" with wrapper_title="Top Groupings" order=False wrapper_footer=True %}
+        {% endif %}
 </div>
 <div class="direct_rightColBox">
-    {% include "postajob/includes/postajob_navigation.html" %}
+    {% include "postajob/includes/postajob_navigation.html" with can_read_request=can_read_request can_read_offline_purchase=can_read_offline_purchase can_read_purchased_product=can_read_purchased_product can_read_product=can_read_product can_read_grouping=can_read_grouping %}
 </div>
 <div class="clearfix"></div>
 {% endblock %}

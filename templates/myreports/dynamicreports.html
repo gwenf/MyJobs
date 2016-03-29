@@ -1,4 +1,5 @@
 {% extends "base-react.html" %}
+{% load common_tags %}
 {% load compress %}
 {% load staticfiles %}
 
@@ -33,8 +34,14 @@
 <script>
 spinnerImg = "{% static "images/ajax-loader.gif" %}";
 </script>
-{% compress js %}
-<script src="{% static "bundle/vendor.js" %}"></script>
-<script src="{% static "bundle/reporting.js" %}"></script>
-{% endcompress %}
+
+{% if wp_base_url %}
+  <script src="{{wp_base_url}}/reporting.js"/></script>
+{% else %}
+  {% compress js %}
+  <script src="{% static "bundle/vendor.js" %}"></script>
+  <script src="{% static "bundle/reporting.js" %}"></script>
+  {% endcompress %}
+{% endif %}
+
 {% endblock %}

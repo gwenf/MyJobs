@@ -10,8 +10,8 @@
 
     <h4>Add these modules to improve your profile</h4>
     {% for suggestion in suggestions %}
-        <a class="btn primary suggestion add-module-btn" 
-           href="{{ suggestion.url }}" 
+        <a class="btn primary suggestion add-module-btn"
+           href="{{ suggestion.url }}"
            data-msg="{{ suggestion.msg }}">
             Add
             <span>{{ suggestion.module }}</span>
@@ -20,7 +20,7 @@
 
     <div id="description" style="min-height:40px;">&nbsp;</div>
 
-    <a class="btn-link" 
+    <a class="btn-link"
        href="{% url 'view_profile' %}">No thanks, Take me to my profile</a>
 </div>
 <div class="span4" id="suggestions" style="clear: right;">

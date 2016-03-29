@@ -26,6 +26,9 @@ if [ -n "$pythonpath" ]; then
     pythonpatharg="-e PYTHONPATH=$pythonpath"
 fi
 
+dev_path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+dev_path=/MyJobs/gulp/node_modules/.bin:$dev_path
+
 init() {
     initsolrdata
     initmysqldata
@@ -146,6 +149,8 @@ doruncd() {
         $pythonpatharg \
         $dockerenvarg \
         -w /MyJobs/"$dir" \
+        -e PATH="$dev_path" \
+        -e npm_config_unsafe_perm=1 \
         -i -t \
         darrint/dev "$@"
 }

@@ -5,11 +5,21 @@
         {% if primary_btn %}
             <a class="btn primary" href="{{url_name}}">{{ btn_name }}</a>
         {% endif %}
-        <a class="btn {% select 'request' %}" href="{% url 'request' %}">Requests</a>
-        <a class="btn {% select 'offline' %}" href="{% url 'offlinepurchase' %}">Offline Purchases</a>
-        <a class="btn {% select 'purchased/product' %}" href="{% url 'purchasedproduct' %}">Purchased Products</a>
-        <a class="btn {% select 'admin/product' ignore='group' %}" href="{% url 'product' %}">Products</a>
-        <a class="btn {% select 'group' %}" href="{% url 'productgrouping' %}">Groupings</a>
+        {% if can_read_request %}
+          <a class="btn {% select 'request' %}" href="{% url 'request' %}">Requests</a>
+        {% endif %}
+        {% if can_read_offline_purchase %}
+          <a class="btn {% select 'offline' %}" href="{% url 'offlinepurchase' %}">Offline Purchases</a>
+        {% endif %}
+        {% if can_read_purchased_product %}
+          <a class="btn {% select 'purchased/product' %}" href="{% url 'purchasedproduct' %}">Purchased Products</a>
+        {% endif %}
+        {% if can_read_product %}
+          <a class="btn {% select 'admin/product' ignore='group' %}" href="{% url 'product' %}">Products</a>
+        {% endif %}
+        {% if can_read_grouping %}
+          <a class="btn {% select 'group' %}" href="{% url 'productgrouping' %}">Groupings</a>
+        {% endif %}
         <a class="btn {% select 'profile' %}" href="{% url 'companyprofile_add' %}">Company Profile</a>
         <a class="btn {% select 'blocked-users' %}" href="{% url 'blocked_user_management' %}">Blocked Users</a>
     </div>

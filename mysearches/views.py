@@ -18,14 +18,13 @@ from myjobs.decorators import user_is_allowed
 from myjobs.models import User
 from myjobs.autoserialize import autoserialize
 from myjobs.cross_site_verify import cross_site_verify
-from myreports.decorators import restrict_to_staff
 from mysearches.models import (SavedSearch, SavedSearchDigest,
                                PartnerSavedSearch)
 from mysearches.forms import (SavedSearchForm, DigestForm,
                               PartnerSubSavedSearchForm)
 from mysearches.helpers import (get_interval_from_frequency, parse_feed,
                                 url_sort_options, validate_dotjobs_url)
-from universal.decorators import warn_when_inactive
+from universal.decorators import warn_when_inactive, restrict_to_staff
 
 
 @user_is_allowed(SavedSearch, 'id', pass_user=True)
@@ -519,7 +518,6 @@ def remove_anchor_from_url(url):
     return url
 
 @django_csrf_exempt
-@restrict_to_staff()
 @cross_site_verify
 @autoserialize
 def secure_saved_search(request):

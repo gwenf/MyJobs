@@ -2,7 +2,7 @@
 // reporting api.
 //
 // This uses the fetch api. Fetch works somewhat differently from jQuery.ajax.
-// This module encasulates all of that. Errors are translated to JS exceptions.
+// This module encapsulates all of that. Errors are translated to JS exceptions.
 
 
 class Api {

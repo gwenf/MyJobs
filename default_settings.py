@@ -665,3 +665,6 @@ EXCLUDED_VIEW_SOURCE_CACHE_KEY = 'excluded_view_sources'
 CUSTOM_EXCLUSION_CACHE_KEY = 'custom_excluded_view_sources'
 
 ENV_URL_PREFIXES = ['qc', 'staging']
+
+# See template tag js_bundle for details.
+WEBPACK_DEV_SERVER_BASE_URL = None

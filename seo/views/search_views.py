@@ -59,6 +59,7 @@ from seo.templatetags.seo_extras import filter_carousel
 from transform import hr_xml_to_json
 from universal.states import states_with_sites
 from universal.helpers import get_company_or_404
+from universal.decorators import restrict_to_staff
 from myjobs.decorators import user_is_allowed
 from myemails.models import EmailSection
 from myblocks.models import Page
@@ -1929,6 +1930,7 @@ def test_markdown(request):
                                   context_instance=RequestContext(request))
 
 
+@restrict_to_staff()
 @user_is_allowed()
 def admin_dashboard(request):
     data_dict = {}
@@ -1936,6 +1938,7 @@ def admin_dashboard(request):
                               context_instance=RequestContext(request))
 
 
+@restrict_to_staff()
 @user_is_allowed()
 def event_overview(request):
     data_dict = {'active_events': [],
@@ -1945,6 +1948,7 @@ def event_overview(request):
                               context_instance=RequestContext(request))
 
 
+@restrict_to_staff()
 @user_is_allowed()
 def manage_header_footer(request):
     headers = EmailSection.objects.filter(section_type=1)
@@ -1959,6 +1963,7 @@ def manage_header_footer(request):
                               context_instance=RequestContext(request))
 
 
+@restrict_to_staff()
 @user_is_allowed()
 def manage_templates(request):
     data_dict = {'events': []}
@@ -1967,6 +1972,7 @@ def manage_templates(request):
                               context_instance=RequestContext(request))
 
 
+@restrict_to_staff()
 @user_is_allowed()
 def blocks_overview(request):
     company = get_company_or_404(request)

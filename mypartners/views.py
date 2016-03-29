@@ -30,11 +30,10 @@ from urllib2 import HTTPError
 from email_parser import build_email_dicts, get_datetime_from_str
 from universal.helpers import (get_company_or_404, get_int_or_none,
                                add_pagination, get_object_or_none)
-from universal.decorators import warn_when_inactive
+from universal.decorators import warn_when_inactive, restrict_to_staff
 from myjobs.models import User
 
 from myjobs.decorators import requires
-from myreports.decorators import restrict_to_staff
 from mysearches.models import PartnerSavedSearch
 from mysearches.helpers import get_interval_from_frequency
 from mysearches.forms import PartnerSavedSearchForm

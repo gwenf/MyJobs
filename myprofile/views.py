@@ -12,7 +12,14 @@ from myjobs.models import User
 from myprofile.models import ProfileUnits, BaseProfileUnitManager
 from myprofile import forms
 from registration.models import ActivationProfile
+from django_remote_forms.forms import RemoteForm
 
+
+@user_is_allowed()
+@user_passes_test(User.objects.not_disabled)
+def edit_summary(request):
+    return render_to_response('myprofile/react_edit.html',
+                              RequestContext(request))
 
 @user_is_allowed()
 @user_passes_test(User.objects.not_disabled)
@@ -67,9 +74,13 @@ def handle_form(request):
     then uses these to update the existing item or create a new instance
     """
     http404_view = 'myprofile.views.handle_form'
+
     item_id = request.REQUEST.get('id', 'new')
     module = request.REQUEST.get('module')
     module = module.replace(" ", "")
+
+    ctx = {}
+    ctx["success"] = True
 
     item = None
     if item_id != 'new':
@@ -103,11 +114,11 @@ def handle_form(request):
             return HttpResponse('success')
 
         if item_id == 'new':
-            form_instance = form(user=request.user, data=request.POST,
+            form_instance = form(user=request.user, data=request.POST.dict(),
                                  auto_id=False)
         else:
             form_instance = form(user=request.user, instance=item,
-                                 auto_id=False, data=request.POST)
+                                 auto_id=False, data=request.POST.dict())
         model = form_instance._meta.model
         data_dict['form'] = form_instance
         data_dict['verbose'] = model._meta.verbose_name.title()
@@ -115,7 +126,10 @@ def handle_form(request):
         model_name = model._meta.verbose_name.lower()
         if form_instance.is_valid():
             instance = form_instance.save()
-            if request.is_ajax():
+            if request.META.get('HTTP_ACCEPT') == 'application/json':
+                return HttpResponse(content_type='application/json',
+                                    content=json.dumps(ctx))
+            elif request.is_ajax():
                 suggestions = ProfileUnits.suggestions(request.user)
                 return render_to_response('myprofile/suggestions.html',
                                           {'suggestions': suggestions[:3],
@@ -125,7 +139,11 @@ def handle_form(request):
             else:
                 return HttpResponseRedirect(reverse('view_profile'))
         else:
-            if request.is_ajax():
+            if request.META.get('HTTP_ACCEPT') == 'application/json':
+                remote_form = RemoteForm(form_instance)
+                return HttpResponse(content_type='application/json',
+                                    content=json.dumps(remote_form.as_dict()))
+            elif request.is_ajax():
                 return HttpResponse(json.dumps(form_instance.errors), status=400)
             else:
                 return render_to_response('myprofile/profile_form.html',
@@ -151,9 +169,14 @@ def handle_form(request):
         model = form_instance._meta.model
         data_dict['form'] = form_instance
         data_dict['verbose'] = model._meta.verbose_name.title()
-        return render_to_response('myprofile/profile_form.html',
-                                  data_dict,
-                                  RequestContext(request))
+        if request.META.get('HTTP_ACCEPT') == 'application/json':
+            remote_form = RemoteForm(form_instance)
+            return HttpResponse(content_type='application/json',
+                                content=json.dumps(remote_form.as_dict()))
+        else:
+            return render_to_response('myprofile/profile_form.html',
+                                      data_dict,
+                                      RequestContext(request))
 
 
 @user_passes_test(User.objects.not_disabled)
@@ -163,7 +186,11 @@ def delete_item(request):
         request.user.profileunits_set.get(id=item_id).delete()
     except ProfileUnits.DoesNotExist:
         pass
-    return HttpResponseRedirect(reverse('view_profile'))
+    if request.META.get('HTTP_ACCEPT') == 'application/json':
+        return HttpResponse(content_type='application/json',
+                            content=json.dumps({}))
+    else:
+        return HttpResponseRedirect(reverse('view_profile'))
 
 
 @user_passes_test(User.objects.not_disabled)

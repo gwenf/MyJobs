@@ -31,7 +31,7 @@
   </div>
   {% if access_code %}
     <div class="row">
-      <div class="col-md-8 col-xs-12 ">
+      <div class="col-md-8 col-xs-12">
         <p class="text-left">
           Your request has been submitted. A representative will be in contact 
           with your company shortly.
@@ -40,7 +40,11 @@
           Please write down the following code. You will need it to verify your
           request. <strong>This is the only time this code is displayed.</strong>
         </p>
-        <p class="text-center">{{ access_code }}</p>
+      </div>
+      <div class="row">
+        <div class="col-md-offset-3 col-md-3 col-xs-12">
+          <p class="text-center" id="auth-code">{{ access_code }}</p>
+        </div>
       </div>
     </div>
   {% endif %}

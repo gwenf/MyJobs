@@ -56,3 +56,4 @@ xlrd==0.9.3
 Sphinx==1.3.3
 XlsxWriter==0.8.4
 django-ajax-selects==1.4.2
+git+https://github.com/DirectEmployers/django-remote-forms.git

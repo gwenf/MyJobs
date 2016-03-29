@@ -828,18 +828,15 @@ class MyJobsViewsTests(MyJobsBase):
         # email should be sent to right person
         self.assertIn(creator.email, mail.outbox[0].to)
 
-    def test_toolbar_logged_in(self):
+    def test_topbar_logged_in(self):
         self.client.login_user(self.user)
-        response = self.client.get(reverse('toolbar'))
-        expected_response = '"user_fullname": "alice@example.com"'
-        self.assertIn(expected_response, response.content)
+        response = self.client.get(reverse('topbar'))
+        self.assertIn("alice@example.com", response.content)
 
-    def test_toolbar_not_logged_in(self):
+    def test_topbar_not_logged_in(self):
         Session.objects.all().delete()
-        response = self.client.get(reverse('toolbar'))
-        expected_response = '({"user_fullname": "", "user_gravatar": '\
-                            '"", "employer": ""});'
-        self.assertEqual(response.content, expected_response)
+        response = self.client.get(reverse('topbar'))
+        self.assertNotIn("alice@example.com", response.content)
 
     def test_p3p(self):
         """
@@ -847,7 +844,7 @@ class MyJobsViewsTests(MyJobsBase):
 
         """
         self.client.login_user(self.user)
-        response = self.client.get(reverse('toolbar'))
+        response = self.client.get(reverse('topbar'))
         p3p = str(response["P3P"])
         self.assertEqual('CP="ALL' in p3p, True)
 
@@ -867,7 +864,7 @@ class MyJobsViewsTests(MyJobsBase):
 
     def test_referring_site_in_topbar(self):
         self.client.get(
-            reverse('toolbar') + '?site_name=Indianapolis%20Jobs&site=http%3A'
+            reverse('topbar') + '?site_name=Indianapolis%20Jobs&site=http%3A'
                                  '%2F%2Findianapolis.jobs&callback=foo',
             HTTP_REFERER='http://indianapolis.jobs')
 
@@ -943,7 +940,7 @@ class MyJobsViewsTests(MyJobsBase):
         self.assertEqual(user.source, 'jobs.directemployers.org')
 
         self.client.get(
-            reverse('toolbar') + '?site_name=Indianapolis%20Jobs&site=http'
+            reverse('topbar') + '?site_name=Indianapolis%20Jobs&site=http'
                                  '%3A%2F%2Findianapolis.jobs&callback=foo',
             HTTP_REFERER='http://indianapolis.jobs')
 
@@ -1049,7 +1046,7 @@ class MyJobsTopbarViewsTests(MyJobsBase):
         response = self.client.get(reverse('topbar'),
                                    HTTP_X_REQUEST_WITH='XMLHttpRequest')
 
-        str_to_find = 'var data = '
+        str_to_find = 'var tools_companies = '
         # Find the index of where json is generated from template tag
         # 'json_companies'
         begin = response.content.find(str_to_find) + len(str_to_find)

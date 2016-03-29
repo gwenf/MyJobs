@@ -238,6 +238,10 @@ ul.submenu > li > a:hover {
     text-decoration: none;
 }
 
+#pop-menu #company-name-menu li a {
+  background-color: #333;
+}
+
 #pop-menu a.no-show {
     display: none;
 }
@@ -400,6 +404,7 @@ ul.submenu > li > a:hover {
 
     #employer-tools:after,
     #settings-link:after,
+    .nav-item > a:after,
     #mobile-company-select > a:after{
         border-bottom: 10px solid transparent;
         border-left: 15px solid #FFF;

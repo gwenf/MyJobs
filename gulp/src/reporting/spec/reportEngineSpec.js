@@ -44,6 +44,7 @@ describe('ReportFinder', () => {
     });
 
     it('can unsubscribe', () => {
+      finder.noteNewReport(22);
       finder.unsubscribeToReportList(ref);
       finder.noteNewReport(33);
       expect(newId).toEqual(22);

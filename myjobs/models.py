@@ -353,11 +353,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         super(User, self).save(force_insert, force_update, using,
                                update_fields)
 
-    @property
-    def activities(self):
+    def get_activities(self, company):
         """Returns a list of activity names associated with this user."""
 
-        return filter(bool, self.roles.values_list(
+        return filter(bool, self.roles.filter(company=company).values_list(
             'activities__name', flat=True))
 
     def email_user(self, message, email_type=settings.GENERIC, **kwargs):
@@ -699,8 +698,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return all([
             bool(company.enabled_access),
             set(required_access).issubset(company.enabled_access),
-            bool(self.activities),
-            set(activity_names).issubset(self.activities)])
+            bool(self.get_activities(company)),
+            set(activity_names).issubset(self.get_activities(company))])
 
     def send_invite(self, email, company, role_name=None):
         """
@@ -885,8 +884,8 @@ def update_role_admins(sender, instance, created, *args, **kwargs):
     """
     When a new activity is created, that activity should immediately be
     associated with the Admin role.
-    """
 
+    """
     if created:
         roles = Role.objects.filter(name="Admin")
         RoleActivities = Role.activities.through

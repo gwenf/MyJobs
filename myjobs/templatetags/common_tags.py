@@ -3,9 +3,9 @@ import json
 from time import strptime, strftime
 from django import template
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from myjobs import version
-from myjobs.models import User
 from myjobs.helpers import get_completion, make_fake_gravatar
 from seo.models import Company
 from universal.helpers import get_company
@@ -35,11 +35,12 @@ def completion_level(level):
 
     return get_completion(level)
 
+
 @register.assignment_tag
 def can(user, company, *activity_names):
     """Template tag analog to `myjobs.User.can()` method."""
 
-    return user.can(company, *activity_names)
+    return not user.is_anonymous() and user.can(company, *activity_names)
 
 
 @register.simple_tag
@@ -88,10 +89,9 @@ def get_company_name(user):
     :user: User instance
 
     Outputs:
-    A `QuerySet` of companies for which the user is a `CompanyUser`.
-    """
+    A `QuerySet` of companies for which the user is assigned the "Admin" role.
 
-    # Only return companies for which the user is a company user
+    """
     return Company.objects.filter(role__user=user).distinct()
 
 
@@ -240,3 +240,118 @@ def get_company_from_cookie(context):
     if request:
         return get_company(request)
     return None
+
+@register.assignment_tag(takes_context=True)
+def get_menus(context):
+    """
+    Returns menu items used in the topbar.
+
+    Each top-level item is a 'menu' (eg. "Employers"), where as everything
+    below those is a submenu (eg. "PRM").
+
+    """
+    # have to use hard coded urls since the named views don't exist on
+    # microsites.
+    url = lambda path: settings.ABSOLUTE_URL + path
+    company = get_company(context.get("request"))
+    user = context.get("user")
+    new_messages = context.get("new_messages")
+
+    # menu item cant be generated for a user who isn't logged in
+    if not user or not user.pk or user.is_anonymous():
+        return []
+
+    if new_messages:
+        message_submenus = [
+            {
+                "id": info.message.pk,
+                "href": url("message/inbox?message=%s" % info.message.pk),
+                "label": "%s - %s" % (
+                    info.message.start_on.date(), info.message.subject[:10]
+                )
+            } for info in context["new_messages"][:3]]
+    else:
+        message_submenus = [
+            {
+                "id": "no-messages",
+                "href": url("message/inbox"),
+                "label": "No new unread messages"
+            }
+        ]
+    message_menu = {
+        "label": "Messages",
+        "id": "menu-inbox",
+        "icon": "icon-envelope icon-white",
+        "iconLabel": str(new_messages.count() if new_messages else 0),
+        "submenus": [
+            {
+                "id": "menu-inbox-all",
+                "href": url("message/inbox"),
+                "label": "Inbox (See All)",
+            }
+        ] + message_submenus
+    }
+
+    employer_menu = {
+        "label": "Employers",
+        "id": "employers",
+        "submenuId": "employer-apps",
+        "submenus": [
+        ]
+    } if user.roles.exists() else {}
+
+    if employer_menu and user.can(company, "read partner"):
+        employer_menu["submenus"] += [
+            {
+                "id": "partner-tab",
+                "href": url("prm/view"),
+                "label": "PRM"
+            },
+            {
+                "id": "reports-tab",
+                "href": url("reports/view/overview"),
+                "label": "Reports",
+            }
+        ]
+
+    if employer_menu and user.can(company, "read role"):
+        employer_menu["submenus"].append(
+            {
+                "id": "manage-users-tab",
+                "href": url("manage-users"),
+                "label": "Manage Users",
+            }
+        )
+
+    profile_menu = {
+        "label": user.email,
+        "submenus": [
+            {
+                "id": "profile-tab",
+                "href": url("profile/view"),
+                "label": "My Profile"
+            },
+            {
+                "id": "searches-tab",
+                "href": url("saved-search/view"),
+                "label": "My Saved Searches"
+            },
+            {
+                "id": "account-tab",
+                "href": url("account/edit"),
+                "label": "Account Settings"
+            },
+            {
+                "id": "search-tab",
+                "href": get_ms_url(context),
+                "label": "Search Jobs"
+            },
+            {
+                "id": "logout-tab",
+                "href": url("accounts/logout"),
+                "label": "Log Out"
+            }
+        ]
+    }
+
+    return [message_menu, employer_menu, profile_menu]

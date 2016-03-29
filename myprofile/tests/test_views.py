@@ -124,6 +124,24 @@ class MyProfileViewsTests(MyJobsBase):
         self.assertEqual(Name.objects.filter(given_name='Susy',
                                              family_name='Smith').count(), 1)
 
+    def test_handle_form_json_serialize_get(self):
+        """When an ajax requests wants to GET json, serialize the form."""
+        resp = self.client.get(reverse('handle_form'),
+                               HTTP_ACCEPT='application/json',
+                               data={'module': 'Name'})
+        self.assertEquals(200, resp.status_code)
+        self.assertIn('application/json', resp['content-type'])
+        data = json.loads(resp.content)
+        self.assertEquals(3, len(data['ordered_fields']))
+        self.assertIsInstance(data['ordered_fields'], list)
+        self.assertEquals(3, len(data['fields']))
+        self.assertIsInstance(data['fields'], dict)
+        self.assertIsInstance(data['fields']['family_name'], dict)
+        self.assertIsInstance(data['fields']['given_name'], dict)
+        self.assertIsInstance(data['fields']['primary'], dict)
+        self.assertEquals(3, len(data['data']))
+        self.assertIsInstance(data['data'], dict)
+
     def test_handle_form_redirect_summary(self):
         """
         When a user has a summary already if they try to make a new summary

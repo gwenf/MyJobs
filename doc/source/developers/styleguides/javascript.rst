@@ -144,3 +144,11 @@ Gulp watch is your friend.
 * Keep unit tests fast.
 * Keep lint report clean.
 * Keep external libraries in vendor.js.
+
+React
+=====
+
+* Write controlled components. (i.e. ``value`` vs ``initial``)
+* Action dispatchers should be named ``doThing``.
+* Action builders (used by dispatchers) should be named ``ThingAction``.
+

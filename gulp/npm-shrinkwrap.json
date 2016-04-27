@@ -791,6 +791,9 @@
     "hoek": {
       "version": "2.16.3"
     },
+    "hoist-non-react-statics": {
+      "version": "1.0.5"
+    },
     "home-or-tmp": {
       "version": "1.0.0"
     },
@@ -1059,6 +1062,9 @@
     },
     "lodash-compat": {
       "version": "3.10.1"
+    },
+    "lodash-es": {
+      "version": "4.11.1"
     },
     "lodash._arraycopy": {
       "version": "3.0.0"
@@ -1458,11 +1464,22 @@
     "react-prop-types": {
       "version": "0.3.0"
     },
+    "react-redux": {
+      "version": "4.4.5",
+      "dependencies": {
+        "lodash": {
+          "version": "4.11.1"
+        }
+      }
+    },
     "react-reorder": {
       "version": "2.0.0"
     },
     "react-router": {
       "version": "1.0.3"
+    },
+    "react-router-redux": {
+      "version": "4.0.4"
     },
     "read-json-sync": {
       "version": "1.1.1"
@@ -1490,6 +1507,14 @@
     },
     "redent": {
       "version": "1.0.0"
+    },
+    "redux": {
+      "version": "3.5.2",
+      "dependencies": {
+        "lodash": {
+          "version": "4.11.1"
+        }
+      }
     },
     "regenerate": {
       "version": "1.2.1"
@@ -1721,6 +1746,9 @@
     },
     "supports-color": {
       "version": "2.0.0"
+    },
+    "symbol-observable": {
+      "version": "0.2.4"
     },
     "tapable": {
       "version": "0.1.10"

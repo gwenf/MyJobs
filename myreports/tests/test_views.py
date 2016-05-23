@@ -26,27 +26,6 @@ class TestOverview(MyReportsTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_classic_report_version(self):
-        """
-        Visiting 'overview' should set the reporting_version cookie to
-        'classic'.
-
-        """
-        response = self.client.get(reverse('overview'))
-        self.assertEqual(
-            response.cookies['reporting_version'].value, 'classic')
-
-    def test_dynamic_report_version(self):
-        """
-        Visiting 'dynamicoverview' should set the reporting_version cookie to
-        'dynamic'.
-
-        """
-        response = self.client.get(reverse('dynamicoverview'))
-        self.assertEqual(
-            response.cookies['reporting_version'].value, 'dynamic')
-
-
 
 class TestViewRecords(MyReportsTestCase):
     """

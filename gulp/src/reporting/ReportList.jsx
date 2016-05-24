@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {map} from 'lodash-compat';
+import {setCookie} from 'common/cookie';
 import PopMenu from 'common/ui/PopMenu';
 import classnames from 'classnames';
 
@@ -55,6 +56,11 @@ export class ReportList extends Component {
     const {history} = this.props;
     e.preventDefault();
     history.pushState(null, '/');
+  }
+
+  handleSwitchVersions() {
+    setCookie('reporting_version', 'classic');
+    window.location.assign('/reports/view/overview');
   }
 
   async handleCloneReport(report) {
@@ -142,7 +148,7 @@ export class ReportList extends Component {
           <h2>Reporting Version</h2>
           <button
             className="button primary wide"
-            onClick={() => window.location.assign('/reports/view/overview')}>
+            onClick={() => this.handleSwitchVersions()}>
             Switch to Classic Reporting
           </button>
         </div>

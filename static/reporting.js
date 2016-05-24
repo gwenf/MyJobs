@@ -1273,6 +1273,11 @@ $(document).ready(function() {
     renderArchive(renderNavigation);
   });
 
+  $subpage.on("click", "#reporting-version", function() {
+    utils.setCookie("reporting_version", "dynamic");
+    window.location.assign("/reports/view/dynamicoverview");
+  });
+
   enableTooltips();
 });
 

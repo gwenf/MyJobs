@@ -60,12 +60,8 @@ def overview(request):
         response.content = html
         return response
 
-    response = HttpResponse()
-    html = render_to_response('myreports/reports.html', ctx,
+    return render_to_response('myreports/reports.html', ctx,
                               RequestContext(request))
-    response.content = html
-    response.set_cookie(*reporting_cookie)
-    return response
 
 
 @requires('read partner', 'read contact', 'read communication record')
@@ -374,12 +370,8 @@ def dynamicoverview(request):
     """The Dynamic Reports page."""
     company = get_company_or_404(request)
     ctx = {"company": company}
-    response = HttpResponse()
-    response.set_cookie('reporting_version', 'dynamic')
-    html = render_to_response('myreports/dynamicreports.html', ctx,
+    return render_to_response('myreports/dynamicreports.html', ctx,
                               RequestContext(request))
-    response.content = html
-    return response
 
 
 @restrict_to_staff()

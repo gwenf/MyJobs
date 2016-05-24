@@ -38,6 +38,13 @@ module.exports = {
         loader: 'eslint-loader',
       },
     ],
+    // ie8 catchall. Some imported react components need this.
+    postLoaders: [
+      {
+        test: /\.js$/,
+        loaders: ['es3ify'],
+      },
+    ],
   },
   plugins: [
     // React is smaller, faster, and silent in this mode.

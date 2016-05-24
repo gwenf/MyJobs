@@ -21,6 +21,7 @@
     "babel-runtime": "^5.8.25",
     "calendar-base": "^0.2.1",
     "classnames": "^2.2.1",
+    "es3ify-loader": "^0.2.0",
     "es6-promise": "^3.0.2",
     "eslint": "^1.10.2",
     "eslint-config-airbnb": "^1.0.0",

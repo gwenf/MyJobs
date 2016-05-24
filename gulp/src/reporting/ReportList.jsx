@@ -8,15 +8,18 @@ export class ReportList extends Component {
   constructor() {
     super();
     this.state = {
-      isMenuActive: false,
       currentlyActive: '',
       reportsRefreshing: [],
     };
   }
 
-  toggleMenu(e) {
-    const {isMenuActive} = this.state;
-    this.setState({isMenuActive: !isMenuActive, currentlyActive: e.target.parentNode.parentNode.id});
+  clickMenu(e) {
+    const {currentlyActive: oldActiveId} = this.state;
+    const activeId = e.target.parentNode.parentNode.id;
+
+    // Hide if they clicked the same one. Important for IE8.
+    const currentlyActive = oldActiveId === activeId ? '' : activeId;
+    this.setState({currentlyActive});
   }
 
   handleRefreshReport(report) {
@@ -81,7 +84,7 @@ export class ReportList extends Component {
   }
 
   closeAllPopups() {
-    this.setState({isMenuActive: false, currentlyActive: ''});
+    this.setState({currentlyActive: ''});
   }
 
   render() {
@@ -121,11 +124,15 @@ export class ReportList extends Component {
           )}
           key={r.id}
           id={numberedID}>
-          {options.length > 0 ? <PopMenu options={options}
-                                         isMenuActive={isThisMenuActive}
-                                         toggleMenu={(e) => this.toggleMenu(e)}
-                                         closeAllPopups={(e) => this.closeAllPopups(e)} /> : ''}
-          {(r.isRunning || this.state.reportsRefreshing.indexOf(r.id) > -1) ? <span className="report-loader"></span> : ''}
+          {options.length > 0 ?
+            <PopMenu options={options}
+              isMenuActive={isThisMenuActive}
+              toggleMenu={(e) => this.clickMenu(e)}
+              closeAllPopups={(e) => this.closeAllPopups(e)} />
+              : ''}
+          {(r.isRunning || this.state.reportsRefreshing.indexOf(r.id) > -1) ?
+            <span className="report-loader"></span>
+            : ''}
           <span className="menu-text">{r.name}</span>
         </li>
       );

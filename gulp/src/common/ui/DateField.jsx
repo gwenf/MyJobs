@@ -1,7 +1,7 @@
 import React from 'react';
 import TextField from './TextField';
 import CalendarPanel from './CalendarPanel';
-import ClickOutHandler from 'react-onclickout';
+import ClickOutCompat from 'common/ui/ClickOutCompat';
 import moment from 'moment';
 
 /**
@@ -201,7 +201,7 @@ class DateField extends React.Component {
     }
 
     return (
-      <ClickOutHandler onClickOut={e => this.closeCalendar(e, this)}>
+      <ClickOutCompat onClickOut={e => this.closeCalendar(e, this)}>
         <div>
           <TextField
             id={name}
@@ -219,7 +219,7 @@ class DateField extends React.Component {
         </div>
         {errorComponent}
         {calendar}
-      </ClickOutHandler>
+      </ClickOutCompat>
     );
   }
 }

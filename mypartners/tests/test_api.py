@@ -136,3 +136,41 @@ class NonUserOutreachTestCase(MyPartnersTestCase):
                          self.inbox.email + "@my.jobs",
                          msg=return_msg.format(response_json[0]["outreach_email"],
                                                self.inbox.email + "@my.jobs"))
+
+    def test_individual_record_api(self):
+        """
+            Test the record API given the logged in user is a member of the same
+            company.
+        """
+        # test to ensure current company's record will return
+        response = self.client.get(reverse('api_get_individual_nuo_record'),
+                                   {"record_id": self.outreach_record.pk})
+        self.assertEqual(response.status_code, 200, msg="expected status 200, "
+                                                        "got %s, may be roles "
+                                                        "or perms issue" %
+                                                        response.status_code)
+        response_json = json.loads(response.content)
+
+        self.assertNotEqual(response_json, {}, msg="empty object was returned,"
+                                                   "record information was "
+                                                   "expected.")
+
+        return_msg = "error loading record information, expected {0}, got {1}"
+        self.assertEqual(response_json["from_email"],
+                         self.outreach_record.from_email,
+                         msg=return_msg.format(response_json["from_email"],
+                                               self.outreach_record.from_email))
+        self.assertEqual(response_json["outreach_email"],
+                         self.inbox.email + "@my.jobs",
+                         msg=return_msg.format(response_json["outreach_email"],
+                                               self.inbox.email + "@my.jobs"))
+
+        # test to ensure other company's record will not return
+        response = self.client.get(reverse('api_get_individual_nuo_record'),
+                                   {"record_id": self.other_record.pk})
+
+        response_json = json.loads(response.content)
+
+        self.assertEqual(response_json, {}, msg="record information was "
+                                                "returned for a non-company "
+                                                "record.")

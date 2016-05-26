@@ -1437,6 +1437,35 @@ def api_get_nuo_records_list(request):
         json_res.append(json_obj)
     return HttpResponse(json.dumps(json_res), mimetype='application/json')
 
+@restrict_to_staff()
+@requires("read outreach record")
+def api_get_individual_nuo_record(request):
+    """
+    GET /prm/api/nonuseroutreach/records/record
+
+    Retrieves the information for a given outreach record.
+
+    """
+    company = get_company_or_404(request)
+    record_id = request.GET.get('record_id', None)
+    if not record_id:
+        raise Http404("No record id provided")
+    outreach_emails = OutreachEmailAddress.objects.filter(company=company)
+    try:
+        record = OutreachRecord.objects.get(outreach_email__in=outreach_emails,
+                                            pk=record_id)
+        json_obj = dict(
+            date_added = record.date_added.strftime('%m-%d-%Y'),
+            outreach_email = record.outreach_email.email + '@my.jobs',
+            from_email = record.from_email,
+            email_body = record.email_body,
+            current_workflow_state = record.current_workflow_state.state,
+        )
+    except OutreachRecord.DoesNotExist:
+        json_obj = {}
+
+    return HttpResponse(json.dumps(json_obj), mimetype='application/json')
+
 @requires('read tag')
 def tag_names(request):
     if request.method == 'GET':

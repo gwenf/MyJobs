@@ -75,6 +75,10 @@ First Time (Linux)
 
 Install docker from your distro.
 
+Make sure your user is added to the docker group.  
+
+docker should be shown when you run ``groups``
+
 Know your local ip address. We'll call it $myip from now on.
 
 Terminal Setup (OSX)
@@ -106,8 +110,6 @@ Build the Development Image
 
 Rerun this any time we change requirements.txt.
 
-``(cd dk2/dev && ln -s ../../requirements.txt .)`` Need this symlink.
-
 ``dk rebuilddev`` Also takes a long time. [If it hits a glitch run this command again]
 
 Build the Background Containers
@@ -136,7 +138,8 @@ Keep trying until ``docker ps`` shows no running machines.
 Load Data into MySQL and Solr
 =============================
 
-``dk background`` At this point possibly only MySql will stay running.
+``dk background`` At this point possibly only MySql and the reverse proxy will 
+stay running.
 
 ``dk maint mysql:5.5`` Start an interactive container based on MySQL
 

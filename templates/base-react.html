@@ -59,7 +59,7 @@
                         {% block activation_message %}
                             {% if user.is_authenticated %}
                                 {% if not user.is_active or not user.is_verified %}
-                                    <div class="alert alert-error hide-mobile">
+                                    <div class="alert alert-danger hide-mobile">
                                         Your account doesn't have full access to My.jobs features! Please activate it using the activation link sent to your email. <br />
                                         <a href="{% url 'resend_activation' %}">Resend my activation email.</a>
                                     </div>

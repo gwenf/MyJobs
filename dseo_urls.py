@@ -131,3 +131,8 @@ urlpatterns += patterns(
 )
 
 urlpatterns += impersonate_patterns
+
+urlpatterns += patterns(
+    '',
+    url(r'^blog/', include('myblogs.urls')),
+)

@@ -1,0 +1,40 @@
+{% extends "base-react.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-sm-12">
+        <h1><strong>{{ blog_entries.0.title }}<strong></h1>
+    </div>
+    <div class="col-sm-12">
+        <div class="breadcrumbs">
+            {% for tag in blog_entries.0.tags.all %}
+            <span>{% if forloop.first %}Tags: {% endif %}{{ tag.name }}</span>
+            {% empty %}
+            This entry is not tagged.
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8 col-xs-12">
+        {{ blog_entries.0.body | safe }}
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <div class="sidebar">
+        <h2 class="top">Navigation</h2>
+        <a class="btn" href="{% url "create_blog_entry" %}">Create New Entry</a>
+        <a class="btn" href="{% url "blog_rss_feed" %}">RSS Feed</a>
+        <h2>Archive</h2>
+        <ul>
+        {% for entry in blog_entries|slice:"1:" %}
+        <li><a href="#">{{ entry.title }} - {{ entry.published_on }}</a></li>
+        {% empty %}
+        No archived posts
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

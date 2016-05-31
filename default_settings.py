@@ -4,6 +4,7 @@ import os
 import re
 import sys
 
+from django.utils.translation import ugettext_lazy as _
 from celery.schedules import crontab
 from os.path import abspath, dirname, basename, join
 
@@ -307,6 +308,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'ajax_select',
     'impersonate',
+    'ckeditor',
 )
 
 # Captcha SSL
@@ -315,11 +317,30 @@ CAPTCHA_AJAX = True
 
 # Add all MyJobs apps here. This separation ensures that automated Jenkins tests
 # only run on these apps
-PROJECT_APPS = ('myjobs', 'myprofile', 'mysearches', 'registration',
-                'mydashboard', 'mysignon', 'mymessages', 'mypartners',
-                'solr', 'postajob', 'moc_coding', 'seo', 'social_links',
-                'wildcard', 'myblocks', 'myemails', 'myreports', 'redirect',
-                'automation', 'universal', 'import_jobs')
+PROJECT_APPS = (
+    'myjobs',
+    'myprofile',
+    'mysearches',
+    'registration',
+    'mydashboard',
+    'mysignon',
+    'mymessages',
+    'mypartners',
+    'solr',
+    'postajob',
+    'moc_coding',
+    'seo',
+    'social_links',
+    'wildcard',
+    'myblocks',
+    'myemails',
+    'myreports',
+    'redirect',
+    'automation',
+    'universal',
+    'import_jobs',
+    'myblogs',
+)
 
 INSTALLED_APPS += PROJECT_APPS
 
@@ -689,3 +710,16 @@ AJAX_LOOKUP_CHANNELS = {
 }
 
 IMPERSONATE_CUSTOM_ALLOW = 'myjobs.helpers.impersonate_access_function'
+
+LANGUAGES = [
+    ('en', _('English')),
+]
+
+CKEDITOR_JQUERY_URL = (
+    '//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': "100%"
+    },
+}

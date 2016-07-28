@@ -222,6 +222,10 @@ CELERY_ROUTES = {
         'queue': 'mongo',
         'routing_key': 'mongo.jobsfs_to_mongo'
     },
+    'tasks.requeue_failures': {
+        'queue': 'solr',
+        'routing_key': 'solr.requeue_failures'
+    },
 }
 CELERYBEAT_SCHEDULE = {
     'weekly-partner-library-update': {

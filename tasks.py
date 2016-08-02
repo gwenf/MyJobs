@@ -600,21 +600,6 @@ def task_priority_etl_to_solr(guid, buid, name):
         raise task_priority_etl_to_solr.retry(exc=e)
 
 
-@task(name="tasks.check_solr_count", send_error_emails=True, ignore_result=True)
-def task_check_solr_count(buid, count):
-    buid = int(buid)
-    conn = Solr(settings.HAYSTACK_CONNECTIONS['default']['URL'])
-    hits = conn.search(q="buid:%s" % buid, rows=1, mlt="false", facet="false").hits
-    if int(count) != int(hits):
-        logger.warn("For BUID: %s, we expected %s jobs, but have %s jobs", buid, count, hits)
-        send_mail(recipient_list=["matt@apps.directemployers.org"],
-                  from_email="solr_count_monitoring@apps.directemployers.org",
-                  subject="Buid Count for %s is incorrect." % buid,
-                  message="For BUID: %s, we expected %s jobs, but have %s jobs.  Check imports for this buid." %
-                        (buid, count, hits),
-                  fail_silently=False)
-
-
 @task(name="tasks.task_clear_solr", ignore_result=True)
 def task_clear_solr(jsid):
     """Delete all jobs for a given Business Unit/Job Source."""
@@ -792,12 +777,20 @@ def send_event_email(email_task):
 
 @task(name="tasks.requeue_failures", ignore_result=True)
 def requeue_failures(hours=8):
+    ALERT_THRESHOLD = 15
     period = datetime.datetime.now() - datetime.timedelta(hours=hours)
 
     failed_tasks = TaskState.objects.filter(state__in=['FAILURE', 'STARTED', 'RETRY'],
                                             tstamp__gt=period,
                                             name__in=['tasks.etl_to_solr',
                                                       'tasks.priority_etl_to_solr'])
+    count = len(failed_tasks)
+    if count > ALERT_THRESHOLD:
+        send_mail(recipient_list=["matt@apps.directemployers.org", "jmclaughlin@apps.directemployers.org"],
+                  from_email="requeue_failures@apps.directemployers.org",
+                  subject="%s Import tasks failed" % count,
+                  message="There were %s failed tasks last night, which exceeded the alert threshold of %s" % (count, ALERT_THRESHOLD),
+                  fail_silently=False)
 
     for task in failed_tasks:
         task_etl_to_solr.delay(*ast.literal_eval(task.args))

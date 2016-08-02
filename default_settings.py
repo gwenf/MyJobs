@@ -162,10 +162,6 @@ CELERY_ROUTES = {
         'queue': 'priority',
         'routing_key': 'priority.update_solr'
     },
-    'tasks.check_solr_count': {
-        'queue': 'solr',
-        'routing_key': 'solr.update_solr'
-    },
     'tasks.task_clear_bu_cache': {
         'queue': 'priority',
         'routing_key': 'priority.clear_cache'
@@ -364,20 +360,20 @@ LOGGING = {
             'class': 'django.utils.log.NullHandler',
         },
         'file': {
-            'filename': '/var/log/directseo/dseo.log',
+            'filename': '/var/log/directseo/django.log',
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': 'midnight',
             'backupCount': 3,
             'formatter': 'verbose'
         },
-        'logfile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': "/home/web/myjobslogs/logfile",
-            'maxBytes': 50000,
-            'backupCount': 2,
-            'formatter': 'standard',
+        'sns': {
+            'filename': '/var/log/directseo/sns.log',
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'midnight',
+            'backupCount': 3,
+            'formatter': 'verbose'
         },
         'console': {
             'level': 'INFO',
@@ -386,53 +382,23 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['console', 'logfile'],
-            'propagate': True,
+        '': {
             'level': 'WARN',
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
+            'handlers': ['console', 'file']
         },
         'myjobs': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'formatter': 'standard',
         },
         'tasks': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'formatter': 'standard',
         },
-        'pysolr': {
-            'level': 'ERROR'
-        },
-        'seo.views.search_views': {
-            'level': 'ERROR',
-            'handlers': ['file']
-        },
-        'seo.updates': {
-            'level': 'ERROR',
-            'handlers': ['file']
-        },
-        'myjobs.views': {
-            'level': 'ERROR',
-            'handlers': ['logfile']
-        },
-        'mypartners.views': {
-            'level': 'ERROR',
-            'handlers': ['logfile']
-        },
-        'requests.packages.urllib3.connectionpool': {
-            'level': 'ERROR'
-        },
-        'amqplib': {
-            'level': 'INFO'
-        },
-        'factory': {
-            'level': 'INFO'
+        'seo.views.import_views': {
+            'level': 'INFO',
+            'handlers': ['file', 'sns']
         },
     }
 }

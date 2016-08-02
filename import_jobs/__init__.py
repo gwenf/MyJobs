@@ -27,7 +27,7 @@ from import_jobs.solr import add_jobs, chunk, delete_by_guid
 logger = logging.getLogger(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.normpath(os.path.join(BASE_DIR, '../../../data/'))
+DATA_DIR = os.path.normpath(os.path.join(BASE_DIR, '/tmp/data/'))
 sys.path.insert(0, os.path.join(BASE_DIR))
 sys.path.insert(0, os.path.join(BASE_DIR, '../'))
 FEED_FILE_PREFIX = "dseo_feed_"

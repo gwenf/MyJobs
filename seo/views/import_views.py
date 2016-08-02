@@ -94,12 +94,6 @@ def confirm_load_jobs_from_etl(response):
                 logger.info("Ignoring sns for %s", jsid)
                 return None
 
-            # Setup a check on this business unit down the road.
-            if 'count' in msg:
-                logger.info("Creating check_solr_count task (%s, %s)"%(buid, msg['count']))
-                eta=timezone.now() + timedelta(minutes=20)
-                task_check_solr_count.apply_async((buid, msg['count']), eta=eta)
-
             logger.info("Creating ETL Task (%s, %s, %s)"%(jsid, buid, name))
             if int(prio)==1:
                 task_priority_etl_to_solr.delay(jsid, buid, name)

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean-shrinkwrap": "babel-node clean-shrinkwrap.js",
-    "devserver": "webpack-dev-server -d --progress --config=webpack.dev.config.js --inline"
+    "devserver": "webpack-dev-server -d --progress --config=webpack.dev.config.js"
   },
   "author": "DirectEmployers Association",
   "license": "(GPL-2.0 OR GPL-3.0 OR MIT)",

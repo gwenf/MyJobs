@@ -25,13 +25,11 @@ add requirements.txt /requirements.txt
 run pip install -r requirements.txt
 run pip install django-debug-toolbar sphinx
 
-run adduser dev
-
-run mkdir -p /var/log/directseo /var/log/myjobs /home/web/myjobslogs
-run touch /var/log/directseo/dseo.log /home/web/myjobslogs/logfile
-run ln -s /var/log /log
+run mkdir /home/dev
+run chmod 0777 /home/dev
 
 volume /MyJobs
 volume /deployment
 
 env DEVSERVER_HTTPS=1
+env HOME=/home/dev

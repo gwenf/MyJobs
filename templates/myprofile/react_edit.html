@@ -30,6 +30,7 @@
 
 {% if wp_base_url %}
   <script src="{{wp_base_url}}/myprofile.js"/></script>
+  <script src="{{wp_base_url}}/webpack-dev-server.js"/></script>
 {% else %}
   {% compress js %}
   <script src="{% static "bundle/vendor.js" %}"></script>

@@ -30,19 +30,20 @@ dev_path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 dev_path=/MyJobs/gulp/node_modules/.bin:$dev_path
 
 init() {
-    initsolrdata
-    initmysqldata
+    initsolrdata53
+    initmysqldata55
     initrevproxycerts
+    initnet
 }
 
-initsolrdata() {
-    docker build -t darrint/solrdata solrdata
-    docker create --name solrdata darrint/solrdata true
+initsolrdata53() {
+    docker build -t solrdata53 solrdata53
+    docker create --name solrdata53 solrdata53 true
 }
 
-initmysqldata() {
-    docker build -t darrint/mysqldata mysqldata
-    docker create --name mysqldata darrint/mysqldata true
+initmysqldata55() {
+    docker build -t mysqldata55 mysqldata55
+    docker create --name mysqldata55 mysqldata55 true
 }
 
 initrevproxycerts() {
@@ -55,6 +56,10 @@ initrevproxycerts() {
     done
 }
 
+initnet() {
+  docker network create myjobs
+}
+
 
 debugargs() {
     echo "$port $portarg $pythonpath $pythonpatharg ||| $@"
@@ -62,48 +67,48 @@ debugargs() {
 
 pull() {
     docker pull mysql:5.5
-    docker pull ubuntu:14.04
-    docker pull ubuntu:15.10
-    docker pull jwilder/nginx-proxy
+    docker pull ubuntu:trusty
+    docker pull solr:5.3.1
+    docker pull nginx:stable
 }
 
 background() {
     docker build \
-        -t darrint/solr \
-        solr
-    docker build \
-         -t darrint/revproxy \
+         -t myjobsdev/revproxy \
          nginx-proxy
     docker run \
-        --name solr \
+        --net=myjobs \
+        --name solr53 \
         -d \
-        --volumes-from solrdata \
+        --volumes-from solrdata53 \
         -p 8983:8983 \
-        darrint/solr
+        solr:5.3.1
     docker run \
-        --name mysql \
+        --net=myjobs \
+        --name mysql55 \
         -d \
         -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-        --volumes-from mysqldata \
+        --volumes-from mysqldata55 \
         --expose=3306 \
         -p 3306:3306 \
         mysql:5.5
     docker run \
-        --name revproxy \
+        --net=myjobs \
+        --name revproxy-simple \
         -d \
         -p 80:80 -p 443:443 \
         -v $(pwd)/revproxy/certs:/etc/nginx/certs \
         -v /var/run/docker.sock:/tmp/docker.sock:ro \
-        darrint/revproxy
+        myjobsdev/revproxy
 }
 
 backgroundstop() {
-    docker stop mysql || true
-    docker stop solr || true
-    docker stop revproxy || true
-    docker rm mysql || true
-    docker rm solr || true
-    docker rm revproxy || true
+    docker stop mysql55 || true
+    docker stop solr53 || true
+    docker stop revproxy-simple || true
+    docker rm mysql55 || true
+    docker rm solr53 || true
+    docker rm revproxy-simple || true
 }
 
 bgrst() {
@@ -112,23 +117,23 @@ bgrst() {
 }
 
 restartsecure() {
-    docker stop secure.my.jobs || true
-    docker rm secure.my.jobs || true
+    docker stop django-secure || true
+    docker rm django-secure || true
     runsecure || true
 }
 
 restartmicrosites() {
-    docker stop star.jobs || true
-    docker rm star.jobs || true
+    docker stop django-microsites || true
+    docker rm django-microsites || true
     runmicrosites || true
 }
 
 maint() {
     docker run \
         --rm \
-        --net=host \
-        --volumes-from solrdata \
-        --volumes-from mysqldata \
+        --net=myjobs \
+        --volumes-from solrdata53 \
+        --volumes-from mysqldata55 \
         -v $(pwd)/..:/MyJobs \
         -v $(pwd)/../../deployment:/deployment \
         -w=/MyJobs \
@@ -139,28 +144,26 @@ maint() {
 
 rebuilddev() {
     cp -p ../requirements.txt dev
-    time docker build -t darrint/dev dev
+    time docker build -t myjobsdev/dev dev
 }
 
 doruncd() {
-    if [ -z ${port+x} ]; then
-     nethost="--net=host"
-    fi
     dir="$1"
     shift
     docker run \
-        $nethost \
+        --net=myjobs \
         --rm \
         -v $(pwd)/..:/MyJobs \
         -v $(pwd)/../../deployment:/deployment \
         $portarg \
         $pythonpatharg \
         $dockerenvarg \
+        --user $(id -u):$(id -g) \
         -w /MyJobs/"$dir" \
         -e PATH="$dev_path" \
         -e npm_config_unsafe_perm=1 \
         -i -t \
-        darrint/dev "$@"
+        myjobsdev/dev "$@"
 }
 
 dorun() {
@@ -174,31 +177,46 @@ manage() {
 runserver() {
     virthost="$1"
     docker run \
-        --name $(echo $virthost | sed 's/*/star/g') \
-        --link solr \
-        --link mysql \
-        --expose=80 \
+        --net=myjobs \
+        --name $virthost \
+        --expose=8000 \
         --rm \
         -v $(pwd)/..:/MyJobs \
         -v $(pwd)/../../deployment:/deployment \
         $pythonpatharg \
         $dockerenvarg \
-        -e VIRTUAL_HOST="$virthost" \
+        --user $(id -u):$(id -g) \
         -w /MyJobs \
         -i -t \
-        darrint/dev \
-        python manage.py runserver 0.0.0.0:80
+        myjobsdev/dev \
+        python manage.py runserver 0.0.0.0:8000
 }
 
 runmicrosites() {
     pythonpatharg="-e PYTHONPATH=settings_dseo" \
-        dockerenvarg="-e NO_HTTPS_REDIRECT=1 $dockerenvarg" \
-        runserver "*.jobs"
+        runserver "django-microsites"
 }
 
 runsecure() {
     pythonpatharg="-e PYTHONPATH=settings_myjobs" \
-        runserver "secure.my.jobs"
+        runserver "django-secure"
+}
+
+rundevserver() {
+    docker run \
+        --net=myjobs \
+        --name webpack-devserver \
+        --rm \
+        -v $(pwd)/..:/MyJobs \
+        -v $(pwd)/../../deployment:/deployment \
+        $pythonpatharg \
+        $dockerenvarg \
+        --user $(id -u):$(id -g) \
+        -p 8080:8080 \
+        -w /MyJobs/gulp \
+        -i -t \
+        myjobsdev/dev \
+        npm run devserver
 }
 
 "$@"

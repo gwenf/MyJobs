@@ -120,7 +120,8 @@ class MyJobsBase(TestCase):
 
         cache.clear()
         clear_url_caches()
-        self.ms_solr = Solr('http://127.0.0.1:8983/solr/seo')
+        # self.ms_solr = Solr('http://127.0.0.1:8983/solr/seo_test')
+        self.ms_solr = Solr(settings.SOLR['seo_test'])
         self.ms_solr.delete(q='*:*')
 
         self.base_context_processors = settings.TEMPLATE_CONTEXT_PROCESSORS

@@ -96,3 +96,7 @@ LOGGING = {
         }
     }
 }
+
+SOLR = {
+    'seo_test': 'http://localhost:8983/seo_test/',
+}

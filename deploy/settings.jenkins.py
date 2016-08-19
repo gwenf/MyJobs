@@ -98,5 +98,5 @@ LOGGING = {
 }
 
 SOLR = {
-    'seo_test': 'http://localhost:8983/seo_test/',
+    'seo_test': 'http://127.0.0.1:8983/solr/seo_test/',
 }

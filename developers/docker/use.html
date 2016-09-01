@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setting Up and Using Docker for Development &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Docker" href="index.html" />
+    <link rel="next" title="Style Guides" href="../styleguides/index.html" />
+    <link rel="prev" title="Docker" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../styleguides/index.html" title="Style Guides"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Docker"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Docker</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="setting-up-and-using-docker-for-development">
+<h1>Setting Up and Using Docker for Development<a class="headerlink" href="#setting-up-and-using-docker-for-development" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-to-expect">
+<h2>What to Expect<a class="headerlink" href="#what-to-expect" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Creates a known good working environment.</li>
+<li>Creates a local reverse proxy which is able to serve microsites in a manner
+consistent with production, including http vs. https handling.</li>
+<li>There will be permissions issues. The user running tools in the docker
+container will not have the same uid as the developer&#8217;s own uid. This will
+result in occasional problems. This tends to affect pyc files, (not a big
+deal) and node_modules (occasionally annoying).</li>
+</ul>
+</div>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Clone MyJobs repo.</p>
+</li>
+<li><p class="first">Add these to the root of the repo (get from another developer):</p>
+<ul>
+<li><p class="first">Permanently:</p>
+<ul class="simple">
+<li>Settings.py</li>
+<li>Dev_settings.py</li>
+<li>Secrets.py</li>
+</ul>
+</li>
+<li><p class="first">Temporarily:</p>
+<ul>
+<li><p class="first">Dump of development MySQL database (named dbbackup.sql). For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>mysqldump -u root -p db &gt; dbbackup.sql;
+</pre></div>
+</div>
+<p>If you make a dump from a newer version of MySQL than what is in production
+you&#8217;re going to have a bad time.</p>
+</li>
+<li><p class="first">An archive of a working Solr configuration. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>cp -r /usr/local/Cellar/solr/5.3.1/server/solr ~/projects/MyJobs
+</pre></div>
+</div>
+<p>If you make a dump from a newer version of Solr than what is in production
+you&#8217;re going to have a bad time.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="getting-docker-and-the-myjobs-convenience-aliases-working">
+<h2>Getting Docker and the MyJobs Convenience Aliases Working<a class="headerlink" href="#getting-docker-and-the-myjobs-convenience-aliases-working" title="Permalink to this headline">¶</a></h2>
+<p>Our goal here is to get Docker installed and our shell aliases working.</p>
+<div class="section" id="first-time-osx">
+<h3>First Time (OSX)<a class="headerlink" href="#first-time-osx" title="Permalink to this headline">¶</a></h3>
+<p>Install <a class="reference external" href="https://download.docker.com/mac/stable/Docker.dmg">Docker for Mac</a>.</p>
+<p>Open the dmg file and place the application in your Applications folder.</p>
+<p>Follow the prompts to install.</p>
+<p>Open the application. An icon of a whale will apear in the top bar and will
+animate until docker has successfully started.</p>
+<p>Once the animation has stopped, run <code class="docutils literal"><span class="pre">docker</span> <span class="pre">ps</span></code> in a terminal.
+It should run without errors.</p>
+<p>Know your local ip address. We&#8217;ll call it $myip from now on.</p>
+</div>
+<div class="section" id="first-time-linux">
+<h3>First Time (Linux)<a class="headerlink" href="#first-time-linux" title="Permalink to this headline">¶</a></h3>
+<p>Install docker from your distro.</p>
+<p>Make sure your user is added to the docker group.</p>
+<p>docker should be shown when you run <code class="docutils literal"><span class="pre">groups</span></code></p>
+<p>Know your local ip address. We&#8217;ll call it $myip from now on.</p>
+</div>
+<div class="section" id="terminal-setup-both">
+<h3>Terminal Setup (Both)<a class="headerlink" href="#terminal-setup-both" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">cd</span> <span class="pre">$myjobs</span></code> where myjobs is wherever you checked out the MyJobs code.</p>
+<p><code class="docutils literal"><span class="pre">.</span> <span class="pre">dk2/env.sh</span></code> This makes the <code class="docutils literal"><span class="pre">dk</span></code> convenience function available.</p>
+</div>
+</div>
+<div class="section" id="initialize-the-data-volumes-and-certs">
+<h2>Initialize the Data Volumes and Certs<a class="headerlink" href="#initialize-the-data-volumes-and-certs" title="Permalink to this headline">¶</a></h2>
+<p>This sets aside some volumes which will not be deleted when containers are
+removed.</p>
+<p>It also initializes some self signed ssl certificates for the reverse proxy.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">init</span></code></p>
+</div>
+<div class="section" id="build-the-development-image">
+<h2>Build the Development Image<a class="headerlink" href="#build-the-development-image" title="Permalink to this headline">¶</a></h2>
+<p>Rerun this any time we change requirements.txt.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">rebuilddev</span></code> Also takes a long time. [If it hits a glitch run this command again]</p>
+</div>
+<div class="section" id="build-the-background-containers">
+<h2>Build the Background Containers<a class="headerlink" href="#build-the-background-containers" title="Permalink to this headline">¶</a></h2>
+<p>MyJobs needs Solr, and MySQL, and we will also set up a reverse proxy here.</p>
+<p>From the MyJobs directory and with <code class="docutils literal"><span class="pre">dk2/env.sh</span></code> sourced:</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">pull</span></code> Takes a long time. Downloads some Docker images for local use.</p>
+<p><code class="docutils literal"><span class="pre">export</span> <span class="pre">MYSQL_ROOT_PASSWORD=&quot;somepassword&quot;</span></code> This should only be needed when
+running MySQL for the first time.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">background</span></code> First run takes a long time.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">backgroundstop</span></code> If you have problems here, restart docker itself or the
+docker virtual machine.</p>
+<p>If needed on Linux: <code class="docutils literal"><span class="pre">systemctl</span> <span class="pre">restart</span> <span class="pre">docker</span></code></p>
+<p>If needed on OSX: Click the whale icon and press &#8220;reset&#8221; on the drop down.</p>
+<p>Keep trying until <code class="docutils literal"><span class="pre">docker</span> <span class="pre">ps</span></code> shows no running machines.</p>
+</div>
+<div class="section" id="load-data-into-mysql-and-solr">
+<h2>Load Data into MySQL and Solr<a class="headerlink" href="#load-data-into-mysql-and-solr" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">background</span></code> At this point possibly only MySql and the reverse proxy will
+stay running.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">maint</span> <span class="pre">mysql:5.5</span></code> Start an interactive container based on MySQL</p>
+<p><code class="docutils literal"><span class="pre">cp</span> <span class="pre">-a</span> <span class="pre">solr_config/*</span> <span class="pre">/var/solr/data</span></code> assuming you have <code class="docutils literal"><span class="pre">solr.xml</span></code> and
+friends in <code class="docutils literal"><span class="pre">solr_config/</span></code></p>
+<p><code class="docutils literal"><span class="pre">mysql</span> <span class="pre">-u</span> <span class="pre">root</span> <span class="pre">-p</span> <span class="pre">-h</span> <span class="pre">$myip</span></code></p>
+<p><code class="docutils literal"><span class="pre">mysql&gt;</span> <span class="pre">SET</span> <span class="pre">GLOBAL</span> <span class="pre">max_allowed_packet=1073741824;</span></code></p>
+<p><code class="docutils literal"><span class="pre">exit</span></code></p>
+<p><code class="docutils literal"><span class="pre">mysql</span> <span class="pre">-u</span> <span class="pre">root</span> <span class="pre">-p</span> <span class="pre">-h</span> <span class="pre">$myip</span> <span class="pre">db</span> <span class="pre">&lt;dbbackup.sql</span></code> assuming that your database
+backup file is <code class="docutils literal"><span class="pre">dbbackup.sql</span></code></p>
+<p><code class="docutils literal"><span class="pre">exit</span></code> Exits the interactive container.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">backgroundstop</span></code></p>
+<p><code class="docutils literal"><span class="pre">docker</span> <span class="pre">ps</span></code> Verify no running containers.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">background</span></code></p>
+<p><code class="docutils literal"><span class="pre">docker</span> <span class="pre">ps</span></code> Should show MySQL, Solr, and revproxy running.</p>
+</div>
+<div class="section" id="configure-myjobs-to-run-in-docker-containers">
+<h2>Configure MyJobs to Run in Docker Containers<a class="headerlink" href="#configure-myjobs-to-run-in-docker-containers" title="Permalink to this headline">¶</a></h2>
+<p>Appropriate settings, obtained from other developers, go in these files:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">secrets.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">settings_myjobs/settings.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">settings_dseo/settings.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">dev_settings.py</span></code></li>
+</ul>
+</div>
+<div class="section" id="verify-that-django-works">
+<h2>Verify that Django Works<a class="headerlink" href="#verify-that-django-works" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">dkm</span> <span class="pre">test</span> <span class="pre">myjobs</span></code> same as <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">test</span> <span class="pre">myjobs</span></code>.</p>
+</div>
+<div class="section" id="run-django-containers">
+<h2>Run Django Containers<a class="headerlink" href="#run-django-containers" title="Permalink to this headline">¶</a></h2>
+<p>We run these services in the interactively in the foreground as it&#8217;s convenient
+to have instant scrollable/searchable access to their logs.</p>
+<p>Start a new terminal.</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">runsecure</span></code></p>
+<p>Start a new terminal</p>
+<p><code class="docutils literal"><span class="pre">dk</span> <span class="pre">runmicrosites</span></code></p>
+</div>
+<div class="section" id="access-local-containers-with-a-browser">
+<h2>Access Local Containers with a Browser<a class="headerlink" href="#access-local-containers-with-a-browser" title="Permalink to this headline">¶</a></h2>
+<p>Add to <code class="docutils literal"><span class="pre">/etc/hosts</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>$myip secure.my.jobs www.my.jobs
+</pre></div>
+</div>
+<p>Add other microsites as needed.</p>
+<p>Go to <a class="reference external" href="http://secure.my.jobs">http://secure.my.jobs</a>. You should have to click through a security
+warning.</p>
+</div>
+<div class="section" id="run-webpack-dev-server">
+<h2>Run Webpack Dev Server<a class="headerlink" href="#run-webpack-dev-server" title="Permalink to this headline">¶</a></h2>
+<p>Add to dev_settings.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">WEBPACK_DEV_SERVER_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://secure.my.jobs:8080&quot;</span>
+<span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">+=</span> <span class="p">(</span>
+    <span class="s1">&#39;myjobs.context_processors.webpack_dev_setting&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>dkg npm run devserver
+</pre></div>
+</div>
+<p>Visit the webpack base url above in a browser. Accept the certificate.</p>
+<p>Visit a url using one of our JS bundles with a browser.</p>
+<p>Change a <code class="docutils literal"><span class="pre">.jsx</span></code> file displayed in the browser. It should auto-reload.</p>
+</div>
+<div class="section" id="run-tests-in-the-background">
+<h2>Run Tests in the Background<a class="headerlink" href="#run-tests-in-the-background" title="Permalink to this headline">¶</a></h2>
+<p>From the root:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>dkgg watch-tasks watch
+</pre></div>
+</div>
+</div>
+<div class="section" id="set-up-docker-with-vm-of-windows">
+<h2>Set Up Docker with VM of Windows<a class="headerlink" href="#set-up-docker-with-vm-of-windows" title="Permalink to this headline">¶</a></h2>
+<p>To use a Windows or other VM in conjunction with Docker (IE Testing, etc)</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Import a valid image into Virtual Box. Below are steps for a Windows VM are</dt>
+<dd><p class="first">below</p>
+<ul class="last simple">
+<li>Download image from <a class="reference external" href="https://dev.windows.com/en-us/microsoft-edge/tools/vms/">https://dev.windows.com/en-us/microsoft-edge/tools/vms/</a></li>
+<li>Extract OVA file from downloaded zip file</li>
+<li>Launch VirtualBox</li>
+<li>Navigate File -&gt; Import Appliance.. Select extracted OVA File</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Right click new VM image, Settings -&gt; Network -&gt; Attached To -&gt; NAT</p>
+</li>
+<li><p class="first">From the console, run <code class="docutils literal"><span class="pre">VBoxManage</span> <span class="pre">modifyvm</span> <span class="pre">&quot;VM</span> <span class="pre">name&quot;</span> <span class="pre">--natdnshostresolver1</span> <span class="pre">on</span></code></p>
+<blockquote>
+<div><ul class="simple">
+<li>Replace &#8220;VM Name&#8221; with the name of the image you created</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">From VirtualBox GUI, Select &#8220;Snapshots&#8221; and create a snapshot of the Image</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>This is useful for temporary licenses such as those for Windows. To reload</dt>
+<dd><p class="first last">the snapshot later, simply right-click and &#8220;Restore Snapshot&#8221;</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">DNS entries in the host computers hosts file are available on Windows VM</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setting Up and Using Docker for Development</a><ul>
+<li><a class="reference internal" href="#what-to-expect">What to Expect</a></li>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#getting-docker-and-the-myjobs-convenience-aliases-working">Getting Docker and the MyJobs Convenience Aliases Working</a><ul>
+<li><a class="reference internal" href="#first-time-osx">First Time (OSX)</a></li>
+<li><a class="reference internal" href="#first-time-linux">First Time (Linux)</a></li>
+<li><a class="reference internal" href="#terminal-setup-both">Terminal Setup (Both)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#initialize-the-data-volumes-and-certs">Initialize the Data Volumes and Certs</a></li>
+<li><a class="reference internal" href="#build-the-development-image">Build the Development Image</a></li>
+<li><a class="reference internal" href="#build-the-background-containers">Build the Background Containers</a></li>
+<li><a class="reference internal" href="#load-data-into-mysql-and-solr">Load Data into MySQL and Solr</a></li>
+<li><a class="reference internal" href="#configure-myjobs-to-run-in-docker-containers">Configure MyJobs to Run in Docker Containers</a></li>
+<li><a class="reference internal" href="#verify-that-django-works">Verify that Django Works</a></li>
+<li><a class="reference internal" href="#run-django-containers">Run Django Containers</a></li>
+<li><a class="reference internal" href="#access-local-containers-with-a-browser">Access Local Containers with a Browser</a></li>
+<li><a class="reference internal" href="#run-webpack-dev-server">Run Webpack Dev Server</a></li>
+<li><a class="reference internal" href="#run-tests-in-the-background">Run Tests in the Background</a></li>
+<li><a class="reference internal" href="#set-up-docker-with-vm-of-windows">Set Up Docker with VM of Windows</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Docker</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../styleguides/index.html"
+                        title="next chapter">Style Guides</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/docker/use.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../styleguides/index.html" title="Style Guides"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Docker"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Docker</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

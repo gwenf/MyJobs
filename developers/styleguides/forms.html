@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Forms: Layout and Input Type Usage &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Style Guides" href="index.html" />
+    <link rel="next" title="JavaScript Coding Standard" href="javascript.html" />
+    <link rel="prev" title="Writing Documentation" href="documentation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="javascript.html" title="JavaScript Coding Standard"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Writing Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="forms-layout-and-input-type-usage">
+<h1>Forms: Layout and Input Type Usage<a class="headerlink" href="#forms-layout-and-input-type-usage" title="Permalink to this headline">¶</a></h1>
+<p>This guide covers the use of forms and specific input types. At the bottom of
+the document is a sample image with input layout examples.</p>
+<div class="section" id="high-level-requirements">
+<h2>High Level Requirements<a class="headerlink" href="#high-level-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Form layouts should handle all layout widths automatically. For testing, this
+includes two primary widths</p>
+<p><strong>Wide</strong>:
+Used in layouts when the form is in a span 8.</p>
+<p><strong>Narrow</strong>:
+Used in mobile layouts and when the form is in a span 4 (ie the side bar).</p>
+<p><strong>Form Validation</strong>:</p>
+<ul class="simple">
+<li>Validation errors should be able to stack when there are multiple errors</li>
+<li>Non field form errors should appear at the top of a form in a red alert</li>
+<li>All Validation warnings should preserve any input already entered in a form</li>
+<li>Validation warnings should replace any help text on the form</li>
+<li>Validation details (if applicable) should be hidden by default</li>
+</ul>
+</div>
+<div class="section" id="aligement">
+<h2>Aligement<a class="headerlink" href="#aligement" title="Permalink to this headline">¶</a></h2>
+<p><strong>Wide Width</strong></p>
+<ul class="simple">
+<li>Labels should be in a span3 column to the left of the field they label</li>
+<li>Label text should be right aligned</li>
+<li>Required forms should use <strong>bold</strong> text</li>
+<li>Inputs should take the rest of the parent column width</li>
+<li>Inputs should be left aligned</li>
+<li>Buttons should be in the column with inputs</li>
+<li>Buttons should align left in a row</li>
+<li>Buttons should be ordered with most important to the left, least to the right</li>
+</ul>
+<p><strong>Narrow Width</strong></p>
+<ul class="simple">
+<li>Labels should appear above the input they label</li>
+<li>Labels should be left aligned</li>
+<li>Inputs should take the full width of the column, less the margins</li>
+</ul>
+</div>
+<div class="section" id="field-validation">
+<h2>Field Validation<a class="headerlink" href="#field-validation" title="Permalink to this headline">¶</a></h2>
+<p>Changes made to a field in error:</p>
+<ul class="simple">
+<li>input border turns red</li>
+<li>label turns red</li>
+<li>help text is hidden (if applicable)</li>
+<li>a warning icon and error description are shown immediately below the fold. If
+there are multiple errors, each one gets its own line below the field</li>
+<li>if additional details are available for an error, they should be placed in a
+hidden div below the error.<ul>
+<li>To access this div, a tree arrow would be placed aligned right on the
+description row. This arrow toggles the div.</li>
+<li>The div should appear in the main DOM layer, not as a floating element.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="field-usage">
+<h2>Field Usage<a class="headerlink" href="#field-usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="text">
+<h3>Text<a class="headerlink" href="#text" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Standard text input by default</li>
+<li>Textarea for paragraph style input</li>
+</ul>
+</div>
+<div class="section" id="option-list">
+<h3>Option List<a class="headerlink" href="#option-list" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Select list</li>
+<li>Radio buttons only when it is appropriate</li>
+</ul>
+</div>
+<div class="section" id="locations">
+<h3>Locations<a class="headerlink" href="#locations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Select list for country</li>
+<li>Select list for region<ul>
+<li>default should be &#8220;Select Region...&#8221;</li>
+<li>text field if there no json file available for selected country</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="date">
+<h3>Date<a class="headerlink" href="#date" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Disabled text input with date picker</li>
+<li>date picker should include a select list for month and year to allow users to
+quickly find the date they want</li>
+</ul>
+</div>
+<div class="section" id="time">
+<h3>Time<a class="headerlink" href="#time" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>set of three drop downs in sequence.<ul>
+<li>Hours (1-12)</li>
+<li>Minutes (0-59)</li>
+<li>AM/PM</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="booleans">
+<h3>Booleans<a class="headerlink" href="#booleans" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Presented as a checkbox</li>
+<li>If multiple checkboxes are presented as one control, include a left aligned
+label to the right of the checkbox</li>
+</ul>
+<img alt="form input usage examples" src="../../_images/forms.png" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Forms: Layout and Input Type Usage</a><ul>
+<li><a class="reference internal" href="#high-level-requirements">High Level Requirements</a></li>
+<li><a class="reference internal" href="#aligement">Aligement</a></li>
+<li><a class="reference internal" href="#field-validation">Field Validation</a></li>
+<li><a class="reference internal" href="#field-usage">Field Usage</a><ul>
+<li><a class="reference internal" href="#text">Text</a></li>
+<li><a class="reference internal" href="#option-list">Option List</a></li>
+<li><a class="reference internal" href="#locations">Locations</a></li>
+<li><a class="reference internal" href="#date">Date</a></li>
+<li><a class="reference internal" href="#time">Time</a></li>
+<li><a class="reference internal" href="#booleans">Booleans</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="documentation.html"
+                        title="previous chapter">Writing Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="javascript.html"
+                        title="next chapter">JavaScript Coding Standard</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/styleguides/forms.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="javascript.html" title="JavaScript Coding Standard"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Writing Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

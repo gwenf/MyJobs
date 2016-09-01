@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>My.jobs API Basic Usage &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="API" href="index.html" />
+    <link rel="next" title="MyJobs API" href="developer_guide.html" />
+    <link rel="prev" title="API" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer_guide.html" title="MyJobs API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="my-jobs-api-basic-usage">
+<h1>My.jobs API Basic Usage<a class="headerlink" href="#my-jobs-api-basic-usage" title="Permalink to this headline">¶</a></h1>
+<p>Updated Dec 4, 2013</p>
+<div class="section" id="about-the-api">
+<h2>About the API<a class="headerlink" href="#about-the-api" title="Permalink to this headline">¶</a></h2>
+<p>The My.jobs api provides access to common data and functions on the My.jobs platform via a url-based REST model. It is built on TastyPie and Django, and returns data in either JSON or JSONp formats.</p>
+</div>
+<div class="section" id="saved-search-api">
+<h2>Saved Search API<a class="headerlink" href="#saved-search-api" title="Permalink to this headline">¶</a></h2>
+<p>In order to create a saved search via the API, you must make two calls. First to the user api to check if the email is already in the system, and the second call to create the saved search itself.</p>
+<p><strong>Usage</strong></p>
+<p>Step 1: Call the user API to see if the email submitted already exists</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><th class="stub">Example</th>
+<td><a class="reference external" href="https://secure.my.jobs/api/v1/user/?email=pat&#64;email.com&amp;username=you&#64;yourcompany.com&amp;api_key=1234567890abcdefghijklmnop">https://secure.my.jobs/api/v1/user/?email=pat&#64;email.com&amp;username=you&#64;yourcompany.com&amp;api_key=1234567890abcdefghijklmnop</a></td>
+</tr>
+<tr class="row-even"><th class="stub">URL</th>
+<td><a class="reference external" href="https://secure.my.jobs/api/v1/user/">https://secure.my.jobs/api/v1/user/</a></td>
+</tr>
+<tr class="row-odd"><th class="stub">Required Parameters</th>
+<td><p class="first"><strong>email</strong></p>
+<p>The email to check for account status. If the email is not associated with an account, an account will be created for them and a verification email will be sent to the user.</p>
+<p><strong>username</strong></p>
+<p>The API username is unique to your organization.</p>
+<p><strong>api_key</strong></p>
+<p class="last">The API key associated with the above username</p>
+</td>
+</tr>
+<tr class="row-even"><th class="stub">Optional Parameters</th>
+<td><p class="first"><strong>callback</strong></p>
+<p class="last">If this parameter is provided, then the response will be returned as JSONp instead of JSON.</p>
+</td>
+</tr>
+<tr class="row-odd"><th class="stub">Response Format</th>
+<td><p class="first"><strong>JSON</strong></p>
+<p>{&#8220;email&#8221;: &#8220;[provided email]&#8221;, &#8220;user_created&#8221;: [true|false]}</p>
+<p><strong>JSONp</strong></p>
+<p class="last">callback({&#8220;email&#8221;: &#8220;[provided email]&#8221;, &#8220;user_created&#8221;: [true|false]})</p>
+</td>
+</tr>
+<tr class="row-even"><th class="stub">Response Values</th>
+<td><p class="first"><strong>email</strong></p>
+<p>The email address of the new account. This should always match the email passed to the api. If there is an error, the email field will contain the error message.</p>
+<p><strong>user_created</strong></p>
+<p class="last">Returns true if the user was created, false if the user already exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Step 2: Call the saved search API to create the saved search</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><th class="stub">Example</th>
+<td><a class="reference external" href="https://secure.my.jobs/api/v1/savedsearch/?callback=finish_ss&amp;email=pat&#64;email.com&amp;url=http%3A%2F%2Fwww.my.jobs%2Fjobs%2F%3Fq%3Dinternet&amp;username=you&#64;yourcompany.com&amp;api_key=1234567890abcdefghijklmnop">https://secure.my.jobs/api/v1/savedsearch/?callback=finish_ss&amp;email=pat&#64;email.com&amp;url=http%3A%2F%2Fwww.my.jobs%2Fjobs%2F%3Fq%3Dinternet&amp;username=you&#64;yourcompany.com&amp;api_key=1234567890abcdefghijklmnop</a></td>
+</tr>
+<tr class="row-even"><th class="stub">URL</th>
+<td><a class="reference external" href="https://secure.my.jobs/api/v1/savedsearch/">https://secure.my.jobs/api/v1/savedsearch/</a></td>
+</tr>
+<tr class="row-odd"><th class="stub">Required Parameters</th>
+<td><p class="first"><strong>email</strong></p>
+<p>The email of the account that will own the saved search. If the email is not associated with an account, the api will return an error.</p>
+<p><strong>url</strong></p>
+<p>The full url of the search page (including protocol). The page must contain an rss alternate link tag in the header for the saed search to work:</p>
+<p><code class="docutils literal"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;alternate&quot;</span> <span class="pre">type=&quot;application/rss+xml&quot;</span> <span class="pre">title=&quot;[page</span> <span class="pre">title]&quot;</span> <span class="pre">href=&quot;[rss</span> <span class="pre">url</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">search</span> <span class="pre">page]&quot;&gt;</span></code></p>
+<p><strong>username</strong></p>
+<p>The API username unique to your organization.</p>
+<p><strong>api_key</strong></p>
+<p class="last">The API key associated with the above username</p>
+</td>
+</tr>
+<tr class="row-even"><th class="stub">Optional Parameters</th>
+<td><p class="first"><strong>callback</strong></p>
+<p class="last">If this parameter is provided, then the response will be returned as JSONp instead of JSON</p>
+</td>
+</tr>
+<tr class="row-odd"><th class="stub">Response Format</th>
+<td><p class="first"><strong>JSON</strong></p>
+<p>{&#8220;email&#8221;: &#8220;[provided email]&#8221;, &#8220;frequency&#8221;: &#8220;D&#8221;, &#8220;new_search&#8221;: [true|false]}</p>
+<p><strong>JSONp</strong></p>
+<p class="last">callback({&#8220;email&#8221;: &#8220;[provided email]&#8221;, &#8220;frequency&#8221;: &#8220;D&#8221;, &#8220;new_search&#8221;: [true|false]})</p>
+</td>
+</tr>
+<tr class="row-even"><th class="stub">Response Values</th>
+<td><p class="first"><strong>email</strong></p>
+<p>The email address for which the saved search was created</p>
+<p><strong>frequency</strong></p>
+<p>The frequency with which the saved search will be sent. Currently, the API only supports daily frequencies.</p>
+<p><strong>new_search</strong></p>
+<p class="last">Returns true if this is a new search and false if the saved search already exists. My.jobs will not allow duplicate searches to be setup.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="about-this-document">
+<h2>About this Document<a class="headerlink" href="#about-this-document" title="Permalink to this headline">¶</a></h2>
+<p>This document outlines the basic usage, but is not a comprehensive document for all features and uses. The services outlined in this document are provided as is. This document is produced and distributed by DirectEmployers Association (<a class="reference external" href="http://directemployers.org">http://directemployers.org</a>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">My.jobs API Basic Usage</a><ul>
+<li><a class="reference internal" href="#about-the-api">About the API</a></li>
+<li><a class="reference internal" href="#saved-search-api">Saved Search API</a></li>
+<li><a class="reference internal" href="#about-this-document">About this Document</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="developer_guide.html"
+                        title="next chapter">MyJobs API</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/api/basic_usage.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer_guide.html" title="MyJobs API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

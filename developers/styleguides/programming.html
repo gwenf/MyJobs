@@ -1,0 +1,707 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Programming Guide &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Style Guides" href="index.html" />
+    <link rel="next" title="Unit Testing" href="../testing/index.html" />
+    <link rel="prev" title="JavaScript Coding Standard" href="javascript.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../testing/index.html" title="Unit Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="javascript.html" title="JavaScript Coding Standard"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="programming-guide">
+<h1>Programming Guide<a class="headerlink" href="#programming-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="goal-of-this-guide">
+<h2>Goal of this Guide<a class="headerlink" href="#goal-of-this-guide" title="Permalink to this headline">¶</a></h2>
+<p>This guide provides a common framework for collaboration amongst developers.
+They serve as a foundation, not a strict set of rules. If conflict between
+collaboration and this guide arise, always fall on the side of collaboration.</p>
+</div>
+<div class="section" id="third-party-code">
+<h2>Third Party Code<a class="headerlink" href="#third-party-code" title="Permalink to this headline">¶</a></h2>
+<p>We need to determine the rules of use for non-DE code in our projects. This is
+a placeholder section until that work is done.</p>
+</div>
+<div class="section" id="universal-guides">
+<h2>Universal Guides<a class="headerlink" href="#universal-guides" title="Permalink to this headline">¶</a></h2>
+<p>Regardless of the language used, there are certain aspects that should be the
+same across all platforms.  When documenting and formatting code you should be
+able to answer yes to all of these questions:</p>
+<ul class="simple">
+<li>Can someone else read and understand this code without my help?</li>
+<li>Will I be able to understand this code in 12 months when I need to make a an
+edit?</li>
+<li>Does my code follow DRY principles?</li>
+<li>Will the code I just wrote cause problems for someone else?</li>
+<li>Will this code open a security hole in the application?</li>
+</ul>
+<div class="section" id="updating-legacy-code">
+<h3>Updating Legacy Code<a class="headerlink" href="#updating-legacy-code" title="Permalink to this headline">¶</a></h3>
+<p>When you are updating a legacy function or piece of code that was written prior
+to these guidelines going into effect, do your best to bring that function up
+to the documentation standard. However, do not edit code for the sole purpose
+of formatting to match this guide.</p>
+</div>
+<div class="section" id="secure-coding">
+<h3>Secure Coding<a class="headerlink" href="#secure-coding" title="Permalink to this headline">¶</a></h3>
+<p>When adding or editing functionality, always keep in mind that outside forces
+are trying to break into our systems. All effort should be made to maintain the
+security and confidentiality of member and customer data, and to actively
+prevent unauthorized access to our servers. This includes, but isn’t limited
+to:</p>
+<ul class="simple">
+<li>Testing</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Test on non-production environments</li>
+<li>Test all code prior to release</li>
+<li>Every method should have a unit test</li>
+<li>Every issue should be QC’s by its reporter in a QC environment</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Deployment</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>All deployed code should be tested</li>
+<li>Deployment should not take down servers in order to proceed</li>
+<li>Deployments should be able to be rolled back to the last operational code
+branch if they fail</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Security of Environments</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Access to Production Environments</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Non cloud windows servers</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Accessible only from within the office network or VPN</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Cloud Servers &amp; all Linux servers</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Secured by SSH keys</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<ul class="simple">
+<li>Access to QC &amp; Staging environments</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Same as production, but shared login is allowed</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p>References: OWASP Secure Coding Quick Reference Guide:
+<a class="reference external" href="https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf">https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf</a></p>
+</div>
+<div class="section" id="code-documentation">
+<h3>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h3>
+<p>When documenting code, code with assumption that you will not be the next
+developer to work on the method. Be concise, but descriptive. Well written code
+is not its own documentation. You must document your methods.</p>
+<p>Standards to follow except for the cases that follow:</p>
+<ul class="simple">
+<li>Multiline Comments (eg Docstrings in Python, Delimited comments in C#)</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Multiline comments should begin with a line break.</li>
+<li>This is an exception to the Pep257 Python convention</li>
+<li>Examples:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span>/*
+This is line 1 of the comment.
+this is line two of the comment.
+
+*/
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span>“””
+This is line 1 of the comment.
+
+This is line two of the comment. It can span
+multiple lines for documentation purposes.
+
+“””
+</pre></div>
+</div>
+</div></blockquote>
+</div></blockquote>
+<ul class="simple">
+<li>Argument notation</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Use colons to denote arguments</li>
+<li>This is an exception to the Pep257 convention of a double dash</li>
+<li>Example:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">:argument:</span> <span class="pre">description</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">argument</span></code></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<ul class="simple">
+<li>Arguments to include:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Inputs (Arguments passed into the function)</li>
+<li>Returns (What the function returns)</li>
+<li>Writes/Modifies (If the function writes something to the screen or modifies
+some global value, denote it.)</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="python-django">
+<h2>Python &amp; Django<a class="headerlink" href="#python-django" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pep8-formatting">
+<h3>Pep8 Formatting<a class="headerlink" href="#pep8-formatting" title="Permalink to this headline">¶</a></h3>
+<p>All code should make a reasonable attempt to follow pep-0008 standard, except
+where it conflicts with practices outlined in the previous section.
+<a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">http://www.python.org/dev/peps/pep-0008/</a></p>
+</div>
+<div class="section" id="pep257-docstrings">
+<h3>Pep257 Docstrings<a class="headerlink" href="#pep257-docstrings" title="Permalink to this headline">¶</a></h3>
+<p>Documenting functions, method, classes, etc should follow the Pep-257 standard, except where it conflicts with practices outlined in the previous section:
+<a class="reference external" href="http://www.python.org/dev/peps/pep-0257/">http://www.python.org/dev/peps/pep-0257/</a></p>
+</div>
+</div>
+<div class="section" id="c">
+<h2>C#<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
+<p>Except where it conflicts with the above universal sections, follow the
+Microsoft C# Coding Conventions:
+<a class="reference external" href="https://msdn.microsoft.com/en-us/library/ff926074.aspx">https://msdn.microsoft.com/en-us/library/ff926074.aspx</a></p>
+</div>
+<div class="section" id="java">
+<h2>Java<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h2>
+<p>Except where it conflicts with the universal styling guides, follow the Google
+Java Style Guide:
+<a class="reference external" href="https://google.github.io/styleguide/javaguide.html">https://google.github.io/styleguide/javaguide.html</a></p>
+</div>
+<div class="section" id="user-interface">
+<h2>User Interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mobile-first">
+<h3>Mobile First<a class="headerlink" href="#mobile-first" title="Permalink to this headline">¶</a></h3>
+<p>When designing new UI screens, wireframes, and usage patterns, start with the
+mobile view first.</p>
+</div>
+<div class="section" id="responsive-design">
+<h3>Responsive Design<a class="headerlink" href="#responsive-design" title="Permalink to this headline">¶</a></h3>
+<p>Mobile and Desktop views should be accomplished using the same page. These
+pages should be responsive the device resolution, adapting the display on
+demand to the best user experience for the device. Under no circumstances
+should a separate mobile site be used in lieu of responsive design.</p>
+</div>
+<div class="section" id="mobile">
+<h3>Mobile<a class="headerlink" href="#mobile" title="Permalink to this headline">¶</a></h3>
+<p>Anything under 800px in width should be considered mobile with a one handed
+touch interface. Support for this display level is mandatory for all sites.</p>
+</div>
+<div class="section" id="tablet">
+<h3>Tablet<a class="headerlink" href="#tablet" title="Permalink to this headline">¶</a></h3>
+<p>Anything under 1024px in width should be considered a tablet device with two
+handed touch interface. Support for this display level is optional for all
+sites.</p>
+</div>
+<div class="section" id="desktop">
+<h3>Desktop<a class="headerlink" href="#desktop" title="Permalink to this headline">¶</a></h3>
+<p>Anything at or over 1024px in width should be considered a desktop or laptop
+with a standard mouse and keyboard interface. Support for this display level is
+mandatory for all sites.</p>
+</div>
+<div class="section" id="buttonization-of-links">
+<h3>Buttonization of links<a class="headerlink" href="#buttonization-of-links" title="Permalink to this headline">¶</a></h3>
+<p>For touch interfaces, all links should be converted to a button with a minimum
+dimension of 45px.</p>
+</div>
+<div class="section" id="icons">
+<h3>Icons<a class="headerlink" href="#icons" title="Permalink to this headline">¶</a></h3>
+<p>Use Fontawesome for icons. <a class="reference external" href="http://fortawesome.github.io/Font-Awesome/">http://fortawesome.github.io/Font-Awesome/</a>.</p>
+</div>
+</div>
+<div class="section" id="javascript">
+<h2>JavaScript<a class="headerlink" href="#javascript" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="external-standards">
+<h3>External Standards<a class="headerlink" href="#external-standards" title="Permalink to this headline">¶</a></h3>
+<p>Unless otherwise noted, follow the the Google Javascript style guide:
+<a class="reference external" href="https://google.github.io/styleguide/javascriptguide.xml">https://google.github.io/styleguide/javascriptguide.xml</a></p>
+</div>
+<div class="section" id="object-oriented">
+<h3>Object Oriented<a class="headerlink" href="#object-oriented" title="Permalink to this headline">¶</a></h3>
+<p>Every effort should be made to write javascript in an object oriented manner</p>
+</div>
+<div class="section" id="javascript-libraries">
+<h3>JavaScript Libraries<a class="headerlink" href="#javascript-libraries" title="Permalink to this headline">¶</a></h3>
+<p>jQuery and jQuery UI should be utilized as appropriate. Do not use other
+javascript libraries without consulting the rest of the team.</p>
+</div>
+<div class="section" id="code-location">
+<h3>Code location<a class="headerlink" href="#code-location" title="Permalink to this headline">¶</a></h3>
+<p>Javascript should be placed in external, versioned files on the CDN.
+Incorporate the version in the file name. When external files are not
+practical, a <code class="docutils literal"><span class="pre">&lt;script&gt;</span></code> block may be used. Inline javascript is not allowed.
+Instead, use elements IDs and event mapping.</p>
+</div>
+</div>
+<div class="section" id="html-css-and-browser-support">
+<h2>HTML, CSS, and Browser Support<a class="headerlink" href="#html-css-and-browser-support" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>External Standards<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Unless otherwise noted, all front end markup and css should follow the Google
+Webmaster Format:
+<a class="reference external" href="https://google.github.io/styleguide/htmlcssguide.xml">https://google.github.io/styleguide/htmlcssguide.xml</a></p>
+</div>
+<div class="section" id="browser-support">
+<h3>Browser Support<a class="headerlink" href="#browser-support" title="Permalink to this headline">¶</a></h3>
+<p>The following browsers and versions are supported and should be used for testing:</p>
+<ul class="simple">
+<li>Google Chrome:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Latest stable build</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Mozilla Firefox</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Latest stable build</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Microsoft Internet Explorer</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>version 8.0 and newer</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Microsoft Spartan</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Latest stable build</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Apple Safari</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>version 7 and newer</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>All other browsers</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>All other browsers that are modern and HTML5 compliant should be supported,
+but no testing is required in them.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="page-structure">
+<h3>Page Structure<a class="headerlink" href="#page-structure" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Use the default structure included with bootstrap. Exceptions should be well
+defended.</li>
+<li>Structure should be entirely controlled by CSS.</li>
+</ul>
+</div>
+<div class="section" id="html-layout">
+<h3>HTML Layout<a class="headerlink" href="#html-layout" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Use HTML5 as much as possible</li>
+<li>Use &lt;html&gt;, &lt;head&gt;, and &lt;body&gt; tags</li>
+</ul>
+</div>
+<div class="section" id="html-tables">
+<h3>HTML Tables<a class="headerlink" href="#html-tables" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>All tables should use the bootstrap striped table styles by default</li>
+<li>Tables should be used only for the display of tabular data.</li>
+<li>Use <code class="docutils literal"><span class="pre">&lt;th&gt;</span></code> for headers, not <code class="docutils literal"><span class="pre">&lt;td&gt;&lt;b&gt;</span></code></li>
+<li><code class="docutils literal"><span class="pre">&lt;tbody&gt;</span></code>, <code class="docutils literal"><span class="pre">&lt;thead&gt;</span></code>, etc are optional</li>
+</ul>
+</div>
+<div class="section" id="html-selectors-for-css">
+<h3>HTML Selectors for CSS<a class="headerlink" href="#html-selectors-for-css" title="Permalink to this headline">¶</a></h3>
+<p>HTML elements should be selected in the following manner:</p>
+<ul class="simple">
+<li>element level</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>For global or mass local styling.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>class level</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>For targeting specific types of elements</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>ID level</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>For targeting specific, once per page elements</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="django-templates-formatting">
+<h3>Django Templates Formatting<a class="headerlink" href="#django-templates-formatting" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Indent all HTML according to parent/child relationships</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>All tabs should 4 space faux-tabs</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Django tags</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Follow div spacing and do not create additional tabbing</li>
+<li>Create 1 line space for django logic so we can see the django tags</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Comment closing tags with class associated with tag</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;div class=”span4”&gt;
+
+    {% if searches %}
+
+    &lt;div class=”form-box”&gt;
+        &lt;ul class=”search-list”&gt;
+            &lt;li&gt;searches&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;{# /form-box #}
+
+    {% endif %}
+
+&lt;/div&gt;{# /span4 #}
+</pre></div>
+</div>
+</div>
+<div class="section" id="css-documentation">
+<h3>CSS Documentation<a class="headerlink" href="#css-documentation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Document large sections of related styles with a one line header comment.</li>
+<li>Document style rules as necessary, paying particular attention to complex
+selectors.</li>
+</ul>
+</div>
+<div class="section" id="naming-conventions">
+<h3>Naming Conventions<a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Keep class and id names as short as possible but as long as needed</li>
+<li>Examples:</li>
+<li>.nav not .navigation</li>
+<li>.class not .cls</li>
+<li>hyphen-case all class and id names</li>
+<li>sub elements should use the parent element and add a hyphen case qualifier</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>this-class<ul>
+<li>this-class-sub-item</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="media-selectors">
+<h3>Media Selectors<a class="headerlink" href="#media-selectors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Media selectors should always be loaded in descending order or relevance:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Global Styles</li>
+<li>narrow &#64;media</li>
+<li>Even more narrow &#64;media</li>
+<li>most narrow &#64;media</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Global style rules should never be added after a media selector unless there is a specific reason for doing so, This reason must be documented.</li>
+</ul>
+</div>
+<div class="section" id="css-rule-location">
+<h3>CSS Rule Location<a class="headerlink" href="#css-rule-location" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>Primary</strong></dt>
+<dd>Every effort should be made to put all CSS into a linked external css file.</dd>
+<dt><strong>Limited</strong></dt>
+<dd>Style blocks in the html body itself. This should only be utilized when a
+linked css file isn’t practical, such as conditional styling. In those cases,
+every effort should be made to use conditional classes rather than a
+<code class="docutils literal"><span class="pre">&lt;style&gt;</span></code> section.</dd>
+<dt><strong>Rarely (But never in most cases)</strong></dt>
+<dd>Via the “style” attribute on an item. There are only time this should exist:
+Inside of email templates. Due to client variability, there is no guarantee
+that <code class="docutils literal"><span class="pre">&lt;style&gt;</span></code> blocks or &lt;link&gt; will be displayed. As such, inline style
+is the only reliable option. See
+<a class="reference external" href="http://kb.mailchimp.com/article/css-in-html-email">http://kb.mailchimp.com/article/css-in-html-email</a> for more information. If
+there is a need to manipulate appearance via javascript. In those cases,
+every effort should be made first to swap classes rather than modify css
+directly.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="version-control">
+<h2>Version Control<a class="headerlink" href="#version-control" title="Permalink to this headline">¶</a></h2>
+<p>Except as Documented below, our development and deployment plan follows the Git Flow pattern:
+<a class="reference external" href="http://scottchacon.com/2011/08/31/github-flow.html">http://scottchacon.com/2011/08/31/github-flow.html</a></p>
+<div class="section" id="exceptions-to-git-flow">
+<h3>Exceptions to Git Flow<a class="headerlink" href="#exceptions-to-git-flow" title="Permalink to this headline">¶</a></h3>
+<p><strong>We have a custom deployment pattern</strong></p>
+<ul class="simple">
+<li>See New Deployment Schedule</li>
+</ul>
+<p><strong>Committing rules:</strong></p>
+<ul class="simple">
+<li>Commit often and liberally.</li>
+<li>Reference tickets in your commits.</li>
+<li>Include the ticket ID at the end of your commit message.</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Example: “This is that new feature. MS-123”.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Be descriptive, but concise.</li>
+<li>Do not commit compiled or temp files (ie .pyc)</li>
+<li>Do not merge PRs if any of the following are true:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>It is a pull request you initiated yourself.</li>
+<li>It is not associated with a ticket number</li>
+<li>Functions are not well documented (see above)</li>
+<li>Tests have not passed</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="remotes">
+<h3>Remotes<a class="headerlink" href="#remotes" title="Permalink to this headline">¶</a></h3>
+<p>Remotes for Version Control should reside on GitHub or our Team Foundation
+Server located on Visual Studio online. Each remote should have a master,
+staging, and quality control branch.</p>
+</div>
+<div class="section" id="pull-requests-and-merges">
+<h3>Pull Requests and Merges<a class="headerlink" href="#pull-requests-and-merges" title="Permalink to this headline">¶</a></h3>
+<p>Pull requests should be opened by the primary author and reviewed by at least one other developer not involved in the feature development.</p>
+</div>
+</div>
+<div class="section" id="issue-tracking-jira">
+<h2>Issue Tracking &amp; Jira<a class="headerlink" href="#issue-tracking-jira" title="Permalink to this headline">¶</a></h2>
+<p>Jira is used for long term tracking of modifications and for visibility into our processes by non technical people who need to see what we are doing.</p>
+<div class="section" id="ticket-status">
+<h3>Ticket Status<a class="headerlink" href="#ticket-status" title="Permalink to this headline">¶</a></h3>
+<p>See New Deployment Schedule</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Programming Guide</a><ul>
+<li><a class="reference internal" href="#goal-of-this-guide">Goal of this Guide</a></li>
+<li><a class="reference internal" href="#third-party-code">Third Party Code</a></li>
+<li><a class="reference internal" href="#universal-guides">Universal Guides</a><ul>
+<li><a class="reference internal" href="#updating-legacy-code">Updating Legacy Code</a></li>
+<li><a class="reference internal" href="#secure-coding">Secure Coding</a></li>
+<li><a class="reference internal" href="#code-documentation">Code Documentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-django">Python &amp; Django</a><ul>
+<li><a class="reference internal" href="#pep8-formatting">Pep8 Formatting</a></li>
+<li><a class="reference internal" href="#pep257-docstrings">Pep257 Docstrings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#c">C#</a></li>
+<li><a class="reference internal" href="#java">Java</a></li>
+<li><a class="reference internal" href="#user-interface">User Interface</a><ul>
+<li><a class="reference internal" href="#mobile-first">Mobile First</a></li>
+<li><a class="reference internal" href="#responsive-design">Responsive Design</a></li>
+<li><a class="reference internal" href="#mobile">Mobile</a></li>
+<li><a class="reference internal" href="#tablet">Tablet</a></li>
+<li><a class="reference internal" href="#desktop">Desktop</a></li>
+<li><a class="reference internal" href="#buttonization-of-links">Buttonization of links</a></li>
+<li><a class="reference internal" href="#icons">Icons</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#javascript">JavaScript</a><ul>
+<li><a class="reference internal" href="#external-standards">External Standards</a></li>
+<li><a class="reference internal" href="#object-oriented">Object Oriented</a></li>
+<li><a class="reference internal" href="#javascript-libraries">JavaScript Libraries</a></li>
+<li><a class="reference internal" href="#code-location">Code location</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#html-css-and-browser-support">HTML, CSS, and Browser Support</a><ul>
+<li><a class="reference internal" href="#id1">External Standards</a></li>
+<li><a class="reference internal" href="#browser-support">Browser Support</a></li>
+<li><a class="reference internal" href="#page-structure">Page Structure</a></li>
+<li><a class="reference internal" href="#html-layout">HTML Layout</a></li>
+<li><a class="reference internal" href="#html-tables">HTML Tables</a></li>
+<li><a class="reference internal" href="#html-selectors-for-css">HTML Selectors for CSS</a></li>
+<li><a class="reference internal" href="#django-templates-formatting">Django Templates Formatting</a></li>
+<li><a class="reference internal" href="#css-documentation">CSS Documentation</a></li>
+<li><a class="reference internal" href="#naming-conventions">Naming Conventions</a></li>
+<li><a class="reference internal" href="#media-selectors">Media Selectors</a></li>
+<li><a class="reference internal" href="#css-rule-location">CSS Rule Location</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-control">Version Control</a><ul>
+<li><a class="reference internal" href="#exceptions-to-git-flow">Exceptions to Git Flow</a></li>
+<li><a class="reference internal" href="#remotes">Remotes</a></li>
+<li><a class="reference internal" href="#pull-requests-and-merges">Pull Requests and Merges</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#issue-tracking-jira">Issue Tracking &amp; Jira</a><ul>
+<li><a class="reference internal" href="#ticket-status">Ticket Status</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="javascript.html"
+                        title="previous chapter">JavaScript Coding Standard</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../testing/index.html"
+                        title="next chapter">Unit Testing</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/styleguides/programming.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../testing/index.html" title="Unit Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="javascript.html" title="JavaScript Coding Standard"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

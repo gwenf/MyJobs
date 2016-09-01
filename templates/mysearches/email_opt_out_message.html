@@ -1,1 +1,0 @@
-<p>{% if user.get_full_name %}{{ user.get_full_name }} ({{ user.email }}){% else %}{{ user.email }}{% endif %} from <a href="{% url 'partner_overview' %}?partner={{ partner.id }}">{{ partner.name }}</a> has unsubscribed from one or more saved search emails that you created for {{ company.name }}.</p>

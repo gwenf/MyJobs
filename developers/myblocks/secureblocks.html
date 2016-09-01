@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Secure Blocks &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="MyBlocks" href="index.html" />
+    <link rel="next" title="MyPartners" href="../mypartners/index.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../mypartners/index.html" title="MyPartners"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">MyBlocks</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="secure-blocks">
+<span id="secure-blocks-reference"></span><h1>Secure Blocks<a class="headerlink" href="#secure-blocks" title="Permalink to this headline">¶</a></h1>
+<p>Secure Blocks are blocks retrieved via an AJAX call to an API. These blocks are
+small reusable components that can be added to any webpage that is tied to a
+secure (log in enabled, https) webpage.</p>
+<div class="section" id="cross-site-verify">
+<h2>Cross Site Verify<a class="headerlink" href="#cross-site-verify" title="Permalink to this headline">¶</a></h2>
+<p>Cross Site Verification was designed to satisfy the need for innumerable https
+certificates in order to supply user information for display on various
+microsites. With this solution, one secure site can manage user information for
+multiple child sites.</p>
+<p>For cross site verification to work, a nonsecure site (http) must be the child
+site of a secure site (https). When a cross site API call is made via CORS or
+JSONP, the parent site verifies the request to ensure the origin of the call
+is from a valid child site. If the microsite does not have a parent site and
+is a secure site, it makes the call to and returns from itself.</p>
+<dl class="function">
+<dt id="myjobs.cross_site_verify.cross_site_verify">
+<code class="descclassname">myjobs.cross_site_verify.</code><code class="descname">cross_site_verify</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myjobs/cross_site_verify.html#cross_site_verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myjobs.cross_site_verify.cross_site_verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for use with cross site verified APIs. In the event of a request,
+this function verifies that the host site is a parent of the origin
+(calling) site.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fn</strong> &#8211; wrapped API function</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">wrapped function call or 404 if error</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="myjobs.autoserialize.autoserialize">
+<code class="descclassname">myjobs.autoserialize.</code><code class="descname">autoserialize</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myjobs/autoserialize.html#autoserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myjobs.autoserialize.autoserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap API. If the API receives a JSONP call, wrap the response in the
+given callback function. Appends cookie objects into response if they exist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fn</strong> &#8211; wrapped function</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return wrapped in callback, if jsonp</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="secure-blocks-widgets">
+<h2>Secure Blocks Widgets<a class="headerlink" href="#secure-blocks-widgets" title="Permalink to this headline">¶</a></h2>
+<p>Within a microsites page, a div can be created with a special data attribute
+(data-secure-block-id). This tag indicates that the value of that data
+attribute is tied to a secure block element_id. That secure block&#8217;s template
+will then be rendered by the parent site and returned to the div. One API
+call is made to the parent of the microsite (or itself, if it has no parent)
+to retrieve all secure blocks divs. The request is subject to the cross site
+verification step above.</p>
+<dl class="function">
+<dt id="myblocks.views.secure_blocks">
+<code class="descclassname">myblocks.views.</code><code class="descname">secure_blocks</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/views.html#secure_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.views.secure_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to retrieve blocks objects for all items in the blocks element of
+the request body. secured by cross site verification wrapper. Currently
+restricted for non-staff users</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Url:</th><td class="field-body">/secure-blocks/</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> &#8211; ajax request potentially containing array of element ids for blocks</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary containing all matched blocks or Suspicious Operation (400)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="myblocks.models.SecureBlock">
+<em class="property">class </em><code class="descclassname">myblocks.models.</code><code class="descname">SecureBlock</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SecureBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SecureBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom abstract base class for secure blocks retrieved through ajax.
+Required JS are bundled into the template</p>
+<dl class="method">
+<dt id="myblocks.models.SecureBlock.context">
+<code class="descname">context</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SecureBlock.context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SecureBlock.context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup context of secure block by appending any kwargs to context
+dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> &#8211; </li>
+<li><strong>kwargs</strong> &#8211; jQuery Data attributes provided from calling site</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">kwargs dict to serve as context dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="myblocks.models.SecureBlock.render_for_ajax">
+<code class="descname">render_for_ajax</code><span class="sig-paren">(</span><em>request</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SecureBlock.render_for_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SecureBlock.render_for_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render template then append all required js tags (if applicable)</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="testing-a-secure-block-widget">
+<h3>Testing a Secure Block Widget<a class="headerlink" href="#testing-a-secure-block-widget" title="Permalink to this headline">¶</a></h3>
+<p>To test a secure block widget, do the following:</p>
+<ul class="simple">
+<li>Navigate to Django Admin</li>
+<li>If parent site relationship is not set up, do the following:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Navigate to SeoSite, edit desired child site (currently my.jobs)</li>
+<li>Under &#8220;parent_site&#8221; drop down, select desired parent site (secure.my.jobs)</li>
+<li>Save</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Navigate to the active site configuration for the child site</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Check the box labled &#8216;Use secure blocks&#8217;</li>
+<li>Save</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Locate the correct model under MyBlocks (ex. SavedSearchWidgetBlock)</li>
+<li>Add new block</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>The only important fields are element_id and template. Template will be
+automatically populated with a default template.
+Offset and Span are required, but currently have no effect on
+the widget. These can be set to 0</li>
+<li>Widget IDs are currently hardcoded on templates. Therefore, the element IDs
+for secure block widgets are predetermined. The two widget element IDs
+included in microsites templates are..</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>saved_search for saved search widget</li>
+<li>sb_toolbar for toolbar/topbar</li>
+<li>If an element ID other than these two is used, it must also be included
+in a template for display using the following format</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><cite>&lt;div data-secure_block_id=&#8221;&#8211;YOUR ELEMENT ID&#8211;&#8221;&gt;&lt;/div&gt;</cite></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<ul class="simple">
+<li>This will only work on templates loaded from seo_base.html</li>
+<li>All secure blocks widgets that replace existing functionality (saved search,
+tools) will REPLACE their counterparts if secure-blocks is enabled for that
+site.</li>
+</ul>
+</div>
+<div class="section" id="secure-block-js">
+<h3>secure-block.js<a class="headerlink" href="#secure-block-js" title="Permalink to this headline">¶</a></h3>
+<p>Secure Blocks relies on the file secure-block.js file located in the
+static directory. This file handles creating the ajax call based on the secure
+block ids as well as populating the respective divs with the response.</p>
+<p><strong>jQuery Data Attributes</strong>:
+jQuery Data attributes assigned to the same div as the data-secure-block-id div
+will be sent to the secure blocks API in a dictionary form. Below is an example
+of a webpage with one secure block named test that has data attributes email
+and url.</p>
+<div class="code javascript highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">email</span><span class="p">:</span><span class="s1">&#39;test@example.com&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="s1">&#39;www.example.com&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>The data attributes will then be available as context variables in the secure
+blocks template.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">jQuery converts hyphens to camelCase when sending data attributes.
+The data attribute email-address would resolve in the secure block template
+as emailAddress. This does not affect underscores (email_address
+is email_address)</p>
+</div>
+<p><strong>Main Functions</strong></p>
+<blockquote>
+<div><p><strong>function load_secure_blocks(dashboard_url) { ... }</strong></p>
+<blockquote>
+<div><p><em>Request secure blocks for all divs containing data-secure-block-id</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">dashboard_url:</th><td class="field-body">The URL of the secure parent of the microsite</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p><strong>function reload_secure_block(block_id, callback) { ... }</strong></p>
+<blockquote>
+<div><p><em>Request specific secure block to be reloaded</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">block_id:</th><td class="field-body">Block to be reloaded</td>
+</tr>
+<tr class="field-even field"><th class="field-name">callback:</th><td class="field-body">Function to be called after ajax call completes successfully</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="saved-search-widget">
+<span id="id1"></span><h2>Saved Search Widget<a class="headerlink" href="#saved-search-widget" title="Permalink to this headline">¶</a></h2>
+<p>The Saved Search widget is the first of the secure-blocks widgets to have
+complex functionality. It incorporates Javascript, CSS, and HTML.</p>
+<dl class="class">
+<dt id="myblocks.models.SavedSearchWidgetBlock">
+<em class="property">class </em><code class="descclassname">myblocks.models.</code><code class="descname">SavedSearchWidgetBlock</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SavedSearchWidgetBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SavedSearchWidgetBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>What is rendered is based heavily on whether or not the
+user is signed in to an account. Block renders as a customizable saved
+search module.</p>
+<dl class="method">
+<dt id="myblocks.models.SavedSearchWidgetBlock.context">
+<code class="descname">context</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SavedSearchWidgetBlock.context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SavedSearchWidgetBlock.context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add additional context variables to those passed in from the ajax call.
+User object and search object added, if available</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="myblocks.models.SavedSearchWidgetBlock.required_js">
+<code class="descname">required_js</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/myblocks/models.html#SavedSearchWidgetBlock.required_js"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#myblocks.models.SavedSearchWidgetBlock.required_js" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all required javascript in URL format</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The appearance of the widget is largerly based on the template saved into the
+model. There are template tags representing the various states that the widget
+can be in.</p>
+<p>As of this writing, the only javascript file used in the widget is
+static/saved-search.js . This file contains the logic for calling the Saved
+Search API and refreshing the</p>
+<p>The current anchor for saved search is as such:</p>
+<p><cite>&lt;div data-secure_block_id=&#8221;saved-search&#8221;&gt;&lt;/div&gt;</cite></p>
+</div>
+<div class="section" id="tools-widget">
+<h2>Tools Widget<a class="headerlink" href="#tools-widget" title="Permalink to this headline">¶</a></h2>
+<p>The tools widget represents the same functionality as the legacy topbar widget.
+This is the first widget to rely on an additional data element, data-widget_type
+to prevent the legacy topbar from being loaded in addition to the tools secure
+block.</p>
+<p>The current anchor for the tools widget is as such:</p>
+<p><cite>&lt;div data-secure_block_id=&#8221;sb_toolbar&#8221; data-widget_type=&#8221;tools&#8221;&gt;&lt;/div&gt;</cite></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Secure Blocks</a><ul>
+<li><a class="reference internal" href="#cross-site-verify">Cross Site Verify</a></li>
+<li><a class="reference internal" href="#secure-blocks-widgets">Secure Blocks Widgets</a><ul>
+<li><a class="reference internal" href="#testing-a-secure-block-widget">Testing a Secure Block Widget</a></li>
+<li><a class="reference internal" href="#secure-block-js">secure-block.js</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#saved-search-widget">Saved Search Widget</a></li>
+<li><a class="reference internal" href="#tools-widget">Tools Widget</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../mypartners/index.html"
+                        title="next chapter">MyPartners</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/myblocks/secureblocks.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../mypartners/index.html" title="MyPartners"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >MyBlocks</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

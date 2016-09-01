@@ -1,7 +1,0 @@
-<div class='direct-action-btn' id="direct_applyButtonBottom">
-    {% if requested_job.link %}
-        <a href="{{ requested_job.link }}" onclick="goalClick('/G/apply-click', this.href); return false;">{% blocktrans %}Apply Now{% endblocktrans %}</a>
-    {% elif requested_job.apply_info %}
-        <div id="apply-block">{{ requested_job.apply_info }}</div>
-    {% endif %}
-</div>

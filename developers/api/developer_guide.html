@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MyJobs API &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="API" href="index.html" />
+    <link rel="next" title="Imports Documentation" href="../import_jobs/index.html" />
+    <link rel="prev" title="My.jobs API Basic Usage" href="basic_usage.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../import_jobs/index.html" title="Imports Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="basic_usage.html" title="My.jobs API Basic Usage"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="myjobs-api">
+<h1>MyJobs API<a class="headerlink" href="#myjobs-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="required-headers">
+<h2>Required Headers<a class="headerlink" href="#required-headers" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><dl class="first docutils">
+<dt>HTTP_ACCEPT</dt>
+<dd><ul class="first last simple">
+<li>json: &#8220;application/json&#8221;</li>
+<li>jsonp: &#8220;text/javascript&#8221;</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>HTTP_CONTENT_TYPE</dt>
+<dd><ul class="first last simple">
+<li>&#8220;application/json&#8221;</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="savedsearch">
+<h2>SavedSearch<a class="headerlink" href="#savedsearch" title="Permalink to this headline">¶</a></h2>
+<p>endpoint: /api/v1/savedsearch/</p>
+<div class="section" id="required-parameters">
+<h3>Required Parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>email</li>
+<li>url</li>
+<li>username</li>
+<li>api_key</li>
+</ul>
+</div>
+<div class="section" id="auto-populated-fields">
+<h3>Auto-populated Fields<a class="headerlink" href="#auto-populated-fields" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">frequency: &#8216;D&#8217;</p>
+</li>
+<li><p class="first">day_of_week: None</p>
+</li>
+<li><p class="first">day_of_month: None</p>
+</li>
+<li><dl class="first docutils">
+<dt>user:</dt>
+<dd><ul class="first last simple">
+<li>email is a username: that user</li>
+<li>email is secondary: its owner</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">label, feed: set to output of validate_dotjobs_url</p>
+</li>
+</ul>
+</div>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="success">
+<h4>Success<a class="headerlink" href="#success" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>callback({&#8220;email&#8221;: &#8220;&lt;input_email&gt;&#8221;, &#8220;frequency&#8221;: &#8220;D&#8221;,</dt>
+<dd>&#8220;new_search&#8221;: true if user has search with this url else false})</dd>
+</dl>
+</div>
+<div class="section" id="error">
+<h4>Error<a class="headerlink" href="#error" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt>No/incorrect username and/or api_key</dt>
+<dd><ul class="first last simple">
+<li>Blank</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>No email provided</dt>
+<dd><ul class="first last simple">
+<li>callback({&#8220;email&#8221;: &#8220;No email provided&#8221;})</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>User with the email address does not exist</dt>
+<dd><ul class="first last simple">
+<li>callback({&#8220;email&#8221;: &#8220;No user with email &lt;email&gt; exists&#8221;})</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>No url</dt>
+<dd><ul class="first last simple">
+<li>callback({&#8220;url&#8221;: &#8220;No .JOBS feed provided&#8221;})</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Invalid url</dt>
+<dd><ul class="first last simple">
+<li>callback({&#8220;url&#8221;: &#8220;This is not a valid .JOBS feed&#8221;})</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="user">
+<h2>User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h2>
+<p>endpoint: /api/v1/user/</p>
+<div class="section" id="id1">
+<h3>Required Parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>email</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Auto-populated Fields<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>password: 8 alphanumeric chars, generated via make_random_password method of user manager; Does not use i, I, l, o, O, 0</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h4>Success<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>callback({&#8220;email&#8221;: &#8220;&lt;email&gt;&#8221;, &#8220;user_created&#8221;: true if user was created else false})</p>
+</div>
+<div class="section" id="id5">
+<h4>Error<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt>No/incorrect username and/or api_key</dt>
+<dd><ul class="first last simple">
+<li>Blank</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>No email</dt>
+<dd><ul class="first last simple">
+<li>callback({&#8220;email&#8221;: &#8220;No email provided&#8221;})</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>curl package is installed</li>
+<li>A user exists and has an api key:</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>$ ./manage.py shell
+&gt; from myjobs.models import User
+&gt; from tastypie.models import create_api_key
+&gt; user = User.objects.get(email=&quot;your_email@example.com&quot;)
+&gt; create_api_key(User, instance=user, created=True)
+</pre></div>
+</div>
+<p>The api key is available as user.api_key.key</p>
+</div>
+<div class="section" id="saved-search">
+<h3>Saved Search<a class="headerlink" href="#saved-search" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span></span>$ curl -H &quot;CONTENT-TYPE: application/json&quot; -H &quot;ACCEPT: text/javascript&quot; “localhost:8000/api/v1/savedsearch/?username=&lt;api email&gt;&amp;api_key=&lt;user’s api key&gt;&amp;email=&lt;existing email or secondary email&gt;&amp;url=www.my.jobs/jobs/?q=c%23
+
+# response if user is valid and search does not exist:
+‘callback({“email”: “&lt;existing email or secondary email&gt;”, “frequency”: “D”, “new_search”: true})’
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>User<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Warning: This creates an account and sends a confirmation email if it didn&#8217;t exist</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>$ curl -H &quot;CONTENT-TYPE: application/json&quot; -H &quot;ACCEPT: text/javascript&quot; “localhost:8000/api/v1/user/?username=&lt;api email&gt;&amp;api_key=&lt;user’s api key&gt;&amp;email=&lt;new or existing email address&gt;”
+
+# response if user does not exist:
+‘callback({“email”: “&lt;new email address&gt;”, “user_created”: true})’
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tbd">
+<h2>TBD<a class="headerlink" href="#tbd" title="Permalink to this headline">¶</a></h2>
+<p><strong>Key Security</strong></p>
+<p>Possibilities:
+* Include user/key in JavaScript; Only accept posts from .JOBS domains
+* Post to a view that adds header information</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">MyJobs API</a><ul>
+<li><a class="reference internal" href="#required-headers">Required Headers</a></li>
+<li><a class="reference internal" href="#savedsearch">SavedSearch</a><ul>
+<li><a class="reference internal" href="#required-parameters">Required Parameters</a></li>
+<li><a class="reference internal" href="#auto-populated-fields">Auto-populated Fields</a></li>
+<li><a class="reference internal" href="#returns">Returns</a><ul>
+<li><a class="reference internal" href="#success">Success</a></li>
+<li><a class="reference internal" href="#error">Error</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user">User</a><ul>
+<li><a class="reference internal" href="#id1">Required Parameters</a></li>
+<li><a class="reference internal" href="#id2">Auto-populated Fields</a></li>
+<li><a class="reference internal" href="#id3">Returns</a><ul>
+<li><a class="reference internal" href="#id4">Success</a></li>
+<li><a class="reference internal" href="#id5">Error</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#saved-search">Saved Search</a></li>
+<li><a class="reference internal" href="#id6">User</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tbd">TBD</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="basic_usage.html"
+                        title="previous chapter">My.jobs API Basic Usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../import_jobs/index.html"
+                        title="next chapter">Imports Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/api/developer_guide.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../import_jobs/index.html" title="Imports Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="basic_usage.html" title="My.jobs API Basic Usage"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

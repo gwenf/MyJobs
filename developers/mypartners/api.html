@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API Reference &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="MyPartners" href="index.html" />
+    <link rel="next" title="Non User Outreach" href="nonuseroutreach.html" />
+    <link rel="prev" title="MyPartners" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="nonuseroutreach.html" title="Non User Outreach"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="MyPartners"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">MyPartners</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-mypartners.models">
+<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-mypartners.models" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mypartners.models.CommonEmailDomain">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">CommonEmailDomain</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#CommonEmailDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.CommonEmailDomain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common email domains which should not be allowed for outreach email
+domains.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.Contact">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">Contact</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Everything here is self explanatory except for one part. With the Contact
+object there is Contact.partner_set and .partners_set</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.ContactLogEntry">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">ContactLogEntry</code><span class="sig-paren">(</span><em>id</em>, <em>action_flag</em>, <em>action_time</em>, <em>change_message</em>, <em>contact_identifier</em>, <em>content_type_id</em>, <em>delta</em>, <em>object_id</em>, <em>object_repr</em>, <em>partner_id</em>, <em>user_id</em>, <em>impersonator_id</em>, <em>successful</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#ContactLogEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.ContactLogEntry" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="mypartners.models.ContactLogEntry.get_edited_object">
+<code class="descname">get_edited_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#ContactLogEntry.get_edited_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.ContactLogEntry.get_edited_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the edited object represented by this log entry</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mypartners.models.ContactLogEntry.get_object_url">
+<code class="descname">get_object_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#ContactLogEntry.get_object_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.ContactLogEntry.get_object_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the link that leads to the view/edit view for that object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.ContactRecord">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">ContactRecord</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#ContactRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.ContactRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for Communication Records</p>
+<dl class="method">
+<dt id="mypartners.models.ContactRecord.get_record_description">
+<code class="descname">get_record_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#ContactRecord.get_record_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.ContactRecord.get_record_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a human readable description of the contact
+record.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.Location">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">Location</code><span class="sig-paren">(</span><em>id</em>, <em>address_line_one</em>, <em>address_line_two</em>, <em>city</em>, <em>state</em>, <em>country_code</em>, <em>postal_code</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.OutreachEmailAddress">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">OutreachEmailAddress</code><span class="sig-paren">(</span><em>id</em>, <em>company_id</em>, <em>email</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#OutreachEmailAddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.OutreachEmailAddress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.OutreachEmailDomain">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">OutreachEmailDomain</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#OutreachEmailDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.OutreachEmailDomain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Email domains from which a comany will accept emails from for the purpose
+of outreach. These email addresses are for non-users.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.OutreachRecord">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">OutreachRecord</code><span class="sig-paren">(</span><em>id</em>, <em>date_added</em>, <em>outreach_email_id</em>, <em>from_email</em>, <em>email_body</em>, <em>subject</em>, <em>current_workflow_state_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#OutreachRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.OutreachRecord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.OutreachWorkflowState">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">OutreachWorkflowState</code><span class="sig-paren">(</span><em>id</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#OutreachWorkflowState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.OutreachWorkflowState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.PRMAttachment">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">PRMAttachment</code><span class="sig-paren">(</span><em>id</em>, <em>attachment</em>, <em>contact_record_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#PRMAttachment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.PRMAttachment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="mypartners.models.PRMAttachment.get_file_name">
+<code class="descname">get_file_name</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#mypartners.models.PRMAttachment.get_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures that a file name is unique before uploading.
+The PRMAttachment instance requires an extra attribute,
+partner (a Partner instance) to be set in order to create the
+file name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.Partner">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">Partner</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Partner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Partner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object that this whole app is built around.</p>
+<dl class="method">
+<dt id="mypartners.models.Partner.get_all_tags">
+<code class="descname">get_all_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Partner.get_all_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Partner.get_all_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets unique tags for partner and its contacts</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mypartners.models.Partner.get_contact_locations">
+<code class="descname">get_contact_locations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Partner.get_contact_locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Partner.get_contact_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of unique contact locations as strings.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.PartnerLibrary">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">PartnerLibrary</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#PartnerLibrary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.PartnerLibrary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partners curated from the Office of Federal Contract Compliance
+Programs (OFCCP).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For the differences between <cite>state</cite> and <cite>st</cite>, see the ofccp
+module.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.PartnerLibrarySource">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">PartnerLibrarySource</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>search_url</em>, <em>download_url</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#PartnerLibrarySource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.PartnerLibrarySource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.SearchParameterQuerySet">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">SearchParameterQuerySet</code><span class="sig-paren">(</span><em>model=None</em>, <em>query=None</em>, <em>using=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#SearchParameterQuerySet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.SearchParameterQuerySet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a query set with a <code class="docutils literal"><span class="pre">from_search</span></code> method for filtering by query
+parameters.</p>
+<dl class="method">
+<dt id="mypartners.models.SearchParameterQuerySet.from_search">
+<code class="descname">from_search</code><span class="sig-paren">(</span><em>company=None</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#SearchParameterQuerySet.from_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.SearchParameterQuerySet.from_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intelligently filter based on query .</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">company:</th><td class="field-body"><p class="first">The company to restrict results to</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">filters:</th><td class="field-body"><p class="first">A JSON string which is an object to be passed to
+filter().</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">filters:</th><td class="field-body"><p class="first">A dict of field: term pairs where field is a field of
+the <code class="docutils literal"><span class="pre">ContactRecord</span></code> model and term is search term
+you&#8217;d like to filter against.</p>
+<p class="last">For <code class="docutils literal"><span class="pre">datetime</span></code>, pass <code class="docutils literal"><span class="pre">start_date</span></code> and/or
+<code class="docutils literal"><span class="pre">end_date</span></code> instead.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Example:</dt>
+<dd><p class="first">If you want to filter partners where the related contact record&#8217;s
+date time is before a certain date:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Partner.objects.from_search(filters=json.dumps({
+    &#39;contactrecord&#39;: {
+        &#39;date_time&#39;: {
+            &#39;lte&#39;: &#39;2015-08-03 00:00:00.0&#39;
+        }
+    }
+})
+</pre></div>
+</div>
+<dl class="last docutils">
+<dt>The above is equivalent to:</dt>
+<dd><dl class="first last docutils">
+<dt>Partner.objects.filter(</dt>
+<dd>contactrecord__date_time__lte=&#8216;2015-08-03 00:00:00.0&#8217;)</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.Status">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">Status</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps track of a particular model&#8217;s approval status.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mypartners.models.Tag">
+<em class="property">class </em><code class="descclassname">mypartners.models.</code><code class="descname">Tag</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>hex_color</em>, <em>company_id</em>, <em>created_on</em>, <em>created_by_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#Tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.Tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mypartners.models.delete_contact">
+<code class="descclassname">mypartners.models.</code><code class="descname">delete_contact</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>using</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mypartners/models.html#delete_contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mypartners.models.delete_contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signalled when a Contact is deleted to deactivate associated partner saved
+searches, if any exist, in addition to clearing that Contact from the
+partners that it is the primary contact for.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">MyPartners</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="nonuseroutreach.html"
+                        title="next chapter">Non User Outreach</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/mypartners/api.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="nonuseroutreach.html" title="Non User Outreach"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="MyPartners"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >MyPartners</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

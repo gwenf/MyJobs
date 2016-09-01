@@ -1,0 +1,1150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>myblocks.models &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for myblocks.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+<span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">authenticate</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.template</span> <span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">Template</span><span class="p">,</span> <span class="n">RequestContext</span>
+<span class="kn">from</span> <span class="nn">django.template.loaders.filesystem</span> <span class="kn">import</span> <span class="n">Loader</span>
+<span class="kn">from</span> <span class="nn">django.utils.safestring</span> <span class="kn">import</span> <span class="n">mark_safe</span>
+
+<span class="kn">from</span> <span class="nn">myblocks</span> <span class="kn">import</span> <span class="n">context_tools</span>
+<span class="kn">from</span> <span class="nn">myblocks.context_tools</span> <span class="kn">import</span> <span class="n">get_site_config</span>
+<span class="kn">from</span> <span class="nn">myblocks.helpers</span> <span class="kn">import</span> <span class="n">success_url</span>
+<span class="kn">from</span> <span class="nn">myjobs.helpers</span> <span class="kn">import</span> <span class="n">expire_login</span>
+<span class="kn">from</span> <span class="nn">myjobs.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">mysearches.models</span> <span class="kn">import</span> <span class="n">SavedSearch</span>
+<span class="kn">from</span> <span class="nn">redirect.helpers</span> <span class="kn">import</span> <span class="n">redirect_if_new</span>
+<span class="kn">from</span> <span class="nn">registration.forms</span> <span class="kn">import</span> <span class="n">CustomAuthForm</span><span class="p">,</span> <span class="n">RegistrationForm</span>
+<span class="kn">from</span> <span class="nn">seo</span> <span class="kn">import</span> <span class="n">helpers</span>
+<span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="n">BusinessUnit</span>
+<span class="kn">from</span> <span class="nn">universal.accessibility</span> <span class="kn">import</span> <span class="n">DOCTYPE_CHOICES</span><span class="p">,</span> <span class="n">LANGUAGE_CODES_CHOICES</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">templatetag_library</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Supplies any templatetags necessary for page rendering.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">templatetags</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;{</span><span class="si">% lo</span><span class="s1">ad seo_extras %}&#39;</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">% lo</span><span class="s1">ad i18n %}&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;{</span><span class="si">% lo</span><span class="s1">ad highlight %}&#39;</span><span class="p">,</span> <span class="s1">&#39;{</span><span class="si">% lo</span><span class="s1">ad humanize %}&#39;</span><span class="p">,</span> <span class="p">])</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">templatetags</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">raw_base_head</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the base head template for an object if one exists.</span>
+
+<span class="sd">    :param obj: A myblocks object.</span>
+<span class="sd">    :return: If the object has a base_head attribute, a string</span>
+<span class="sd">             containing the base_head template. Otherwise a blank string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">base_head</span><span class="p">:</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">Loader</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_template_source</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">base_head</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">raw_base_template</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the base body template for an object.</span>
+
+<span class="sd">    :param obj: A myblocks object with a valid base_template.</span>
+<span class="sd">    :return: The base_template as a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">Loader</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_template_source</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">base_template</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Block"><a class="viewcode-back" href="../../developers/myblocks/overview.html#myblocks.models.Block">[docs]</a><span class="k">class</span> <span class="nc">Block</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all individual block objects. Stores information for</span>
+<span class="sd">    rendering the block.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">base_head</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">content_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">ContentType</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">element_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">_get_real_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">bootstrap_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="s2">&quot;col-md-offset-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="s2">&quot;col-md-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">offset</span><span class="p">,</span> <span class="n">span</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">block_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Casts the block to the appropriate subclass.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">get_object_for_this_type</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides the context required to render a block. In most</span>
+<span class="sd">        cases this should be overriden in the subclass.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides the final template for a block.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;div class=&quot;block-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/div&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap_classes</span><span class="p">(),</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">render_for_ajax</span><span class="p">(</span><span class="n">raw_self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        render the block template to be returned as a response to ajax call</span>
+<span class="sd">        :param raw_self: self before being cast to proper subclass</span>
+<span class="sd">        :param request: ajax request</span>
+<span class="sd">        :param params: keyword parameters</span>
+<span class="sd">        :return: template rendered for ajax</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">raw_self</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">full_template</span> <span class="o">=</span> <span class="n">templatetag_library</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">full_template</span><span class="p">)</span>
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">rendered_template</span>
+
+    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides any javascript required by a block. In most cases</span>
+<span class="sd">        this will be overriden by the subclass.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">get_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve information for setting cookies for block, if exists. To be</span>
+<span class="sd">        overwritten by child class</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="c1"># Set content_type so the object can later be cast back to</span>
+            <span class="c1"># its subclass.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_real_type</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Block</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">ApplyLinkBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/applylink.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;requested_job&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_job</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">job_id</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">BreadboxBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/breadbox.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;breadbox&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_breadbox</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ColumnBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s1">&#39;ColumnBlockOrder&#39;</span><span class="p">,</span>
+                                    <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;included_blocks&#39;</span><span class="p">)</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">context</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all the templates for each block in the ColumnBlock</span>
+<span class="sd">        in the order specified by the matching ColumnBlockOrder.</span>
+<span class="sd">        Each block is wrapped in a row div.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;columnblockorder__order&#39;</span><span class="p">):</span>
+            <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;div class=&quot;row&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/div&gt;&#39;</span>
+                          <span class="o">%</span> <span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">get_template</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="s1">&#39;&lt;div class=&quot;block-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/div&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap_classes</span><span class="p">(),</span>
+                                                      <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">blocks</span><span class="p">))</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines and de-duplicates any javascript required by the</span>
+<span class="sd">        blocks in the ColumnBlock.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">js</span> <span class="o">+=</span> <span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">required_js</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">ContentBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/content.html&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">FacetBlurbBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/facetblurb.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;facet_blurb_facet&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_facet_blurb_facet</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">JobDetailBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/jobdetail.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;site_commitments_string&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_commitments_string</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;requested_job&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_job</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">job_id</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">JobDetailBreadboxBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/jobdetailbreadbox.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">breadcrumbs</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_job_detail_breadbox</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">job_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;job_detail_breadcrumbs&#39;</span><span class="p">:</span> <span class="n">breadcrumbs</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">JobDetailHeaderBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/jobdetailheader.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;requested_job&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_job</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">job_id</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<div class="viewcode-block" id="LoginBlock"><a class="viewcode-back" href="../../developers/myblocks/overview.html#myblocks.models.LoginBlock">[docs]</a><span class="k">class</span> <span class="nc">LoginBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specialized block containing logic for use login functions</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/login.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">querystring</span> <span class="o">=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="c1"># If data is being posted to this specific block, give the form</span>
+            <span class="c1"># the opportunity to render any errors.</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;login_action&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+                <span class="s1">&#39;login_form&#39;</span><span class="p">:</span> <span class="n">CustomAuthForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">),</span>
+                <span class="s1">&#39;login_submit_btn_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;login_action&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+            <span class="s1">&#39;login_form&#39;</span><span class="p">:</span> <span class="n">CustomAuthForm</span><span class="p">(),</span>
+            <span class="s1">&#39;login_submit_btn_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">handle_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logs a user in if it was a request to log a user in and</span>
+<span class="sd">        the login attempt was successful.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Confirm that the requst is a post, and that this form is</span>
+        <span class="c1"># the intended recipient of the posted data.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CustomAuthForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># Log in the user and redirect based on the success_url rules.</span>
+            <span class="n">expire_login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">get_user</span><span class="p">())</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">success_url</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="s1">&#39;myguid&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">get_user</span><span class="p">()</span><span class="o">.</span><span class="n">user_guid</span><span class="p">,</span>
+                                <span class="n">expires</span><span class="o">=</span><span class="mi">365</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s1">&#39;.my.jobs&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">submit_btn_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;login-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+
+<span class="k">class</span> <span class="nc">MoreButtonBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/morebutton.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;arranged_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_arranged_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;data_type&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;num_default_jobs&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">context_tools</span><span class="o">.</span><span class="n">get_default_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">)),</span>
+            <span class="s1">&#39;num_featured_jobs&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">context_tools</span><span class="o">.</span><span class="n">get_featured_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">)),</span>
+            <span class="s1">&#39;site_config&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_config</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">pager.164-21.js&#39;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">RegistrationBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/registration.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">querystring</span> <span class="o">=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="c1"># If data is being posted to this specific block, give the form</span>
+            <span class="c1"># the opportunity to render any errors.</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;registration_action&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+                <span class="s1">&#39;query_string&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+                <span class="s1">&#39;registration_form&#39;</span><span class="p">:</span> <span class="n">RegistrationForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                                                      <span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="s1">&#39;registration_submit_btn_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;registration_action&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+            <span class="s1">&#39;registration_form&#39;</span><span class="p">:</span> <span class="n">RegistrationForm</span><span class="p">(),</span>
+            <span class="s1">&#39;registration_submit_btn_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">handle_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Registers a user if it was a request to register a user</span>
+<span class="sd">        and the registration form was correctly completed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Confirm that the requst is a post, and that this form is</span>
+        <span class="c1"># the intended recipient of the posted data.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_btn_name</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">RegistrationForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># Create a user, log them in, and redirect based on the</span>
+            <span class="c1"># success_url rules.</span>
+            <span class="n">user</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+                                                     <span class="n">send_email</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                                     <span class="o">**</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+            <span class="n">user_cache</span> <span class="o">=</span> <span class="n">authenticate</span><span class="p">(</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                <span class="n">password</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;password1&#39;</span><span class="p">])</span>
+            <span class="n">expire_login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_cache</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">success_url</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="s1">&#39;myguid&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">user_guid</span><span class="p">,</span> <span class="n">expires</span><span class="o">=</span><span class="mi">365</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+                                <span class="n">domain</span><span class="o">=</span><span class="s1">&#39;.my.jobs&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">submit_btn_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;registration-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+
+
+<div class="viewcode-block" id="SecureBlock"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SecureBlock">[docs]</a><span class="k">class</span> <span class="nc">SecureBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom abstract base class for secure blocks retrieved through ajax.</span>
+<span class="sd">    Required JS are bundled into the template</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SecureBlock.context"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SecureBlock.context">[docs]</a>    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup context of secure block by appending any kwargs to context</span>
+<span class="sd">        dict.</span>
+
+<span class="sd">        :param request:</span>
+<span class="sd">        :param kwargs: jQuery Data attributes provided from calling site</span>
+<span class="sd">        :return: kwargs dict to serve as context dictionary</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="SecureBlock.render_for_ajax"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SecureBlock.render_for_ajax">[docs]</a>    <span class="k">def</span> <span class="nf">render_for_ajax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render template then append all required js tags (if applicable)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rendered_template</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SecureBlock</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">render_for_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span>
+                                                        <span class="n">params</span><span class="p">)</span>
+        <span class="n">static_string</span> <span class="o">=</span> <span class="s1">&#39;&lt;script src=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&lt;/script&gt;&#39;</span>
+        <span class="n">required_js</span> <span class="o">=</span> <span class="p">[</span><span class="n">static_string</span> <span class="o">%</span> <span class="n">js</span> <span class="k">for</span> <span class="n">js</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_js</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rendered_template</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">required_js</span><span class="p">))</span></div>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+
+<span class="k">class</span> <span class="nc">ToolsWidgetBlock</span><span class="p">(</span><span class="n">SecureBlock</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This widget is used to display account and navigation related links via</span>
+<span class="sd">    the secure blocks API. It is based on the topbar functionality, but will</span>
+<span class="sd">    represent a more flexible and customizable approach.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># temporarily use the current topbar template</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;includes/topbar.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add additional context variables to those passed in from the ajax call.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ToolsWidgetBlock</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="k">else</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="c1"># Ensure that old myguid cookies can be handled correctly</span>
+            <span class="n">guid</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">COOKIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;myguid&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_guid</span><span class="o">=</span><span class="n">guid</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+               <span class="k">pass</span>
+
+        <span class="n">caller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_caller_info</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">microsite_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;site_name&#39;</span><span class="p">,</span> <span class="n">caller</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;current_microsite_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">microsite_name</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;current_microsite_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">caller</span>
+        <span class="k">return</span> <span class="n">context</span>
+
+    <span class="k">def</span> <span class="nf">get_caller_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get site info for caller site</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">caller</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_ORIGIN&#39;</span><span class="p">):</span>
+            <span class="n">caller</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_ORIGIN&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">):</span>
+            <span class="n">parsed_url</span> <span class="o">=</span>  <span class="n">urlparse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">))</span>
+            <span class="n">caller</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">://</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">netloc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">caller</span>
+
+    <span class="k">def</span> <span class="nf">get_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set cookies for last microsite and lastmicrositename</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cookies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">caller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_caller_info</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">caller</span><span class="p">:</span>
+            <span class="n">max_age</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+            <span class="n">last_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;site_name&#39;</span><span class="p">,</span> <span class="n">caller</span><span class="p">)</span>
+            <span class="n">cookies</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;key&#39;</span><span class="p">:</span><span class="s1">&#39;lastmicrosite&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">caller</span><span class="p">,</span>
+                            <span class="s1">&#39;max_age&#39;</span><span class="p">:</span><span class="n">max_age</span><span class="p">,</span>
+                            <span class="s1">&#39;domain&#39;</span><span class="p">:</span><span class="s1">&#39;.my.jobs&#39;</span><span class="p">})</span>
+            <span class="n">cookies</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;key&#39;</span><span class="p">:</span><span class="s1">&#39;lastmicrositename&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">last_name</span><span class="p">,</span>
+                            <span class="s1">&#39;max_age&#39;</span><span class="p">:</span><span class="n">max_age</span><span class="p">,</span>
+                            <span class="s1">&#39;domain&#39;</span><span class="p">:</span><span class="s1">&#39;.my.jobs&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">cookies</span>
+
+
+<div class="viewcode-block" id="SavedSearchWidgetBlock"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SavedSearchWidgetBlock">[docs]</a><span class="k">class</span> <span class="nc">SavedSearchWidgetBlock</span><span class="p">(</span><span class="n">SecureBlock</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    What is rendered is based heavily on whether or not the</span>
+<span class="sd">    user is signed in to an account. Block renders as a customizable saved</span>
+<span class="sd">    search module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/secure_blocks/savedsearch.html&#39;</span>
+
+<div class="viewcode-block" id="SavedSearchWidgetBlock.context"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SavedSearchWidgetBlock.context">[docs]</a>    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add additional context variables to those passed in from the ajax call.</span>
+<span class="sd">        User object and search object added, if available</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SavedSearchWidgetBlock</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">saved_search_url</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="k">else</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">saved_search_url</span><span class="p">:</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="p">(</span><span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span>
+                      <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                              <span class="n">url</span><span class="o">=</span><span class="n">saved_search_url</span><span class="p">)</span>
+                      <span class="o">.</span><span class="n">first</span><span class="p">())</span>
+
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+            <span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">search</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="SavedSearchWidgetBlock.required_js"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myblocks.models.SavedSearchWidgetBlock.required_js">[docs]</a>    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of all required javascript in URL format</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">secure-blocks/sb-saved-search.js&#39;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">]</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">SavedSearchesListWidgetBlock</span><span class="p">(</span><span class="n">SecureBlock</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Widget for displaying users 5 most recent saved searches. If there are</span>
+<span class="sd">    more than five, a link back to the saved search page is provided.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/secure_blocks/savedsearchlist.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">saved_searches_url</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;saved_search_main&#39;</span><span class="p">))</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">saved_searches</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">saved_searches</span> <span class="o">=</span> <span class="p">(</span><span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span>
+                              <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+                              <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_on&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">:</span>  <span class="n">user</span><span class="p">,</span>
+            <span class="s1">&#39;saved_searches&#39;</span><span class="p">:</span> <span class="n">saved_searches</span><span class="p">,</span>
+            <span class="s1">&#39;saved_searches_view_url&#39;</span><span class="p">:</span> <span class="n">saved_searches_url</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">SearchBoxBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/searchbox.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;location_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_location_term</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s1">&#39;moc_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;moc_id_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_id_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;search_url&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_search_url</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;site_config&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_config</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;title_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_title_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;total_jobs_count&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_total_jobs_count</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">SearchFilterBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/searchfilter.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;widgets&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_widgets</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">pager.163-24.js&#39;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">SearchResultBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/searchresult.html&#39;</span>
+    <span class="n">base_head</span> <span class="o">=</span> <span class="s1">&#39;myblocks/head/searchresult.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">site_buid_objects</span> <span class="o">=</span> <span class="n">BusinessUnit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">SITE_BUIDS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;arranged_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_arranged_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;data_type&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_default_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;featured_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_featured_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;location_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_location_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;moc_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;query_string&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_query_string</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;results_heading&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_results_heading</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;site_commitments_string&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_commitments_string</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;site_config&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_config</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;site_tags&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_TAGS</span><span class="p">,</span>
+            <span class="s1">&#39;title_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_title_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;analytics_info&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s1">&#39;site_business_units&#39;</span><span class="p">:</span> <span class="p">([</span><span class="n">bu</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">bu</span> <span class="ow">in</span>
+                                                    <span class="n">site_buid_objects</span><span class="p">]),</span>
+                <span class="s1">&#39;default_facet_names&#39;</span><span class="p">:</span> <span class="p">([</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span>
+                                                    <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FACET</span><span class="p">]),</span>
+                <span class="s1">&#39;featured_facet_names&#39;</span><span class="p">:</span> <span class="p">([</span><span class="n">ff</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+                                                    <span class="n">settings</span><span class="o">.</span><span class="n">FEATURED_FACET</span><span class="p">])</span>
+            <span class="p">})</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">render_for_ajax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the template for a SearchResultBlock and renders it.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">templatetag_library</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">SearchResultHeaderBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/searchresultsheader.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;arranged_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_arranged_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;results_heading&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_results_heading</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;default_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_default_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;featured_jobs&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_featured_jobs</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;location_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_location_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;moc_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;query_string&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_query_string</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;title_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_title_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ShareBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/share.html&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">VeteranSearchBox</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/blocks/veteransearchbox.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;location_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_location_term</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s1">&#39;moc_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;moc_id_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_moc_id_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;search_url&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_search_url</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;site_config&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_site_config</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;title_term&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_title_term</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;total_jobs_count&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_total_jobs_count</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Row</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s1">&#39;BlockOrder&#39;</span><span class="p">)</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">block</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">()])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">bootstrap_classes</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;row&quot;</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">context</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all the templates for each block in the Row</span>
+<span class="sd">        in the order specified by the matching BlockOrder.</span>
+<span class="sd">        The combined templates are then wrapped in a row div.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">get_template</span><span class="p">()</span>
+                  <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;blockorder__order&#39;</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="s1">&#39;&lt;div class=&quot;row&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/div&gt;&#39;</span> <span class="o">%</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">required_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines and de-duplicates any javascript required by the</span>
+<span class="sd">        blocks in the Row.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">js</span> <span class="o">+=</span> <span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span><span class="o">.</span><span class="n">required_js</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Page"><a class="viewcode-back" href="../../developers/myblocks/overview.html#myblocks.models.Page">[docs]</a><span class="k">class</span> <span class="nc">Page</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Blocks webpage container. Comprised of rows of blocks to form a highly</span>
+<span class="sd">    customizable webpage.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_template</span> <span class="o">=</span> <span class="s1">&#39;myblocks/myblocks_base.html&#39;</span>
+    <span class="n">base_head</span> <span class="o">=</span> <span class="s1">&#39;myblocks/head/page.html&#39;</span>
+    <span class="n">templatetag_library</span> <span class="o">=</span> <span class="n">templatetag_library</span><span class="p">()</span>
+
+    <span class="n">AJAX_JOBS</span> <span class="o">=</span> <span class="s1">&#39;ajax_jobs&#39;</span>
+    <span class="n">ERROR_404</span> <span class="o">=</span> <span class="s1">&#39;404&#39;</span>
+    <span class="n">HOME_PAGE</span> <span class="o">=</span> <span class="s1">&#39;home_page&#39;</span>
+    <span class="n">JOB_DETAIL</span> <span class="o">=</span> <span class="s1">&#39;job_detail&#39;</span>
+    <span class="n">SEARCH_RESULTS</span> <span class="o">=</span> <span class="s1">&#39;search_results&#39;</span>
+    <span class="n">LOGIN</span> <span class="o">=</span> <span class="s1">&#39;login&#39;</span>
+    <span class="n">NO_RESULTS</span> <span class="o">=</span> <span class="s1">&#39;no_results&#39;</span>
+
+    <span class="n">PRODUCTION</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span>
+    <span class="n">STAGING</span> <span class="o">=</span> <span class="s1">&#39;staging&#39;</span>
+
+    <span class="n">page_type_choices</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">ERROR_404</span><span class="p">,</span> <span class="s1">&#39;404&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">HOME_PAGE</span><span class="p">,</span> <span class="s1">&#39;Home Page&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">JOB_DETAIL</span><span class="p">,</span> <span class="s1">&#39;Job Detail Page&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">SEARCH_RESULTS</span><span class="p">,</span> <span class="s1">&#39;Job Search Results Page&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">LOGIN</span><span class="p">,</span> <span class="s1">&#39;Login Page&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">NO_RESULTS</span><span class="p">,</span> <span class="s1">&#39;No Results Found&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">page_status_choices</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">STAGING</span><span class="p">,</span> <span class="s1">&#39;Staging&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">PRODUCTION</span><span class="p">,</span> <span class="s1">&#39;Production&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">page_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">page_type_choices</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s1">&#39;Row&#39;</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s1">&#39;RowOrder&#39;</span><span class="p">)</span>
+    <span class="n">sites</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s1">&#39;seo.SeoSite&#39;</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">page_status_choices</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+                              <span class="n">default</span><span class="o">=</span><span class="s1">&#39;production&#39;</span><span class="p">)</span>
+
+    <span class="n">head</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">add_blank</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">choices</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;Inherit from Configuration&#39;</span><span class="p">),)</span> <span class="o">+</span> <span class="n">choices</span>
+
+    <span class="n">doc_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                <span class="n">choices</span><span class="o">=</span><span class="n">add_blank</span><span class="p">(</span><span class="n">DOCTYPE_CHOICES</span><span class="p">),</span>
+                                <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">language_code</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                     <span class="n">choices</span><span class="o">=</span><span class="n">add_blank</span><span class="p">(</span><span class="n">LANGUAGE_CODES_CHOICES</span><span class="p">),</span>
+                                     <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">all_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of every unique block included in a page.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">row__page</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="o">|</span>
+                 <span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">columnblockorder__column_block__row__page</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">block</span><span class="o">.</span><span class="n">cast</span><span class="p">()</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Block</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()]</span>
+
+    <span class="k">def</span> <span class="nf">bootstrap_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;col-md-12&quot;</span>
+
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_blocks</span><span class="p">():</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+        <span class="n">site_config</span> <span class="o">=</span> <span class="n">get_site_config</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;site_title&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_TITLE</span><span class="p">,</span>
+                        <span class="s1">&#39;site_description&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_DESCRIPTION</span><span class="p">,</span>
+                        <span class="s1">&#39;doctype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc_type</span> <span class="ow">or</span> <span class="n">site_config</span><span class="o">.</span><span class="n">doc_type</span><span class="p">,</span>
+                        <span class="s1">&#39;language_code&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language_code</span>
+                                          <span class="ow">or</span> <span class="n">site_config</span><span class="o">.</span><span class="n">language_code</span><span class="p">)})</span>
+
+        <span class="k">return</span> <span class="n">context</span>
+
+    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;roworder__order&#39;</span><span class="p">):</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get_template</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+    <span class="nd">@context_tools.Memoized</span>
+    <span class="k">def</span> <span class="nf">get_head</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines the page head with all of the heads for each</span>
+<span class="sd">        individual block on the page.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_blocks</span><span class="p">()</span>
+
+        <span class="c1"># Combine the block head</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="p">[</span><span class="n">block</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">]</span>
+
+        <span class="n">additional_js</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Combine, convert to script tags, and de-duplicate all of the</span>
+        <span class="c1"># js required for each page.</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_blocks</span><span class="p">():</span>
+            <span class="n">additional_js</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">to_js_tag</span><span class="p">(</span><span class="n">js</span><span class="p">)</span> <span class="k">for</span> <span class="n">js</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">required_js</span><span class="p">()]</span>
+
+        <span class="n">head</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">additional_js</span><span class="p">))</span>
+
+        <span class="c1"># Apply Page.head last so that any CSS in Page.head overwrites</span>
+        <span class="c1"># the block-level CSS.</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">head</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span>
+
+    <span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_filters</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">facet_slugs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;facet_slugs&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">facet_slugs</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;facet_slug&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">mark_safe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_body</span><span class="p">()),</span>
+            <span class="s1">&#39;google_analytics&#39;</span><span class="p">:</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_google_analytics</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="s1">&#39;head&#39;</span><span class="p">:</span> <span class="n">mark_safe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_head</span><span class="p">()),</span>
+            <span class="s1">&#39;max_filter_settings&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">ROBOT_FILTER_LEVEL</span><span class="p">,</span>
+            <span class="c1"># see how many active filters there are and then add total number of</span>
+            <span class="c1"># facet slugs as there may be multiple filters in the facet slug entry</span>
+            <span class="s1">&#39;num_filters&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;facet_slug&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">facet_slugs</span><span class="p">),</span>
+            <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="s1">&#39;STATIC_URL&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">raw_base_template</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">Context</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">human_readable_page_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the page_type into a human readable format for use</span>
+<span class="sd">        in the admin.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">page_type_choices_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_type_choices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">page_type_choices_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_type</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">human_readable_page_type</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s1">&#39;Page Type&#39;</span>
+
+    <span class="k">def</span> <span class="nf">human_readable_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts sites into a list of matching domains for use in the</span>
+<span class="sd">        admin.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sites</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;domain&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+    <span class="n">human_readable_sites</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s1">&#39;Sites&#39;</span>
+
+    <span class="k">def</span> <span class="nf">human_readable_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts status into a human readable format for use in the admin.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status_choices_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_status_choices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">status_choices_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">]</span>
+    <span class="n">human_readable_status</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s1">&#39;Status&#39;</span>
+
+    <span class="k">def</span> <span class="nf">pixel_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the template for the tracking pixel.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;img style=&quot;display: none;&quot; border=&quot;0&quot; height=&quot;1&quot; width=&quot;1&quot; alt=&quot;My.jobs&quot;</span>
+<span class="s2">            {</span><span class="si">% i</span><span class="s2">f the_job %}</span>
+<span class="s2">                src=&quot;//my.jobs/pixel.gif?{{request|make_pixel_qs:the_job|safe}}&quot;</span>
+<span class="s2">            {</span><span class="si">% e</span><span class="s2">lse %}</span>
+<span class="s2">                src=&quot;//my.jobs/pixel.gif?{{request|make_pixel_qs|safe}}&quot;</span>
+<span class="s2">            {</span><span class="si">% e</span><span class="s2">ndif %}</span>
+<span class="s2">            /&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the template for a Page and renders it.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">to_js_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">js_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param js_file: The location of a javascript file as a string.</span>
+<span class="sd">        :return: A script tag for js_file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;script type=&quot;text/javascript&quot; src=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&lt;/script&gt;&#39;</span> <span class="o">%</span> <span class="n">js_file</span>
+
+    <span class="k">def</span> <span class="nf">handle_job_detail_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used on job detail pages, this returns a redirect to the</span>
+<span class="sd">        appropriate url if:</span>
+
+<span class="sd">        1. There is no matching job (404).</span>
+<span class="sd">        2. The matching job isn&#39;t actually available on the site</span>
+<span class="sd">            because it belongs to a business unit or site package</span>
+<span class="sd">            not associated with that site (Redirect to home page).</span>
+<span class="sd">        3. It&#39;s missing slugs or the slugs are out of order</span>
+<span class="sd">            Redirect to the page with slugs in the correct order).</span>
+
+<span class="sd">        If there is no redirect, returns None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;job_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_job</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">job_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">job</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">job_id</span><span class="p">:</span>
+                <span class="n">search_type</span> <span class="o">=</span> <span class="s1">&#39;guid&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">31</span> <span class="k">else</span> <span class="s1">&#39;uid&#39;</span>
+                <span class="c1"># The job was not in solr; find and redirect to its apply url</span>
+                <span class="c1"># if it&#39;s a new job that hasn&#39;t been syndicated, otherwise</span>
+                <span class="c1"># return a 404.</span>
+                <span class="n">do_redirect</span> <span class="o">=</span> <span class="n">redirect_if_new</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">search_type</span><span class="p">:</span> <span class="n">job_id</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">do_redirect</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">do_redirect</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;myblocks.models.Page.handle_job_detail_redirect: &quot;</span>
+                          <span class="s2">&quot;job does not exist&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_BUIDS</span> <span class="ow">and</span> <span class="n">job</span><span class="o">.</span><span class="n">buid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_BUIDS</span><span class="p">:</span>
+            <span class="n">on_this_site</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SITE_PACKAGES</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">on_sites</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">on_sites</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">on_this_site</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">)</span>
+
+        <span class="n">title_slug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title_slug&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">location_slug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;location_slug&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">job_location_slug</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">location</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">title_slug</span> <span class="o">==</span> <span class="n">job</span><span class="o">.</span><span class="n">title_slug</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span>
+                <span class="n">location_slug</span> <span class="o">==</span> <span class="n">job_location_slug</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;feed&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">])</span> <span class="k">if</span> <span class="n">query</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span>
+                     <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">query</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">])]))</span>
+
+        <span class="c1"># The url wasn&#39;t quite the canonical form, so we redirect them</span>
+        <span class="c1"># to the correct version based on the title and location of the</span>
+        <span class="c1"># job with the passed in id.</span>
+        <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;location_slug&#39;</span><span class="p">:</span> <span class="n">slugify</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">location</span><span class="p">),</span>
+            <span class="s1">&#39;title_slug&#39;</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">title_slug</span><span class="p">,</span>
+            <span class="s1">&#39;job_id&#39;</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">guid</span>
+        <span class="p">}</span>
+        <span class="n">redirect_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;job_detail_by_location_slug_title_slug_job_id&#39;</span><span class="p">,</span>
+                               <span class="n">kwargs</span><span class="o">=</span><span class="n">new_kwargs</span><span class="p">)</span>
+
+        <span class="c1"># if the feed type is passed, add source params, otherwise only preserve</span>
+        <span class="c1"># the initial query string.</span>
+        <span class="k">if</span> <span class="n">feed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">query</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&amp;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">query</span>
+            <span class="n">redirect_url</span> <span class="o">+=</span> <span class="s2">&quot;?utm_source=</span><span class="si">%s</span><span class="s2">&amp;utm_medium=feed</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">feed</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">:</span>
+            <span class="n">redirect_url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">query</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">redirect_url</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_search_results_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used on search result pages, this returns a redirect to the</span>
+<span class="sd">        appropriate url if:</span>
+
+<span class="sd">        1.  helpers.determine_redirect() supplies a redirect.</span>
+<span class="sd">            The redirect rules that function uses are defined</span>
+<span class="sd">            in the determine_redirect function.</span>
+<span class="sd">        2.  There are no facet_counts (Redirect to home page).</span>
+<span class="sd">        3.  There are no featured jobs, no default jobs, and</span>
+<span class="sd">            no query term applied. This means there are either</span>
+<span class="sd">            no jobs for the site or a series of filters that</span>
+<span class="sd">            should not be able to be applied were applied</span>
+<span class="sd">            (Redirects to home page).</span>
+
+<span class="sd">        If there is no redirect, returns None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_filters</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">query_string</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_query_string</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">redirect_url</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">determine_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">redirect_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">redirect_url</span>
+
+        <span class="n">jobs_and_counts</span> <span class="o">=</span> <span class="n">context_tools</span><span class="o">.</span><span class="n">get_jobs_and_counts</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">default_jobs</span> <span class="o">=</span> <span class="n">jobs_and_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">featured_jobs</span> <span class="o">=</span> <span class="n">jobs_and_counts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">facet_counts</span> <span class="o">=</span> <span class="n">jobs_and_counts</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">facet_counts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">default_jobs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">featured_jobs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">query_string</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">handle_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows for each page type to handle the possibility of redirecting</span>
+<span class="sd">        if necessary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">JOB_DETAIL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_job_detail_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEARCH_RESULTS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_search_results_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+
+<span class="k">class</span> <span class="nc">BlockOrder</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Row&#39;</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ColumnBlockOrder</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">)</span>
+    <span class="n">column_block</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;ColumnBlock&#39;</span><span class="p">,</span>
+                                     <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;included_column_blocks&#39;</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">RowOrder</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Row&#39;</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Page&#39;</span><span class="p">)</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Row for page </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">pk</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

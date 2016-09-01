@@ -1,7 +1,0 @@
-{{ object.description }}
-{{ object.title }}
-{{ object.country }}
-{{ object.country_short }}
-{{ object.state }}
-{{ object.state_short }}
-{{ object.city }}

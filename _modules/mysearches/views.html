@@ -1,0 +1,653 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mysearches.views &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mysearches.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">urlparse</span><span class="o">,</span> <span class="nn">urllib</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">user_passes_test</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">Http404</span><span class="p">,</span>
+                         <span class="n">HttpResponseNotAllowed</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">django.template</span> <span class="kn">import</span> <span class="n">RequestContext</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.csrf</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">csrf_exempt</span> <span class="k">as</span> <span class="n">django_csrf_exempt</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">HTTPError</span>
+
+<span class="kn">from</span> <span class="nn">myjobs.decorators</span> <span class="kn">import</span> <span class="n">user_is_allowed</span>
+<span class="kn">from</span> <span class="nn">myjobs.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">myjobs.autoserialize</span> <span class="kn">import</span> <span class="n">autoserialize</span>
+<span class="kn">from</span> <span class="nn">myjobs.cross_site_verify</span> <span class="kn">import</span> <span class="n">cross_site_verify</span>
+<span class="kn">from</span> <span class="nn">mysearches.models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="n">SavedSearchDigest</span><span class="p">,</span>
+                               <span class="n">PartnerSavedSearch</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mysearches.forms</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SavedSearchForm</span><span class="p">,</span> <span class="n">DigestForm</span><span class="p">,</span>
+                              <span class="n">PartnerSubSavedSearchForm</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mysearches.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_interval_from_frequency</span><span class="p">,</span> <span class="n">parse_feed</span><span class="p">,</span>
+                                <span class="n">url_sort_options</span><span class="p">,</span> <span class="n">validate_dotjobs_url</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">universal.decorators</span> <span class="kn">import</span> <span class="n">warn_when_inactive</span><span class="p">,</span> <span class="n">restrict_to_staff</span>
+
+
+<span class="nd">@user_is_allowed</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">pass_user</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete_saved_search</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search_id</span><span class="p">)</span>
+
+        <span class="c1"># a single search is being deleted</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">,</span>
+                                   <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">search_name</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">search</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># all searches are being deleted</span>
+        <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">partnersavedsearch__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">search_name</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
+
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span>
+        <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;saved_search_main_query&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;?d=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">search_name</span><span class="p">))</span>
+
+
+<span class="nd">@user_is_allowed</span><span class="p">()</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="nd">@warn_when_inactive</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="s2">&quot;Saved Searches are&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">saved_search_main</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># instantiate the form if the digest object exists</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">digest_obj</span> <span class="o">=</span> <span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+            <span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">MultipleObjectsReturned</span><span class="p">):</span>
+        <span class="n">digest_obj</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+    <span class="n">saved_searches</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">partnersavedsearch__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">partner_saved_searches</span> <span class="o">=</span> <span class="n">PartnerSavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_verified</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">DigestForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">digest_obj</span><span class="p">)</span>
+        <span class="n">add_form</span> <span class="o">=</span> <span class="n">SavedSearchForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">add_form</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/saved_search_main.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;saved_searches&#39;</span><span class="p">:</span> <span class="n">saved_searches</span><span class="p">,</span>
+                               <span class="s1">&#39;partner_saved_searches&#39;</span><span class="p">:</span> <span class="n">partner_saved_searches</span><span class="p">,</span>
+                               <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                               <span class="s1">&#39;add_form&#39;</span><span class="p">:</span> <span class="n">add_form</span><span class="p">,</span>
+                               <span class="s1">&#39;updated&#39;</span><span class="p">:</span> <span class="n">updated</span><span class="p">,</span>
+                               <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Saved Searches&#39;</span><span class="p">},</span>
+                              <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="nd">@user_is_allowed</span><span class="p">()</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="nd">@warn_when_inactive</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="s2">&quot;Saved Searches are&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">view_full_feed</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="n">saved_search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">saved_search</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">):</span>
+        <span class="n">is_pss</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_pss</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">saved_search</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+        <span class="n">url_of_feed</span> <span class="o">=</span> <span class="n">url_sort_options</span><span class="p">(</span><span class="n">saved_search</span><span class="o">.</span><span class="n">feed</span><span class="p">,</span>
+                                       <span class="n">saved_search</span><span class="o">.</span><span class="n">sort_by</span><span class="p">,</span>
+                                       <span class="n">frequency</span><span class="o">=</span><span class="n">saved_search</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">items</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">parse_feed</span><span class="p">(</span><span class="n">url_of_feed</span><span class="p">,</span> <span class="n">saved_search</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+                                      <span class="n">saved_search</span><span class="o">.</span><span class="n">jobs_per_email</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HTTPError</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">get_interval_from_frequency</span><span class="p">(</span>
+            <span class="n">saved_search</span><span class="o">.</span><span class="n">frequency</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/view_full_feed.html&#39;</span><span class="p">,</span>
+                                  <span class="p">{</span><span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">saved_search</span><span class="p">,</span>
+                                   <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">items</span><span class="p">,</span>
+                                   <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Saved Searches&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;is_pss&#39;</span><span class="p">:</span> <span class="n">is_pss</span><span class="p">,</span>
+                                   <span class="s1">&#39;start_date&#39;</span><span class="p">:</span> <span class="n">start_date</span><span class="p">,</span>
+                                   <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">count</span><span class="p">},</span>
+                                  <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;saved_search_main&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">more_feed_results</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># Ajax request comes from the view_full_feed view when user scrolls to</span>
+    <span class="c1"># bottom of the page</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+        <span class="n">url_of_feed</span> <span class="o">=</span> <span class="n">url_sort_options</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;feed&#39;</span><span class="p">],</span>
+                                       <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;sort_by&#39;</span><span class="p">],</span>
+                                       <span class="n">frequency</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">])</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">parse_feed</span><span class="p">(</span><span class="n">url_of_feed</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">],</span>
+                           <span class="n">offset</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/feed_page.html&#39;</span><span class="p">,</span>
+                                  <span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">items</span><span class="p">},</span> <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">validate_url</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+        <span class="n">feed_title</span><span class="p">,</span> <span class="n">rss_url</span> <span class="o">=</span> <span class="n">validate_dotjobs_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                                                   <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rss_url</span><span class="p">:</span>
+            <span class="c1"># returns the RSS url via AJAX to show if field is validated</span>
+            <span class="c1"># id valid, the label field is auto populated with the feed_title</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rss_url&#39;</span><span class="p">:</span> <span class="n">rss_url</span><span class="p">,</span>
+                    <span class="s1">&#39;feed_title&#39;</span><span class="p">:</span> <span class="n">feed_title</span><span class="p">,</span>
+                    <span class="s1">&#39;url_status&#39;</span><span class="p">:</span> <span class="s1">&#39;valid&#39;</span><span class="p">}</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;url_status&#39;</span><span class="p">:</span> <span class="s1">&#39;not valid&#39;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">save_digest_form</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">digest_obj</span> <span class="o">=</span> <span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                <span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">MultipleObjectsReturned</span><span class="p">):</span>
+            <span class="n">digest_obj</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">DigestForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                          <span class="n">instance</span><span class="o">=</span><span class="n">digest_obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+            <span class="c1"># If this is an ajax request, we can return success/failure</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># The request is not ajax; Redirect to the main saved search page</span>
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;saved_search_main&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="nd">@warn_when_inactive</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="s2">&quot;Saved Searches are&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">save_search_form</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;search_id&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search_id</span><span class="p">)</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">):</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">PartnerSubSavedSearchForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                                         <span class="n">instance</span><span class="o">=</span><span class="n">original</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="p">,</span>
+                                         <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SavedSearchForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                               <span class="n">instance</span><span class="o">=</span><span class="n">original</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;saved_search_main&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/saved_search_edit.html&#39;</span><span class="p">,</span>
+                                      <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                                       <span class="s1">&#39;search_id&#39;</span><span class="p">:</span> <span class="n">search_id</span><span class="p">},</span>
+                                      <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="nd">@warn_when_inactive</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="s2">&quot;Saved Searches are&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="n">partner_saved_search</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pss&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">partner_saved_search</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">search_id</span><span class="p">:</span>
+            <span class="n">saved_search</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">,</span>
+                                             <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">saved_search</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;mysearches.views.edit_search: trying to edit a &quot;</span>
+                              <span class="s2">&quot;PartnerSavedSearch as a SavedSearch&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">saved_search</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">is_pss</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SavedSearchForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">saved_search</span><span class="p">,</span>
+                               <span class="n">auto_id</span><span class="o">=</span><span class="s1">&#39;id_edit_</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">search_id</span><span class="p">:</span>
+            <span class="n">saved_search</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">,</span>
+                                             <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">saved_search</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">):</span>
+                <span class="n">is_pss</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">form</span> <span class="o">=</span> <span class="n">PartnerSubSavedSearchForm</span><span class="p">(</span>
+                    <span class="n">instance</span><span class="o">=</span><span class="n">saved_search</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="p">,</span>
+                    <span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                    <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;mysearches.views.edit_search: no id provided&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/saved_search_edit.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                               <span class="s1">&#39;search_id&#39;</span><span class="p">:</span> <span class="n">search_id</span><span class="p">,</span>
+                               <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Saved Searches&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">saved_search</span><span class="p">,</span>
+                               <span class="s1">&#39;is_pss&#39;</span><span class="p">:</span> <span class="n">is_pss</span><span class="p">,</span>
+                               <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">label</span><span class="p">},</span>
+                              <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_verified</span><span class="p">)</span>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">not_disabled</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">save_edit_form</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">():</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;search_id&#39;</span><span class="p">)</span>
+        <span class="n">saved_search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">saved_search</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">SavedSearchForm</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+                                   <span class="n">instance</span><span class="o">=</span><span class="n">saved_search</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">))</span>
+
+
+<span class="nd">@user_is_allowed</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">unsubscribe_confirmation</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">unsub_links</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;all_searches&quot;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;unsubscribe&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;?id=digest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;all_email&quot;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;unsubscribe_all&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;?id=all&quot;</span>
+    <span class="p">}</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">search_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">search_id</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="n">unsub_links</span><span class="p">[</span><span class="s1">&#39;single_search&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span>
+            <span class="s1">&#39;unsubscribe&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;?id={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">search_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span>
+        <span class="s1">&#39;mysearches/saved_search_unsubscribe_confirmation.html&#39;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s1">&#39;links&#39;</span><span class="p">:</span> <span class="n">unsub_links</span><span class="p">},</span> <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="nd">@user_is_allowed</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">pass_user</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">unsubscribe</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deactivates a user&#39;s saved searches.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">    :request: HttpRequest object</span>
+<span class="sd">    :search_id: the string &#39;digest&#39; to disable all searches</span>
+<span class="sd">        or the id value of a specific search to be disabled</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">has_pss</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search_id</span><span class="p">)</span>
+        <span class="n">saved_search</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">SavedSearch</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">search_id</span><span class="p">,</span>
+                                         <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="c1"># saved_search is a single search rather than a queryset this time</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="p">[</span><span class="n">saved_search</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">saved_search</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">saved_search</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">has_pss</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">saved_search</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">has_pss</span><span class="p">:</span>
+                <span class="n">saved_search</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="o">.</span><span class="n">unsubscribed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">saved_search</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="c1"># method expects an iterable and I didn&#39;t want to run</span>
+                <span class="c1"># another query</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">send_opt_out_notifications</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">saved_search</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="p">])</span>
+            <span class="n">saved_search</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">digest</span> <span class="o">=</span> <span class="n">SavedSearchDigest</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+            <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">digest</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">digest</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">digest</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">saved_searches</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                                                    <span class="n">is_active</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c1"># we want the associated partner saved searches themselves</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">send_opt_out_notifications</span><span class="p">([</span>
+            <span class="n">search</span><span class="o">.</span><span class="n">partnersavedsearch</span> <span class="k">for</span> <span class="n">search</span> <span class="ow">in</span> <span class="n">saved_searches</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">partnersavedsearch__isnull</span><span class="o">=</span><span class="bp">False</span><span class="p">)])</span>
+
+        <span class="c1"># saved_searches that have partner saved searches</span>
+        <span class="n">ss_have_pss</span> <span class="o">=</span> <span class="n">saved_searches</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">partnersavedsearch__isnull</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c1"># Bulk update (django 1.6) can&#39;t dig through a Foreign Key have to</span>
+        <span class="c1"># iterate with a for loop</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">ss_have_pss</span><span class="p">:</span>
+            <span class="n">ss</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="o">.</span><span class="n">unsubscribed</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">ss</span><span class="o">.</span><span class="n">partnersavedsearch</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># Updating the field that a queryset was filtered on seems to empty</span>
+        <span class="c1"># that queryset; Make a copy and then update the queryset</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">saved_searches</span><span class="p">)</span>
+        <span class="n">saved_searches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;mysearches.views.unsubscribe: no id provided&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/saved_search_disable.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;search_id&#39;</span><span class="p">:</span> <span class="n">search_id</span><span class="p">,</span>
+                               <span class="s1">&#39;searches&#39;</span><span class="p">:</span> <span class="n">cache</span><span class="p">,</span>
+                               <span class="s1">&#39;email_user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+                               <span class="s1">&#39;contains_pss&#39;</span><span class="p">:</span> <span class="n">has_pss</span><span class="p">},</span>
+                              <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">saved_search_widget</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">saved_search_url</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+    <span class="n">callback</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;callback&#39;</span><span class="p">)</span>
+    <span class="n">success_email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="k">else</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                                                <span class="n">url</span><span class="o">=</span><span class="n">saved_search_url</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">success_email</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">search</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user__email</span><span class="o">=</span><span class="n">success_email</span><span class="p">,</span>
+                                                <span class="n">url</span><span class="o">=</span><span class="n">saved_search_url</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="n">ctx</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+        <span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">search</span><span class="p">,</span>
+        <span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="n">success_email</span><span class="p">,</span>
+        <span class="s1">&#39;is_pss&#39;</span><span class="p">:</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="s1">&#39;partnersavedsearch&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s1">&#39;mysearches/saved_search_widget.html&#39;</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span>
+                              <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">content</span><span class="p">)),</span>
+                        <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/javascript&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="k">lambda</span> <span class="n">u</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">send_saved_search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">search_id</span><span class="p">)</span>
+        <span class="n">search</span><span class="o">.</span><span class="n">send_email</span><span class="p">(</span><span class="n">additional_headers</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&quot;filters&quot;:{&quot;clicktrack&quot;:{&#39;</span>
+                                              <span class="s1">&#39;&quot;settings&quot;:{&quot;enable&quot;:0}}}&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_pss&#39;</span><span class="p">):</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">partnersavedsearch</span>
+            <span class="n">redirect_to</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;partner_view_full_feed&#39;</span><span class="p">)</span> <span class="o">+</span> \
+                <span class="s1">&#39;?partner={partner_id}&amp;id={search_id}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">partner_id</span><span class="o">=</span><span class="n">search</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                    <span class="n">search_id</span><span class="o">=</span><span class="n">search</span><span class="o">.</span><span class="n">pk</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">redirect_to</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;view_full_feed&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;?id={search_id}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">search_id</span><span class="o">=</span><span class="n">search_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">redirect_to</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;mysearches.views.send_saved_search: &quot;</span>
+                      <span class="s2">&quot;feature not available outside of QC&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">user_creation_retrieval</span><span class="p">(</span><span class="n">auth_user</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve user account for adding saved searches. If the email belongs</span>
+<span class="sd">    to a user and that user is not logged in, error is raised.</span>
+
+<span class="sd">    :param auth_user: Currently logged in user</span>
+<span class="sd">    :param email: Email attempting to be added</span>
+<span class="sd">    :return: New or existing user account tied to provided email</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_user</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No user provided. This field is required&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">email</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No email provided. This field is required&#39;</span><span class="p">)</span>
+
+    <span class="c1"># retrieve the user account is created, otherwise, create it</span>
+    <span class="n">email_user_account</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+                                                           <span class="n">send_email</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">created</span> <span class="ow">and</span> <span class="n">email_user_account</span> <span class="o">!=</span> <span class="n">auth_user</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This email has already been taken. If this is your&#39;</span>
+                         <span class="s1">&#39; email, please log in to add this search&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO: ADD LINK</span>
+
+    <span class="k">return</span> <span class="n">email_user_account</span><span class="p">,</span> <span class="n">created</span>
+
+
+<span class="k">def</span> <span class="nf">add_or_activate_saved_search</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempt to add a new saved search to a user, or it is already exists,</span>
+<span class="sd">    make sure it is active.</span>
+
+<span class="sd">    :param user: User recieving search</span>
+<span class="sd">    :param url: URL for search</span>
+<span class="sd">    :return: The new or activated search</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No URL provided&quot;</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="n">label</span><span class="p">,</span> <span class="n">feed</span> <span class="o">=</span> <span class="n">validate_dotjobs_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">label</span> <span class="ow">and</span> <span class="n">feed</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid .JOBS URL Provided&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create notes field noting that it was created as current date/time</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%A, %B </span><span class="si">%d</span><span class="s1">, %Y %l:%M %p&#39;</span><span class="p">)</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="s1">&#39;Saved on &#39;</span> <span class="o">+</span> <span class="n">now</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://&#39;</span> <span class="o">+</span> <span class="n">url</span>
+    <span class="n">netloc</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+    <span class="n">notes</span> <span class="o">+=</span> <span class="s1">&#39; from &#39;</span> <span class="o">+</span> <span class="n">netloc</span>
+
+    <span class="n">search_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                   <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+                   <span class="s1">&#39;feed&#39;</span><span class="p">:</span> <span class="n">feed</span><span class="p">,</span>
+                   <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+                   <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                   <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;day_of_week&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                   <span class="s1">&#39;day_of_month&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                   <span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="n">notes</span><span class="p">}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># if search already exists, activate it</span>
+        <span class="n">saved_search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">search_args</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                                <span class="n">email__iexact</span><span class="o">=</span><span class="n">search_args</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                                <span class="n">url</span><span class="o">=</span><span class="n">search_args</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+        <span class="n">saved_search</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">saved_search</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">SavedSearch</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="c1"># if there&#39;s no search for that email/user, create it</span>
+        <span class="n">saved_search</span> <span class="o">=</span> <span class="n">SavedSearch</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)</span>
+        <span class="n">saved_search</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">saved_search</span><span class="o">.</span><span class="n">initial_email</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">saved_search</span>
+
+
+<span class="k">def</span> <span class="nf">get_value_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks GET, POST and body for key, returns whatever is found or none</span>
+
+<span class="sd">    :param request: request with get, post, or body</span>
+<span class="sd">    :param key: key being searched for</span>
+<span class="sd">    :return: value for key or none</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">request_body</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># if request.body exists and is a json object, load it</span>
+        <span class="n">request_body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span>
+             <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span>
+             <span class="n">request_body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+<span class="k">def</span> <span class="nf">remove_anchor_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove anchor tags from the provided URL. %23 is &#39;#&#39; url encoded.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;%23&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">url</span><span class="p">[:</span><span class="n">url</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;%23&#39;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">url</span>
+
+<span class="nd">@django_csrf_exempt</span>
+<span class="nd">@cross_site_verify</span>
+<span class="nd">@autoserialize</span>
+<div class="viewcode-block" id="secure_saved_search"><a class="viewcode-back" href="../../developers/mysearches/secure_saved_search.html#mysearches.views.secure_saved_search">[docs]</a><span class="k">def</span> <span class="nf">secure_saved_search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handling for creation of a saved search via the saved search secure block</span>
+<span class="sd">    widget.</span>
+
+<span class="sd">    :param request: inbound request</span>
+<span class="sd">    :return: Dictionary, to be converted by autoserialize decorator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">allowed_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span><span class="s1">&#39;POST&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HttpResponseNotAllowed</span><span class="p">(</span><span class="n">allowed_methods</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;user_created&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;search_activated&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">}</span>
+    <span class="n">email_in</span> <span class="o">=</span> <span class="n">get_value_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">new_search_account</span><span class="p">,</span> <span class="n">user_created</span> <span class="o">=</span> <span class="n">user_creation_retrieval</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                                                   <span class="n">email_in</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">message</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Invalid email.&quot;</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="n">response</span><span class="p">[</span><span class="s1">&#39;user_created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_created</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">remove_anchor_from_url</span><span class="p">(</span><span class="n">get_value_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">saved_search</span> <span class="o">=</span> <span class="n">add_or_activate_saved_search</span><span class="p">(</span><span class="n">new_search_account</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">message</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">if</span> <span class="n">saved_search</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;search_activated&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="n">response</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

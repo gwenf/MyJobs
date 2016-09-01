@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Job Posting" href="index.html" />
+    <link rel="next" title="Postajob Setup Guide" href="setup.html" />
+    <link rel="prev" title="Job Posting" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Postajob Setup Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Job Posting"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Job Posting</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<span id="product-life-cycle"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>Product Life Cycle<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>A product transitions between different states throughout its life time, and
+depending on that state may be interacted with in a few different ways,
+depending on the user&#8217;s role. What follows is a complete description of that
+life cycle broken down by a user&#8217;s role.</p>
+<div class="section" id="purchased-microsite-owner">
+<h3>Purchased Microsite Owner<a class="headerlink" href="#purchased-microsite-owner" title="Permalink to this headline">¶</a></h3>
+<p>A purchased microsite owner can create and sell products as well as moderate
+the use of those products. Before doing so, they must first have a site-package
+to add that product to. Currently, requests for site-packages are fielded by
+DirectEmployers staff. After fulfilling the site-package requirement, the
+process of selling and managing products is pretty straight forward.</p>
+<div class="section" id="product-creation">
+<h4>Product Creation<a class="headerlink" href="#product-creation" title="Permalink to this headline">¶</a></h4>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pricing a product requires that a purchased microsite owner have an
+Authorize.net account.</p>
+</div>
+<p>Creating a product is simply a matter of deciding which site-package it is
+a part of, determining which company it belongs to, the price of the
+product, and various details about the types of jobs that can be created
+with the product.  If a purchased microsite owner wants finer grained
+control over which jobs may be posted, they should ensure that the product
+requires approval.</p>
+</div>
+<div class="section" id="product-groupings">
+<h4>Product Groupings <a class="footnote-reference" href="#id4" id="id2">[1]</a><a class="headerlink" href="#product-groupings" title="Permalink to this headline">¶</a></h4>
+<p>In order for products to be visible for a user, they must first be a part of a
+product grouping. In the simplest case, a product grouping will consist of a
+single product, but they may be leveraged to prioritize and organize products.
+For instance, it is entirely reasonable to create a &#8220;Featured Products&#8221; product
+grouping.</p>
+</div>
+<div class="section" id="offline-purchase">
+<h4>Offline Purchase<a class="headerlink" href="#offline-purchase" title="Permalink to this headline">¶</a></h4>
+<p>An offline purchase represents an order that may or may not have been
+fulfilled. If a purchasing company is specified, then the selected products
+will appear in that company&#8217;s purchased products list. If a purchasing company
+is not specified, the offline purchase&#8217;s redemption code may be used later to
+claim the purchase.</p>
+</div>
+<div class="section" id="job-posting-requests">
+<h4>Job Posting Requests<a class="headerlink" href="#job-posting-requests" title="Permalink to this headline">¶</a></h4>
+<p>By this point, a user now has the ability to post jobs using their purchased
+products. Each job posting that is moderated may be accepted, rejected, or in
+cases where it is deemed necessary, the company can be blocked from creating
+future postings. If a moderated job is later edited, it will be sent for review
+again before being published.</p>
+</div>
+</div>
+<div class="section" id="unaffiliated-user">
+<h3>Unaffiliated User<a class="headerlink" href="#unaffiliated-user" title="Permalink to this headline">¶</a></h3>
+<p>An unaffiliated user may purchase products which given them access to one or
+more job postings. Those job postings may or may not have an expiration date,
+require approval on submission, and may be edited or deleted as necessary.</p>
+<div class="section" id="product-purchase">
+<h4>Product Purchase<a class="headerlink" href="#product-purchase" title="Permalink to this headline">¶</a></h4>
+<p>In order to purchase a product, a user must either belong to a company which is
+recognized as a customer of the product owner, or they must manually enter a
+redemption code for a purchase negotiated outside of the posted jobs framework.</p>
+</div>
+<div class="section" id="job-posting">
+<h4>Job Posting<a class="headerlink" href="#job-posting" title="Permalink to this headline">¶</a></h4>
+<p>Each purchased product has a number of job listings which will appear on the
+product&#8217;s sites. A job posting may have multiple locations, special
+instructions for applicants, and an expiration date <a class="footnote-reference" href="#id5" id="id3">[2]</a>.</p>
+</div>
+<div class="section" id="waiting-for-approval">
+<h4>Waiting for Approval<a class="headerlink" href="#waiting-for-approval" title="Permalink to this headline">¶</a></h4>
+<p>If that product requires approval, a job posting may be rejected, in which
+case, the poster will be notified of the reasons and may attempt to re-submit
+the posting. It is also within the product owner&#8217;s discretion to revoke a
+company user&#8217;s permission to create any job postings, in which case that user
+will be notified as well.</p>
+</div>
+<div class="section" id="editing-job-postings">
+<h4>Editing Job Postings<a class="headerlink" href="#editing-job-postings" title="Permalink to this headline">¶</a></h4>
+<p>Once a job posting is published, a user may later edit (eg. to correct typos)
+or delete (eg. once the position is filled) it. It should be noted that a
+moderated job that has been re-submitted will have to be re-approved.</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Future versions of this feature will deprecate the use of product
+groupings, which should streamline the entire process.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>The product may have a maximum expiration (eg. 30 days), which may not be
+exceeded.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#id1">Product Life Cycle</a><ul>
+<li><a class="reference internal" href="#purchased-microsite-owner">Purchased Microsite Owner</a><ul>
+<li><a class="reference internal" href="#product-creation">Product Creation</a></li>
+<li><a class="reference internal" href="#product-groupings">Product Groupings </a></li>
+<li><a class="reference internal" href="#offline-purchase">Offline Purchase</a></li>
+<li><a class="reference internal" href="#job-posting-requests">Job Posting Requests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unaffiliated-user">Unaffiliated User</a><ul>
+<li><a class="reference internal" href="#product-purchase">Product Purchase</a></li>
+<li><a class="reference internal" href="#job-posting">Job Posting</a></li>
+<li><a class="reference internal" href="#waiting-for-approval">Waiting for Approval</a></li>
+<li><a class="reference internal" href="#editing-job-postings">Editing Job Postings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Job Posting</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="next chapter">Postajob Setup Guide</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/postajob/overview.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Postajob Setup Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Job Posting"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Job Posting</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

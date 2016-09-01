@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Imports Documentation &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Developer Documentation" href="../index.html" />
+    <link rel="next" title="ETL Imports" href="etl_imports.html" />
+    <link rel="prev" title="MyJobs API" href="../api/developer_guide.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="etl_imports.html" title="ETL Imports"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../api/developer_guide.html" title="MyJobs API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Developer Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="imports-documentation">
+<h1>Imports Documentation<a class="headerlink" href="#imports-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Our Job imports for direct_seo sites tend to follow the idea of the Extract,
+Transform, Load (ETL) process.  What this means is that to load jobs we
+generally start with getting the source files, extract the pertinent data for
+each job from them, transform it from the source format to something solr
+understands, and then batch insert it into solr.</p>
+<p>There are three sources for loading jobs.  The first corresponds with
+<cite>tasks.task_update_solr</cite> and is primarily used to load data from state job
+banks.  It gets it&#8217;s data from <cite>http://seoxml.directemployers.com/</cite> and the
+data is retrieved as a single large XML document.</p>
+<p>The second, <cite>tasks.task_etl_to solr</cite> and <cite>tasks.task_priority_etl_to_solr</cite> is
+used to load individual companies data.  It retrieves a zipfile from
+<cite>http://jobsfs.directemployers.org/</cite>.  The reason that this is not used for
+state job banks is due to the fact the current format does not support having
+multiple companies in a single zipfile, which a state job bank requires.</p>
+<p>The final source is the myjobs postajob system, and doesn&#8217;t follow the standard
+import process, as the jobs are not imported using a typical batch ETL process,
+but are rather inserted and/or updated synchronously via the webservers.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="etl_imports.html">ETL Imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl_imports.html#etl-import-process">ETL Import Process:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl_imports.html#debugging-general-failures">Debugging General Failures:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl_imports.html#debugging-individual-failures">Debugging Individual Failures:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl_imports.html#running-a-task-manually">Running a Task Manually:</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../api/developer_guide.html"
+                        title="previous chapter">MyJobs API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="etl_imports.html"
+                        title="next chapter">ETL Imports</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/import_jobs/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="etl_imports.html" title="ETL Imports"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../api/developer_guide.html" title="MyJobs API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

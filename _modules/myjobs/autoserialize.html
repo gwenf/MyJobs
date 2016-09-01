@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>myjobs.autoserialize &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for myjobs.autoserialize</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="k">def</span> <span class="nf">inject_cookies</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">cookies</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inject cookies into a HttpResponse object. Allows wrapped function</span>
+<span class="sd">    to return cookie objects to be set.</span>
+
+<span class="sd">    :param response: HttpResponse object</span>
+<span class="sd">    :param cookies: List of dicts with cookie information</span>
+<span class="sd">    :return: response with cookies added</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">cookie</span> <span class="ow">in</span> <span class="n">cookies</span><span class="p">:</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="o">**</span><span class="n">cookie</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>
+
+<div class="viewcode-block" id="autoserialize"><a class="viewcode-back" href="../../developers/myblocks/secureblocks.html#myjobs.autoserialize.autoserialize">[docs]</a><span class="k">def</span> <span class="nf">autoserialize</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrap API. If the API receives a JSONP call, wrap the response in the</span>
+<span class="sd">    given callback function. Appends cookie objects into response if they exist</span>
+
+<span class="sd">    :param fn: wrapped function</span>
+<span class="sd">    :return: return wrapped in callback, if jsonp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">handle_autoserialize</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># see if response has cookies to be saved</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cookies</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cookies&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">cookies</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;callback&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+            <span class="n">callback</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;callback&#39;</span><span class="p">]</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="s2">&quot;text/javascript&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">payload</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="s2">&quot;application/json&quot;</span>
+        <span class="n">http_response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">)</span>
+        <span class="n">http_response</span> <span class="o">=</span> <span class="n">inject_cookies</span><span class="p">(</span><span class="n">http_response</span><span class="p">,</span> <span class="n">cookies</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">http_response</span>
+    <span class="k">return</span> <span class="n">handle_autoserialize</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

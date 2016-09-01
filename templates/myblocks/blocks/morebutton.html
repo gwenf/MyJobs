@@ -1,5 +1,0 @@
-{% if num_featured_jobs|add:num_default_jobs > site_config.num_job_items_to_show %}
-    <span id="direct_moreLessLinks_listingDiv" data-type={% if data_type %}"{{ data_type }}"{% else %}{% trans "listing" %}{% endif %} class="more_less_links_container" offset="{{site_config.num_job_items_to_show|multiply_value:2}}" data-num-items="{{site_config.num_job_items_to_show}}">
-        <a id="button_moreJobs" href="#" rel="nofollow">More</a>
-    </span>
-{% endif %}

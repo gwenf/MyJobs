@@ -1,0 +1,770 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Postajob Setup Guide &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Job Posting" href="index.html" />
+    <link rel="next" title="SEO" href="../seo/index.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../seo/index.html" title="SEO"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Job Posting</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="postajob-setup-guide">
+<h1>Postajob Setup Guide<a class="headerlink" href="#postajob-setup-guide" title="Permalink to this headline">¶</a></h1>
+<p>This guide describes how to configure a microsite to use the <code class="docutils literal"><span class="pre">postajob</span></code>
+application in a variety of use cases. We discuss first the common requirements
+among each use case, then describe the specific use cases in detail.</p>
+<p>For your own purposes, you should change this URL to the one used by your
+microsite.</p>
+<div class="section" id="conventions-used-in-this-guide">
+<h2>Conventions used in this guide<a class="headerlink" href="#conventions-used-in-this-guide" title="Permalink to this headline">¶</a></h2>
+<p>To make the various use cases more concrete, this guide has adopted a number of
+conventions to assist you in your understanding of various concepts:</p>
+<ul class="simple">
+<li>When we talk about a site, we will always use <a class="reference external" href="http://directemployers.jobs">http://directemployers.jobs</a>.
+This ensures that there is always a live example for you to compare to the
+site you are attempting to configure.</li>
+<li>In production, it is more likely that custom-tailored roles will be created
+for each of the personas that might be assumed when performing various tasks
+on a microsite with postajob enabled. However, for simplicity, we always
+assign our user the <code class="docutils literal"><span class="pre">Admin</span></code> role, which automatically includes every
+activity available in the system.</li>
+<li>The above might make it difficult to ascertain whether a page is working as
+expected. Thus, with each use case description, this guide provides a table
+which annotates which activities are required for each of the views relevant
+to the use case being examined.</li>
+</ul>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Each use case has a different set of requirements. As some of those
+requirements are shared between some of the use cases, we&#8217;ve decided to collect
+the instructions for each of those requirements in one spot. When you are
+reading use case descriptions, the requirements will be listed as well. As
+such, feel free to go directly to the <a class="reference internal" href="#use-cases"><span>use cases</span></a> and refer
+back to these requirements when necessary.</p>
+<div class="section" id="logging-in">
+<span id="enable-login"></span><h3>Logging In<a class="headerlink" href="#logging-in" title="Permalink to this headline">¶</a></h3>
+<p>A lot of postajob features requires that a user be logged in. As most sites
+aren&#8217;t network sites (and thus do not have a top bar with a login link), they
+don&#8217;t have a built in way for users to log in, which is where login blocks come
+in. Creating a login page can be done as follows:</p>
+<div class="section" id="from-the-django-shell">
+<h4>From the Django shell<a class="headerlink" href="#from-the-django-shell" title="Permalink to this headline">¶</a></h4>
+<p>Find the site you wish to add a login page to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">myblocks.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;directemployers.jobs&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add a page to that site:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Login Page&quot;</span><span class="p">,</span> <span class="n">page_type</span><span class="o">=</span><span class="n">Page</span><span class="o">.</span><span class="n">LOGIN</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span><span class="o">.</span><span class="n">sites</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add a row containing a login block to that page:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">row</span> <span class="o">=</span> <span class="n">Row</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">row_order</span> <span class="o">=</span> <span class="n">RowOrder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">login_block</span> <span class="o">=</span> <span class="n">LoginBlock</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Login Block&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="mi">12</span><span class="s2">&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">block_order</span> <span class="o">=</span> <span class="n">BlockOrder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="n">login_block</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-the-django-admin">
+<h4>From the Django admin<a class="headerlink" href="#from-the-django-admin" title="Permalink to this headline">¶</a></h4>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Setting offset to 0 and span to 12 would have the effect of creating
+a content block which fills the width of its parent.</p>
+</div>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://directemployers.jobs/admin/myblocks/loginblock/add/">create a new login block</a>, ensuring to select an element id, offset, and
+span.</li>
+<li><a class="reference external" href="http://directemployers.jobs/admin/myblocks/row/add/">create a new row</a> and add your new login block to it. Be sure to assign an
+order to it, noting that indexes start at 0, not 1.</li>
+<li><a class="reference external" href="http://directemployers.jobs/admin/myblocks/page/">create a new page</a> tied to the <cite>SeoSite</cite> you are working with, using
+&#8216;Login Page&#8217; as the page type. As with row, be sure to add an order.</li>
+</ol>
+<p>You should now be able to visit the <a class="reference external" href="http://directemployers.jobs/login">login page</a> for your microsite.</p>
+</div>
+</div>
+<div class="section" id="enabling-job-posting">
+<span id="enable-posting"></span><h3>Enabling Job Posting<a class="headerlink" href="#enabling-job-posting" title="Permalink to this headline">¶</a></h3>
+<p>Enabling job posting is a matter of granting a particular company access to the
+posting application and then assigning a particular user a role with activities
+related to job posting. Specifically, you need to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>associate a company with your microsite</li>
+<li>give that company app-level access to posting</li>
+<li>assign the user trying to access job posting a role with the correct
+activities</li>
+</ul>
+</div></blockquote>
+<div class="section" id="automatically">
+<h4>Automatically<a class="headerlink" href="#automatically" title="Permalink to this headline">¶</a></h4>
+<p>Open a Django shell and run the following commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="n">Company</span><span class="p">,</span> <span class="n">SeoSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">postajob.helpers</span> <span class="kn">import</span> <span class="n">enable_posting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span> <span class="o">=</span> <span class="n">Company</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Association&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;directemployers.jobs&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enable_posting</span><span class="p">(</span><span class="n">company</span><span class="p">,</span> <span class="n">site</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that it is not possible to automatically enable posting from the Django
+admin.</p>
+</div>
+<div class="section" id="id1">
+<h4>From the Django shell<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>Associate the company to the seo site:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span> <span class="o">=</span> <span class="n">Company</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Association&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;directemployers.jobs&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span><span class="o">.</span><span class="n">canonical_company</span> <span class="o">=</span> <span class="n">company</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Enable Posting access for the company:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">myjobs.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">posting_access</span> <span class="o">=</span> <span class="n">AppAccess</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Posting&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span><span class="o">.</span><span class="n">app_access</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">posting_access</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Associate the user to the company:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">role</span> <span class="o">=</span> <span class="n">company</span><span class="o">.</span><span class="n">role_set</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Admin&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="s2">&quot;dev@apps.directemployers.org&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-the-django-admin-and-user-management-tool">
+<h4>From the Django Admin and User Management Tool<a class="headerlink" href="#from-the-django-admin-and-user-management-tool" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic">
+<li><p class="first">select the appropriate company as the <code class="docutils literal"><span class="pre">canonical_company</span></code> for
+<a class="reference external" href="http://directemployers.jobs/admin/seo/seosite/36815/?_changelist_filters=q%3Ddirectemployers.jobs">your seo site</a>.</p>
+</li>
+<li><p class="first"><cite>enable posting access</cite> for the company chosen above by adding &#8220;Posting&#8221; to
+the &#8220;Chosen App-Level Access&#8221; box in the &#8220;App-Level Access&#8221; section.</p>
+</li>
+<li><p class="first"><cite>assign your user a role</cite> which has permission to post.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>at the moment, this must be done on <a class="reference external" href="https://secure.my.jobs">https://secure.my.jobs</a> as that is
+the only domain for which User Management is available</li>
+<li>be sure to change to the correct company in the topbar.</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="creating-a-site-package">
+<span id="create-sitepackage"></span><h3>Creating a Site Package<a class="headerlink" href="#creating-a-site-package" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The jobs within products are posted to sites within site packages owned by
+the company who owns the product, <em>not</em> the company who purchased the
+product.</p>
+</div>
+<p>The microsites on which a job will be posted to is determined by the site
+package (not to be confused with site familiess) associated with the compnay
+who owns the job. Creating a site package is straight forward.</p>
+<div class="section" id="id2">
+<h4>From the Django Shell<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>Obtain the company who will own the site package:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span> <span class="o">=</span> <span class="n">Company</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Association&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Find relevant sites:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sites</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">canonical_company</span><span class="o">=</span><span class="n">company</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Associate the company and sites to a new site package:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">site_package</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Sites, owner=company)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site_package</span><span class="o">.</span><span class="n">sites</span> <span class="o">=</span> <span class="n">sites</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h4>From the Django Admin and User Management Tool<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p><cite>Create a new site package</cite>, being sure to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>name it something meaningful (eg. DirectEmployers Sites)</li>
+<li>only select sites affiliated with the company who owns the job</li>
+<li>select that company as the site package&#8217;s owner</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="enabling-the-marketplace">
+<span id="enable-marketplace"></span><h3>Enabling the Marketplace<a class="headerlink" href="#enabling-the-marketplace" title="Permalink to this headline">¶</a></h3>
+<p>Enabling the marketplace is similar to <cite>enabling job posting &lt;enable-posting&gt;</cite>
+except that you need to grant marketplace access instead of posting access, and
+you need to add marketplace activities to a user&#8217;s role instead of posting
+activities. All together then, you need to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>associate a company with your microsite</li>
+<li>give that company app-level access to marketplace</li>
+<li>assign the user trying to access the marketplace a role with the correct
+activities</li>
+</ul>
+</div></blockquote>
+<div class="section" id="id4">
+<h4>Automatically<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Open a Django shell and run the following commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="n">Company</span><span class="p">,</span> <span class="n">SeoSite</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">postajob.helpers</span> <span class="kn">import</span> <span class="n">enable_marketplace</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span> <span class="o">=</span> <span class="n">Company</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Association&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;directemployers.jobs&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enable_marketplace</span><span class="p">(</span><span class="n">company</span><span class="p">,</span> <span class="n">site</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that it is not possible to automatically enable posting from the Django
+admin.</p>
+</div>
+<div class="section" id="id5">
+<h4>From the Django Shell<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>Associate the company to the seo site:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">seo.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span> <span class="o">=</span> <span class="n">Company</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;DirectEmployers Association&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">SeoSite</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;directemployers.jobs&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span><span class="o">.</span><span class="n">canonical_company</span> <span class="o">=</span> <span class="n">company</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Enable MarketPlace access for the company:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">myjobs.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">marketplace_access</span> <span class="o">=</span> <span class="n">AppAccess</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MarketPlace&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">company</span><span class="o">.</span><span class="n">app_access</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">marketplace_access</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Associate the user to the company:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">role</span> <span class="o">=</span> <span class="n">company</span><span class="o">.</span><span class="n">role_set</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Admin&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="s2">&quot;dev@apps.directemployers.org&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h4>From the Django Admin and User Management Tool<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic simple">
+<li>select the appropriate company as the <code class="docutils literal"><span class="pre">canonical_company</span></code> for
+<a class="reference external" href="http://directemployers.jobs/admin/seo/seosite/36815/?_changelist_filters=q%3Ddirectemployers.jobs">your seo site</a>.</li>
+<li><cite>enable marketplace access</cite> for the company chosen above by adding &#8220;Posting&#8221; to
+the &#8220;Chosen App-Level Access&#8221; box in the &#8220;App-Level Access&#8221; section.</li>
+<li><cite>assign your user a role</cite> which has permission to post.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="use-cases">
+<span id="id7"></span><h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>Here, we describe the purpose of and setup requirements of each of the eight
+postajob use cases.</p>
+<div class="section" id="use-case-1-external-party-buying-a-job">
+<h3>Use Case 1: External party buying a job<a class="headerlink" href="#use-case-1-external-party-buying-a-job" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are often times wheree the choice of company is ambiguous. This
+is a known limitation of the current system which we hope to correct after
+site families are implemented.</p>
+</div>
+<p>A small business owner (SBO) finds Paul&#8217;s website. They decide to post a job,
+so they create an account. This account is with paul&#8217;s site, powered by
+My.jobs. After creating an account, the SBO goes to the product listing and
+purchases a product, 5 posting for 30 days, for $100. Paul receives an invoice
+email that he can forward to the SBO. After purchasing the product, the SBO
+goes to the purchased products page and posts a job. The job appears on the
+site after approval.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The company who owns the product being purchased should have a functional
+<a class="reference internal" href="#use-case-2"><span>use case 2</span></a>.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="views">
+<h4>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="30%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id8">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/list/</td>
+<td>product_listing</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>/posting/product/purchase/add/</td>
+<td>PurchasedProductFormView</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>/posting/purchased-jobs/</td>
+<td>purchasedproducts_overview</td>
+<td>read purchased product</td>
+</tr>
+<tr class="row-odd"><td>/posting/purchased-jobs/product/</td>
+<td>purchasedjobs_overview</td>
+<td>read purchased job</td>
+</tr>
+<tr class="row-even"><td>/posting/purchased-jobs/product/*/view/</td>
+<td>view_job</td>
+<td>read purchased job</td>
+</tr>
+<tr class="row-odd"><td>/postign/job/purchase/add/</td>
+<td>PurchasedJobFormView</td>
+<td>create purchased job</td>
+</tr>
+<tr class="row-even"><td>/posting/job/purchase/update/</td>
+<td>PurchasedJobFormView</td>
+<td>update purchased job</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="use-case-2-site-owner-posting-to-their-own-site">
+<span id="use-case-2"></span><h3>Use Case 2: Site owner posting to their own site<a class="headerlink" href="#use-case-2-site-owner-posting-to-their-own-site" title="Permalink to this headline">¶</a></h3>
+<p>Rebecca has a job that can&#8217;t be indexed, as it is on an internal ATS that can&#8217;t
+be reached by DE&#8217;s agents. She logs into post-a-job and posts the site to her
+.JOBS Company Sites. The jobs appears. Later, she can come back and edit it or
+delete it once it filled.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#enable-login"><span>Logging In</span></a></li>
+<li><a class="reference internal" href="#enable-posting"><span>Enabling Job Posting</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="id9">
+<h4>Views<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="23%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id10">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/all/</td>
+<td>jobs_overview</td>
+<td>read job</td>
+</tr>
+<tr class="row-odd"><td>/posting/job/add/</td>
+<td>JobFormView</td>
+<td>create job</td>
+</tr>
+<tr class="row-even"><td>/posting/job/update</td>
+<td>JobFormView</td>
+<td>update job</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="use-case-3-site-owner-creating-a-product-for-sale">
+<h3>Use Case 3: Site owner creating a product for sale<a class="headerlink" href="#use-case-3-site-owner-creating-a-product-for-sale" title="Permalink to this headline">¶</a></h3>
+<p>Paul logs into the posting admin. He creates a product for 5 job postings in 30
+days. He then creates a group and assigns his new product to that group. The
+group appears in the products for sale page that SBO sees when visiting Paul&#8217;s
+site. Later, he can edit or delete the posting as needed, but any purchased
+instances of the product are unaffected.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#enable-login"><span>Logging In</span></a></li>
+<li><a class="reference internal" href="#enable-marketplace"><span>Enabling the Marketplace</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="id11">
+<h4>Views<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="21%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id12">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/admin/</td>
+<td>purchasedmicrosite_admin_overview</td>
+<td>read product | read request | read offline purchase | read purchased product | read grouping</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/product</td>
+<td>admin_products</td>
+<td>read product</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/product/add</td>
+<td>ProductFormView</td>
+<td>create product</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/product/update</td>
+<td>ProductFormView</td>
+<td>update product</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/product/group</td>
+<td>admin_groupings</td>
+<td>read grouping</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/product/group/add</td>
+<td>ProductGroupingFormView</td>
+<td>create grouping</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/product/group/update</td>
+<td>ProductGroupingFormView</td>
+<td>update grouping</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/product/group/delete</td>
+<td>ProductGroupingFormView</td>
+<td>delete grouping</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="use-case-4-site-owner-reviewing-posted-jobs">
+<h3>Use Case 4: Site owner reviewing posted jobs<a class="headerlink" href="#use-case-4-site-owner-reviewing-posted-jobs" title="Permalink to this headline">¶</a></h3>
+<p>An SBO has posted a job to Paul&#8217;s site. Paul logs into the admin and goes to
+requests. He reviews the jobs and approves it by clicking on &#8220;Approve this
+job&#8221;.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#enable-login"><span>Logging In</span></a></li>
+<li><a class="reference internal" href="#enable-marketplace"><span>Enabling the Marketplace</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="id13">
+<h4>Views<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="28%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id14">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/admin/request/</td>
+<td>admin_request</td>
+<td>read request</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/request/view/</td>
+<td>read_request</td>
+<td>read request</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/request/approve/</td>
+<td>process_admin_request</td>
+<td>update request</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/request/deny/</td>
+<td>process_admin_request</td>
+<td>update request</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="use-case-5-site-owner-blocks-and-unblocks-a-user">
+<h3>Use Case 5: Site owner blocks and unblocks a user<a class="headerlink" href="#use-case-5-site-owner-blocks-and-unblocks-a-user" title="Permalink to this headline">¶</a></h3>
+<p>An SBO posts a job and Paul thinks it is inappropriate. Instead of approving
+the job, he clicks on &#8220;Block postings from this user&#8221;. Later, the SBO explains
+that it is a legit posting. Paul logs in, goes to &#8220;Blocked Users&#8221;, and unblocks
+the SBO.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#enable-login"><span>Logging In</span></a></li>
+<li><a class="reference internal" href="#enable-marketplace"><span>Enabling the Marketplace</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="id15">
+<h4>Views<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="28%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id16">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/admin/blocked-users/</td>
+<td>blocked_user_management</td>
+<td>read request</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/request/block</td>
+<td>process_admin_request</td>
+<td>update request</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/blocked-users/unblock</td>
+<td>unblock_user</td>
+<td>update request</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="use-case-6-site-owner-entering-offline-purchases">
+<h3>Use Case 6: Site owner entering offline purchases<a class="headerlink" href="#use-case-6-site-owner-entering-offline-purchases" title="Permalink to this headline">¶</a></h3>
+<p>Paul sells a job posting at a conference. He creates an offline purchase and
+emails the SBO a redemption code. The SBO goes to /posting/purchase/redeem/ and
+redeems the purchase by entering the code. The SBO can now post jobs within
+that product.</p>
+<p>Requirements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#enable-login"><span>Logging In</span></a></li>
+<li><a class="reference internal" href="#enable-marketplace"><span>Enabling the Marketplace</span></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="id17">
+<h4>Views<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="34%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL Path</th>
+<th class="head">View Name</th>
+<th class="head">Required Activities <a class="footnote-reference" href="#id19" id="id18">[1]</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/posting/admin/purchase/offline/</td>
+<td>admin_offlinepurchase</td>
+<td>read offline purchase</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/purchase/offline/add/</td>
+<td>OfflinePurchaseFormView</td>
+<td>create offline purchase</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/purchase/offline/update/</td>
+<td>OfflinePurchaseFormView</td>
+<td>update offline purchase</td>
+</tr>
+<tr class="row-odd"><td>/posting/admin/purchase/offline/delete/</td>
+<td>OfflinePurchaseFormView</td>
+<td>delete offline purchase</td>
+</tr>
+<tr class="row-even"><td>/posting/admin/purchase/offline/success/</td>
+<td>view_request</td>
+<td>read offline purchase</td>
+</tr>
+<tr class="row-odd"><td>/posting/purchase/redeem/</td>
+<td>OfflinePurchaseRedemptionFormView</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id19" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id8">1</a>, <a class="fn-backref" href="#id10">2</a>, <a class="fn-backref" href="#id12">3</a>, <a class="fn-backref" href="#id14">4</a>, <a class="fn-backref" href="#id16">5</a>, <a class="fn-backref" href="#id18">6</a>)</em> A requirement listed as &#8220;foo | bar&#8221; signifies that either foo <em>or</em> bar is required, not both</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Postajob Setup Guide</a><ul>
+<li><a class="reference internal" href="#conventions-used-in-this-guide">Conventions used in this guide</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a><ul>
+<li><a class="reference internal" href="#logging-in">Logging In</a><ul>
+<li><a class="reference internal" href="#from-the-django-shell">From the Django shell</a></li>
+<li><a class="reference internal" href="#from-the-django-admin">From the Django admin</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#enabling-job-posting">Enabling Job Posting</a><ul>
+<li><a class="reference internal" href="#automatically">Automatically</a></li>
+<li><a class="reference internal" href="#id1">From the Django shell</a></li>
+<li><a class="reference internal" href="#from-the-django-admin-and-user-management-tool">From the Django Admin and User Management Tool</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-site-package">Creating a Site Package</a><ul>
+<li><a class="reference internal" href="#id2">From the Django Shell</a></li>
+<li><a class="reference internal" href="#id3">From the Django Admin and User Management Tool</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#enabling-the-marketplace">Enabling the Marketplace</a><ul>
+<li><a class="reference internal" href="#id4">Automatically</a></li>
+<li><a class="reference internal" href="#id5">From the Django Shell</a></li>
+<li><a class="reference internal" href="#id6">From the Django Admin and User Management Tool</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a><ul>
+<li><a class="reference internal" href="#use-case-1-external-party-buying-a-job">Use Case 1: External party buying a job</a><ul>
+<li><a class="reference internal" href="#views">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-case-2-site-owner-posting-to-their-own-site">Use Case 2: Site owner posting to their own site</a><ul>
+<li><a class="reference internal" href="#id9">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-case-3-site-owner-creating-a-product-for-sale">Use Case 3: Site owner creating a product for sale</a><ul>
+<li><a class="reference internal" href="#id11">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-case-4-site-owner-reviewing-posted-jobs">Use Case 4: Site owner reviewing posted jobs</a><ul>
+<li><a class="reference internal" href="#id13">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-case-5-site-owner-blocks-and-unblocks-a-user">Use Case 5: Site owner blocks and unblocks a user</a><ul>
+<li><a class="reference internal" href="#id15">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-case-6-site-owner-entering-offline-purchases">Use Case 6: Site owner entering offline purchases</a><ul>
+<li><a class="reference internal" href="#id17">Views</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../seo/index.html"
+                        title="next chapter">SEO</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/postajob/setup.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../seo/index.html" title="SEO"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Job Posting</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

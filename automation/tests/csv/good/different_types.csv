@@ -1,4 +1,0 @@
-BUID,View Source Name,View Source,Action Type,Action,Value 1,Value 2
-1,,1,1,switchlastinstance,/job,/apply
-1,,2,1,switchlastthenadd,/job!!!!/apply,?foo=bar
-1,,3,1,replacethenadd,old!!!!new,?foo=bar

@@ -1,4 +1,0 @@
-{% load humanize %}
-{% for city in city_data %}
-	<li><a href="http://{{ city.slab_state }}.jobs/{{ city.url }}">{{ city.location }} ({{ city.count|intcomma }})</a></li>
-{% endfor %}

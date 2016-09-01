@@ -1,1 +1,0 @@
-member_carousel_callback([{"url": "//d2e48ltfsb5exy.cloudfront.net/100x50/seo/zurich-na.gif", "name": "Zurich NA"}])

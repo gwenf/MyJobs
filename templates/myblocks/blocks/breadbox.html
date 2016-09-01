@@ -1,8 +1,0 @@
-{% if breadbox.all_breadcrumbs %}
-    <h3>{% trans "Current Search Criteria" %}</h3>
-    <ul id="direct_searchOptions">
-        {% for breadcrumb in breadbox.all_breadcrumbs %}
-        <li><a class="{{ breadcrumb.breadcrumb_class }}" href="{{ breadcrumb.url }}" title="{% trans 'Remove' %}">{{ breadcrumb.display_title|smart_truncate }}</a></li>
-        {% endfor %}
-    </ul>
-{% endif %}

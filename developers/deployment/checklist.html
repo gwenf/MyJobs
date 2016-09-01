@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Deployment Checklist &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Developer Documentation" href="../index.html" />
+    <link rel="next" title="Frequently Asked Questions" href="../../faq.html" />
+    <link rel="prev" title="ETL Imports" href="../import_jobs/etl_imports.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../faq.html" title="Frequently Asked Questions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../import_jobs/etl_imports.html" title="ETL Imports"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Developer Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="deployment-checklist">
+<h1>Deployment Checklist<a class="headerlink" href="#deployment-checklist" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Follow this checklist after every deployment to staging or production. This
+checklist is intended to verify that critical and major functionality is operating
+as intdended.</p>
+<p><strong>IF YOU FIND AN ISSUE</strong>, bring it to the attention of the my.jobs team lead
+immediatly. They will make the determination if a hotfix or rollback is needed.</p>
+</div>
+<div class="section" id="microsites">
+<h2>Microsites<a class="headerlink" href="#microsites" title="Permalink to this headline">¶</a></h2>
+<p>Check microsites in the following areas.
+<strong>GOAL</strong>: Verify correct operation of network and company sites.</p>
+<div class="section" id="network-integrity">
+<h3>Network Integrity<a class="headerlink" href="#network-integrity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.my.jobs">http://www.my.jobs</a> resolves</li>
+<li><a class="reference external" href="http://www.my.jobs/jobs">http://www.my.jobs/jobs</a> resolves</li>
+<li><a class="reference external" href="http://seattle.jobs">http://seattle.jobs</a> shows only Seattle Jobs</li>
+<li><a class="reference external" href="http://florida.jobs">http://florida.jobs</a> shows only florida jobs</li>
+<li><a class="reference external" href="http://canada.jobs">http://canada.jobs</a> shows only canadian jobs</li>
+<li>Spot check 5 job detail pages, check for markup issues or server errors</li>
+<li>Apply links correctly redirect</li>
+</ul>
+</div>
+<div class="section" id="company-microsite-integrity">
+<h3>Company Microsite Integrity<a class="headerlink" href="#company-microsite-integrity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://phillips66.jobs">http://phillips66.jobs</a> shows only phillips 66 jobs</li>
+<li><a class="reference external" href="http://jobs.schwab.com/">http://jobs.schwab.com/</a> shows only Charles Schwab jobs</li>
+<li><a class="reference external" href="http://hyatt-boston.jobs">http://hyatt-boston.jobs</a> shows only hyatt jobs in Boston and has correct branding</li>
+<li>Spot check 5 job detail pages, check for markup issues or server errors</li>
+</ul>
+</div>
+<div class="section" id="redirects-integrity">
+<h3>Redirects Integrity<a class="headerlink" href="#redirects-integrity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Apply links correctly redirect</li>
+</ul>
+</div>
+<div class="section" id="search">
+<h3>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Searching for a keyword returns correct results</li>
+<li>Searching for a location returns correct results</li>
+<li>Searching for both keyword and location returns correct results</li>
+<li>Keyword search terms can be removed in the sidebar</li>
+<li>Location search terms can be removed in the sidebar</li>
+</ul>
+</div>
+<div class="section" id="navigation">
+<h3>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Topbar loads correctly with user information</li>
+<li>Topbar dropdowns work correctly</li>
+<li>Adding a filter in the side bar works</li>
+<li>Removing a filter in the side bar works</li>
+<li>Active filters and search terms both show in the sidebar correctly</li>
+</ul>
+</div>
+</div>
+<div class="section" id="secure-my-jobs">
+<h2>Secure.my.jobs<a class="headerlink" href="#secure-my-jobs" title="Permalink to this headline">¶</a></h2>
+<p>Check the secure platform in the following areas.
+<strong>GOAL</strong>: Ensure authentication works, PRM is available, and all other tools work.</p>
+<div class="section" id="authentication">
+<h3>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Login as non-staff employer and verify tools are available</li>
+<li>Logout and log back in to verify it works</li>
+</ul>
+</div>
+<div class="section" id="prm">
+<h3>PRM<a class="headerlink" href="#prm" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Partners are listed</li>
+<li>Communication records are displayed</li>
+</ul>
+</div>
+<div class="section" id="reports">
+<h3>Reports<a class="headerlink" href="#reports" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>A report can be successfully run</li>
+</ul>
+</div>
+<div class="section" id="user-management">
+<h3>User Management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>User list displays</li>
+<li>Role list diplays</li>
+<li>Users can be edited</li>
+<li>Roles can be edited</li>
+<li>Invitations work</li>
+</ul>
+</div>
+<div class="section" id="profile">
+<h3>Profile<a class="headerlink" href="#profile" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Profile displays</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Deployment Checklist</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#microsites">Microsites</a><ul>
+<li><a class="reference internal" href="#network-integrity">Network Integrity</a></li>
+<li><a class="reference internal" href="#company-microsite-integrity">Company Microsite Integrity</a></li>
+<li><a class="reference internal" href="#redirects-integrity">Redirects Integrity</a></li>
+<li><a class="reference internal" href="#search">Search</a></li>
+<li><a class="reference internal" href="#navigation">Navigation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#secure-my-jobs">Secure.my.jobs</a><ul>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#prm">PRM</a></li>
+<li><a class="reference internal" href="#reports">Reports</a></li>
+<li><a class="reference internal" href="#user-management">User Management</a></li>
+<li><a class="reference internal" href="#profile">Profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../import_jobs/etl_imports.html"
+                        title="previous chapter">ETL Imports</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../faq.html"
+                        title="next chapter">Frequently Asked Questions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/deployment/checklist.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../faq.html" title="Frequently Asked Questions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../import_jobs/etl_imports.html" title="ETL Imports"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

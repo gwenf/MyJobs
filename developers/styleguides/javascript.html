@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>JavaScript Coding Standard &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="../../index.html" />
+    <link rel="up" title="Style Guides" href="index.html" />
+    <link rel="next" title="Programming Guide" href="programming.html" />
+    <link rel="prev" title="Forms: Layout and Input Type Usage" href="forms.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="programming.html" title="Programming Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms: Layout and Input Type Usage"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="javascript-coding-standard">
+<h1>JavaScript Coding Standard<a class="headerlink" href="#javascript-coding-standard" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<p>Our deliverable is a set of app specific JS bundles, and a <code class="docutils literal"><span class="pre">vendor.js</span></code> bundle
+which contains code shared by all apps.</p>
+<ul class="simple">
+<li>Minimize development build time and size of our app specific JS bundles.</li>
+<li>We should thoroughly discuss any changes that might increase the size of our
+deliverable <code class="docutils literal"><span class="pre">vendor.js</span></code> size, especially when alternatives exist</li>
+<li>Although we tolerate a longer build and larger delivered size of our
+<code class="docutils literal"><span class="pre">vendor.js</span></code> bundle, it should at least not contain dead code.</li>
+<li>As JS tools evolve and mature, we want to gain leverage from these
+improvements.<ul>
+<li>Minimize instances of &#8220;oops, we can&#8217;t upgrade because...&#8221;</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="style">
+<h2>Style<a class="headerlink" href="#style" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We follow the [AirBnB](<a class="reference external" href="https://github.com/airbnb/javascript">https://github.com/airbnb/javascript</a>) standard.</li>
+<li>Document any exceptions here.</li>
+<li>Developers should run the lint tool and keep the report clean. Any mistakes
+should be fixed as part of the PR process.</li>
+</ul>
+</div>
+<div class="section" id="code-locations">
+<h2>Code Locations<a class="headerlink" href="#code-locations" title="Permalink to this headline">¶</a></h2>
+<p>New JS code goes under the &#8220;gulp&#8221; folder, which contains our JS application
+code and the infrastructure for building it into app appropriate bundles.</p>
+<div class="section" id="subfolders">
+<h3>Subfolders<a class="headerlink" href="#subfolders" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">common</span></code>: modules that might be used in multiple apps.</li>
+<li><code class="docutils literal"><span class="pre">reporting</span></code>, <code class="docutils literal"><span class="pre">nonuseroutreach</span></code> etc.: app specific folders.</li>
+<li>each app folder should contain a main.js file.<ul>
+<li>This is the starting point for bootstrapping the application.</li>
+<li>It will generally contain some object instantiation and React <code class="docutils literal"><span class="pre">render</span></code>
+calls.</li>
+<li>It should be short.</li>
+</ul>
+</li>
+<li>the app folders should contain separate modules for business logic and app
+specific components.</li>
+<li>the app folders should contain a spec folder which itself contains Jasmine
+tests.</li>
+</ul>
+</div>
+<div class="section" id="desired-design-practices">
+<h3>Desired Design Practices<a class="headerlink" href="#desired-design-practices" title="Permalink to this headline">¶</a></h3>
+<p>We expect exceptions to these practices.</p>
+<ul class="simple">
+<li>Interactive views should be rendered in React components.<ul>
+<li>Break components down to small composable pieces.</li>
+<li>Limit functionality. Avoid &#8220;business logic.&#8221;<ul>
+<li>Accept props.</li>
+<li>Respond to events.</li>
+<li>Set internal state.</li>
+<li>Invoke callbacks, via props.</li>
+</ul>
+</li>
+<li>If interacting with business logic object instances, don&#8217;t pass those down
+to child components. Pass down callbacks only.</li>
+</ul>
+</li>
+<li>Business logic should be written using modern idiomatic JS functions and
+classes.<ul>
+<li>Choose promises over callbacks when possible.</li>
+<li>Use async/await when responding to promises.</li>
+<li>Use separate classes for processing data and interacting with external
+services (API).<ul>
+<li>For a smaller app, having a class dedicated to calling the API and
+returning the result in a promise is often sufficient.</li>
+<li>Use dependency injection techniques to keep unit test coverage of
+important classes high.</li>
+</ul>
+</li>
+<li>Don&#8217;t enforce critical invariants (security, etc.) in the client code at
+all. That should be done in the backend API.</li>
+</ul>
+</li>
+<li>Unit tests of business logic should not require a lot of extra libraries.<ul>
+<li>Instantiate classes, invoke functions, check results, state, etc.</li>
+<li>Tests should not call external API&#8217;s or do significant IO.</li>
+<li>Business logic tests should not mess with React, the DOM, etc.</li>
+</ul>
+</li>
+<li>Future: Unit tests of view code should also be fast and IO free.<ul>
+<li>Set up props.</li>
+<li>Simulate events.</li>
+<li>Verify state.</li>
+<li>Should not require real DOM.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="library-policy">
+<h2>Library Policy<a class="headerlink" href="#library-policy" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Implement as much of our business logic as possible in idiomatic JS. (i.e.,
+not React)<ul>
+<li>Future: Keep the libraries we use up to date. (?? when, exactly ??)</li>
+<li>Gain as much leverage as possible from as few libraries as possible.<ul>
+<li>React</li>
+<li>Jasmine</li>
+<li>Polyfills</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Scrutinize new library additions carefully.<ul>
+<li>Are there hidden licensing issues?</li>
+<li>Will this further bloat our bundles or startup time?</li>
+<li>Could the total cost of implementing this library be surprisingly bad in
+the future?</li>
+<li>Would a trivial self written function or component be sufficient?</li>
+<li>Is this library going to entangle our business logic in a way that will
+harm upgrades?</li>
+<li>When this library dies someday, will that harm us?</li>
+<li>Will use of this library prevent us from upgrading other libraries in the
+future? (i.e. some prebuilt react component, only works with React 0.13.
+Oops.)</li>
+<li>Are we bringing in a large library only to use a very small part of it?
+(using a tank where a stick would do)</li>
+</ul>
+</li>
+<li>Avoid editing <code class="docutils literal"><span class="pre">package.json</span></code> by hand. Use <code class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span> <span class="pre">--save</span></code> and
+other npm commands as much as possible. These automatically keep the
+shrinkwrap file up to date.</li>
+<li>NPM likes to put a lot of unstable information in the shrinkwrap file.
+If you find a lot of extraneous lines in the diff of <code class="docutils literal"><span class="pre">npm-shrinkwrap.json</span></code>,
+run <code class="docutils literal"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">clean-shrinkwrap</span></code>. The diff should be much cleaner and give
+some insight into the consequenes of the library change.</li>
+</ul>
+</div>
+<div class="section" id="practices">
+<h2>Practices<a class="headerlink" href="#practices" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Write unit tests for new code.</li>
+<li>Keep unit tests passing.</li>
+<li>Keep unit tests fast.</li>
+<li>Keep lint report clean.</li>
+</ul>
+</div>
+<div class="section" id="react-conventions">
+<h2>React Conventions<a class="headerlink" href="#react-conventions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>There should be one React component per file. Use <code class="docutils literal"><span class="pre">export</span> <span class="pre">default</span></code> to
+export it.<ul>
+<li>Document the react component with a <code class="docutils literal"><span class="pre">/**</span></code> comment at the top of the
+component class or function.</li>
+<li>Keep propTypes up to date. Document what each prop means.</li>
+</ul>
+</li>
+<li>Write controlled components.</li>
+<li>Keep separation between components which define a lot of user interaction and
+components which compose other components to build a user application.</li>
+</ul>
+</div>
+<div class="section" id="redux-conventions">
+<h2>Redux Conventions<a class="headerlink" href="#redux-conventions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The most important documentation is the documentation of the reducer
+functions. Put a <cite>/**</cite> comment at the top of the reducer function.<ul>
+<li>Make clear the concept behind each prop.</li>
+<li>Don&#8217;t describe what the UI does, at that is likely to change.</li>
+<li>Bad example: &#8220;active: make item blue&#8221;</li>
+<li>Good example:</li>
+</ul>
+</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>/**
+ *  format for user list {
+ *
+ *    users: [
+ *      id: integer, database id for this user
+ *      name: string, display name for this user
+ *      active: boolean indicating that the user working on this item.
+ *    ]
+ *  }
+ */
+export default handleActions({
+</pre></div>
+</div>
+<ul class="simple">
+<li>Also document compound actions with <code class="docutils literal"><span class="pre">/**</span></code> comments<ul>
+<li>Describe the action in terms of why it is occuring.</li>
+<li>Include descriptions</li>
+<li>Example:</li>
+</ul>
+</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>/**
+ * The user is done working and ready to see the result
+ *
+ * dryRun: don&#39;t save the result, just show a preview
+ */
+export function submitWork(dryRun) {
+</pre></div>
+</div>
+<ul class="simple">
+<li>Encode as much business logic as possible into redux reducers.</li>
+<li>Keep business logic out of React components. It is necessary to do the
+occasional dom tweak or auto-scroll in React, but this should not be common.</li>
+<li>Write action creators to conform to &#8220;Standard Flux Actions&#8221;.</li>
+<li>When unit testing reducers, just invoke them as functions and check their
+result.</li>
+<li>When unit testing compound actions, you can either invoke them as functions
+or create a redux store and dispatch them.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">JavaScript Coding Standard</a><ul>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#style">Style</a></li>
+<li><a class="reference internal" href="#code-locations">Code Locations</a><ul>
+<li><a class="reference internal" href="#subfolders">Subfolders</a></li>
+<li><a class="reference internal" href="#desired-design-practices">Desired Design Practices</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#library-policy">Library Policy</a></li>
+<li><a class="reference internal" href="#practices">Practices</a></li>
+<li><a class="reference internal" href="#react-conventions">React Conventions</a></li>
+<li><a class="reference internal" href="#redux-conventions">Redux Conventions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="forms.html"
+                        title="previous chapter">Forms: Layout and Input Type Usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="programming.html"
+                        title="next chapter">Programming Guide</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developers/styleguides/javascript.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="programming.html" title="Programming Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms: Layout and Input Type Usage"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Style Guides</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Frequently Asked Questions &mdash; My.jobs 4.6.158-13 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '4.6.158-13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="My.jobs 4.6.158-13 documentation" href="index.html" />
+    <link rel="prev" title="Deployment Checklist" href="developers/deployment/checklist.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developers/deployment/checklist.html" title="Deployment Checklist"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="user-management">
+<h2>User Management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-i-m-trying-to-access-prm-why-do-i-get-a-404">I&#8217;m trying to access PRM; Why do I get a 404?</dt>
+<dd>You need to be assigned a role for the company whose PRM instance you are
+trying to access.</dd>
+<dt id="term-i-ve-assigned-myself-a-role-to-a-company-so-why-do-i-still-get-a-403-when"><span id="term-attempting-to-access-prm"></span>I&#8217;ve assigned myself a role to a company, so why do I still get a 403 when<br />attempting to Access PRM?</dt>
+<dd>You should ensure that the company has PRM app-level access</dd>
+<dt id="term-the-company-i-m-attempting-to-access-has-prm-app-level-access-so-why-do-i"><span id="term-still-get-a-403-when-trying-to-access-prm"></span>The company I&#8217;m attempting to access has PRM app-level access, so why do I<br />still get a 403 when trying to access PRM?</dt>
+<dd>In addition to the company needing to have app-level access for the app
+which you are trying to access, the role assigned to the user needs to have
+activities required for that particular app&#8217;s page. In the case of the PRM
+overview page, a role must include the &#8220;read partner&#8221; activity.</dd>
+<dt id="term-i-think-i-m-having-an-existential-crisis-i-don-t-have-permissions-to-assign"><span id="term-roles-so-how-would-i-be-assigned-a-role-with-the-read-partner-activity"></span>I think I&#8217;m having an existential crisis. I don&#8217;t have permissions to assign<br />roles, so how would I be assigned a role with the &#8220;read partner&#8221; activity?</dt>
+<dd>It is assumed that someone for the company already exists as an admin who
+can assign that role for you. If not, you&#8217;ll need to assign yourself as an
+Admin from the console.</dd>
+<dt id="term-how-do-i-assign-roles-in-the-django-admin">How do I assign roles in the Django Admin?</dt>
+<dd>You don&#8217;t. That was a design decision to discourage employees from managing
+users on behalf of the member. Assigning roles should be done from the
+<code class="docutils literal"><span class="pre">User</span> <span class="pre">Management</span></code> option found under <code class="docutils literal"><span class="pre">Employer</span></code> in the topbar.</dd>
+<dt id="term-why-don-t-i-see-user-management-in-the-topbar">Why don&#8217;t I see &#8220;User Management&#8221; in the topbar?</dt>
+<dd>First, the company for which you&#8217;d like to manage users should have &#8220;User
+Management&#8221; app-level access. Then, the user attempting to manage users
+should be assigned a role which has the &#8220;read role&#8221; activity.</dd>
+<dt id="term-how-do-i-add-app-level-access">How do I add app-level access?</dt>
+<dd>If you navigate to &#8220;Companies&#8221; in the Django admin (under &#8220;Common Tasks&#8221;)
+and select a company, you should see a section called &#8220;App-Level Access&#8221;
+near the top. Note that it could take a moment for the page to load.</dd>
+</dl>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<dl class="glossary docutils">
+<dt id="term-where-is-this-hosted">Where is this hosted?</dt>
+<dd>This documentation is hosted directly on GitHub using their <code class="docutils literal"><span class="pre">gh-pages</span></code>
+feature</dd>
+<dt id="term-how-will-i-edit-this-document-in-the-future">How will I edit this document in the future?</dt>
+<dd><p class="first">There is a Jenkins tasks which builds documentation any time new commits
+are made to quality-control. If for some reason, you need to do this
+manually, you can do the following:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>cd doc
+make html
+git commit -am &quot;Updated documentation.&quot;
+make ghpages
+</pre></div>
+</div>
+</dd>
+<dt id="term-why-is-it-so-ugly">Why is it so ugly?</dt>
+<dd>It&#8217;s completely themeable, so the current look is arbitrary.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#user-management">User Management</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="developers/deployment/checklist.html"
+                        title="previous chapter">Deployment Checklist</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/faq.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developers/deployment/checklist.html" title="Deployment Checklist"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">My.jobs 4.6.158-13 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Direct Employers Association.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

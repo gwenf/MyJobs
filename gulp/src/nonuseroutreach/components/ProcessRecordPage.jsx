@@ -1,18 +1,13 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {getDisplayForValue} from 'common/array.js';
 import FieldWrapper from 'common/ui/FieldWrapper';
 import Card from './Card';
 import Form from './Form';
 import SearchDrop from './SearchDrop';
-import Select from 'common/ui/Select';
 import {get} from 'lodash-compat/object';
 
 import {
-  partnerForm,
-  contactForm,
   contactNotesOnlyForm,
-  communicationRecordForm,
 } from 'nonuseroutreach/forms';
 
 import {
@@ -147,6 +142,7 @@ class ProcessRecordPage extends Component {
   renderNewCommunicationRecord() {
     const {
       dispatch,
+      communicationRecordForm,
       communicationRecordFormContents,
     } = this.props;
 
@@ -157,14 +153,14 @@ class ProcessRecordPage extends Component {
         submitTitle="Add Record"
         formContents={communicationRecordFormContents}
         onEdit={(n, v) =>
-          dispatch(editFormAction('communicationrecord', n, v))}
+          dispatch(editFormAction('communication_record', n, v))}
         onSubmit={() => this.handleSaveCommunicationRecord()}
         />
     );
   }
 
   renderNewPartner() {
-    const {dispatch, partnerFormContents} = this.props;
+    const {dispatch, partnerForm, partnerFormContents} = this.props;
 
     return (
       <Form
@@ -179,7 +175,14 @@ class ProcessRecordPage extends Component {
   }
 
   renderNewContact() {
-    const {dispatch, contactIndex, contactFormsContents} = this.props;
+    const {
+      dispatch,
+      contactIndex,
+      contactForms,
+      contactFormsContents,
+    } = this.props;
+
+    const contactForm = contactForms[contactIndex];
     const contactFormContents = contactFormsContents[contactIndex] || {};
 
     return (
@@ -213,29 +216,22 @@ class ProcessRecordPage extends Component {
   }
 
   renderSelectWorkflow() {
-    const {dispatch,
-      workflowState,
-      workflowStates,
+    const {
+      dispatch,
+      outreachRecordForm,
+      outreachRecordFormContents,
     } = this.props;
 
     return (
-      <Card title="Form Ready for Submission">
-        <FieldWrapper label="Workflow Status">
-          <Select
-            name="workflow"
-            value={getDisplayForValue(workflowStates, workflowState)}
-            choices={workflowStates}
-            onChange={e => dispatch(
-              editFormAction(
-                'outreachrecord',
-                'current_workflow_state',
-                e.target.value))}
-            />
-        </FieldWrapper>
-        <button className="nuo-button" onClick={() => this.handleSubmit()}>
-          Submit
-        </button>
-      </Card>
+      <Form
+        form={outreachRecordForm}
+        title="Form Ready for Submission"
+        submitTitle="Submit"
+        formContents={outreachRecordFormContents}
+        onEdit={(n, v) =>
+          dispatch(editFormAction('outreach_record', n, v, null))}
+        onSubmit={() => this.handleSubmit()}
+        />
     );
   }
 
@@ -278,33 +274,31 @@ class ProcessRecordPage extends Component {
 ProcessRecordPage.propTypes = {
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
-  outreachId: PropTypes.string.isRequired,
   processState: PropTypes.string.isRequired,
   partnerId: PropTypes.any,
   partnerFormContents: PropTypes.object.isRequired,
   contactFormsContents: PropTypes.arrayOf(
     PropTypes.object.isRequired).isRequired,
+  outreachRecordFormContents: PropTypes.object,
   contactIndex: PropTypes.number,
   communicationRecordFormContents: PropTypes.object.isRequired,
-  workflowState: PropTypes.number,
-  workflowStates: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.number.isRequired,
-      display: PropTypes.string.isRequired,
-    }).isRequired
-  ).isRequired,
+  partnerForm: PropTypes.object,
+  contactForms: PropTypes.arrayOf(PropTypes.object),
+  communicationRecordForm: PropTypes.object,
+  outreachRecordForm: PropTypes.object,
 };
 
 export default connect(state => ({
-  outreachId: state.process.outreachId,
   processState: state.process.state,
-  partnerId: get(state.process, 'record.partner.pk.value'),
+  partnerId: get(state.process, 'record.partner.pk'),
   contactIndex: state.process.contactIndex,
   partnerFormContents: state.process.record.partner,
   contactFormsContents: state.process.record.contacts,
   communicationRecordFormContents:
-    state.process.record.communicationrecord,
-  workflowState:
-    get(state.process.record, 'outreachrecord.current_workflow_state.value'),
-  workflowStates: state.process.workflowStates,
+    state.process.record.communication_record,
+  outreachRecordFormContents: state.process.record.outreach_record,
+  partnerForm: state.process.forms.partner,
+  contactForms: state.process.forms.contacts,
+  communicationRecordForm: state.process.forms.communication_record,
+  outreachRecordForm: state.process.forms.outreach_record,
 }))(ProcessRecordPage);

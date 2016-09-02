@@ -12,7 +12,7 @@ export default class RemoteFormField extends Component {
   render() {
     const {fieldName, form, value, onChange} = this.props;
     const field = form.fields[fieldName] || {};
-    const errors = form.errors[fieldName];
+    const errors = (form.errors || {})[fieldName];
     const fieldDisable = field.readonly;
 
     function wrap(child) {
@@ -30,6 +30,8 @@ export default class RemoteFormField extends Component {
     const inputType = (field.widget || {}).input_type || 'unspecified';
 
     switch (inputType) {
+    case 'time':
+    case 'datetime':
     case 'text':
       return wrap(
         <TextField
@@ -83,6 +85,11 @@ export default class RemoteFormField extends Component {
           choices={field.choices}
           disable={fieldDisable}
           />
+      );
+    case 'selectmultiple':
+      // TODO: tags select here
+      return wrap(
+        <input placeholder=">>Tag Select Goes Here<<"/>
       );
     case 'checkbox':
       return wrap(

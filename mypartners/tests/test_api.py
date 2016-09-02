@@ -189,6 +189,22 @@ class NonUserOutreachTestCase(MyPartnersTestCase):
                                                 "returned for a non-company "
                                                 "record.")
 
+    def test_tag_names(self):
+        """
+        Test that tags don't have "for $company" appended to their displays.
+        """
+        tag = Tag.objects.create(company=self.company, name="This Tag")
+
+        response = self.client.get(reverse('api_get_nuo_forms'))
+        payload = json.loads(response.content)
+        tag_displays = [
+            t['display']
+            for t in
+            payload['partner']['fields']['tags']['choices']
+        ]
+        self.company.tag_set.add(tag)
+        self.assertIn('This Tag', tag_displays)
+
 class NUOConversionAPITestCase(MyPartnersTestCase):
     """
     Tests related to the conversion API for non user outreach. This API
@@ -207,54 +223,54 @@ class NUOConversionAPITestCase(MyPartnersTestCase):
         self.outreach_workflow = OutreachWorkflowStateFactory()
         a_tag = TagFactory()
         self.request_data = {
-            "forms": {
-                "outreachrecord": {
-                    "pk": {'value': self.outreach_record.pk},
+            "data": {
+                "outreach_record": {
+                    "pk": self.outreach_record.pk,
                     "current_workflow_state":
-                        {'value': self.outreach_workflow.pk},
+                        self.outreach_workflow.pk,
                 },
                 "partner": {
-                    "pk": {'value': ""},
-                    "name": {'value': "James B"},
-                    "data_source": {'value': "email"},
-                    "uri": {'value': "http://www.example.com"},
-                    "tags": [{'pk': {'value': a_tag.pk}}],
-                    "owner": {'value': self.company.pk},
+                    "pk": "",
+                    "name": "James B",
+                    "data_source": "email",
+                    "uri": "http://www.example.com",
+                    "tags": [{'pk': a_tag.pk}],
+                    "owner": self.company.pk,
                 },
                 "contacts": [
                     {
-                        "pk": {'value': ""},
-                        "name": {'value': "Nicole J"},
-                        "email": {'value': "nicolej@test.com"},
-                        "phone": {'value': "7651234123"},
+                        "pk": "",
+                        "name": "Nicole J",
+                        "email": "nicolej@test.com",
+                        "phone": "7651234123",
                         "location": {
-                            "pk": {'value': ""},
-                            "address_line_one": {'value': ""},
-                            "address_line_two": {'value': ""},
-                            "city": {'value': "Newtoneous"},
-                            "state": {'value': "AZ"},
-                            "country_code": {'value': "1"},
-                            "label": {'value': "new place"},
+                            "pk": "",
+                            "address_line_one": "",
+                            "address_line_two": "",
+                            "city": "Newtoneous",
+                            "state": "AZ",
+                            "country_code": "1",
+                            "label": "new place",
                             },
-                        "tags": [{'pk': {'value': a_tag.pk}}],
-                        "notes": {'value': "long note left here"},
+                        "tags": [{'pk': a_tag.pk}],
+                        "notes": "long note left here",
                     },
                     {
-                        "pk": {'value': self.contact.pk},
-                        "notes": {'value': "new notes"},
+                        "pk": self.contact.pk,
+                        "notes": "new notes",
                     },
                 ],
-                "contactrecord": {
-                    "contact_type": {'value': "phone"},
-                    "location": {'value': "dining hall"},
-                    "length": {'value': "10:30"},
-                    "subject": {'value': "new job"},
-                    "date_time": {'value': "2016-01-01 05:10"},
-                    "notes": {'value': "dude was chill"},
-                    "job_id": {'value': "10"},
-                    "job_applications": {'value': "20"},
-                    "job_interviews": {'value': "10"},
-                    "job_hires": {'value': "0"},
+                "communication_record": {
+                    "contact_type": "phone",
+                    "location": "dining hall",
+                    "length": "10:30",
+                    "subject": "new job",
+                    "date_time": "2016-01-01 05:10",
+                    "notes": "dude was chill",
+                    "job_id": "10",
+                    "job_applications": "20",
+                    "job_interviews": "10",
+                    "job_hires": "0",
                     "tags": [],
                 }
             }
@@ -553,11 +569,35 @@ class NUOConversionAPITestCase(MyPartnersTestCase):
         :param expected_count: How many objects should be created
 
         """
+        abbreviated_content = response.content
+        try:
+            abbreviated_parsed = json.loads(abbreviated_content)
+
+            def simplify(root):
+                return {'errors': root['errors']}
+
+            if 'forms' in abbreviated_content:
+                forms = abbreviated_content['forms']
+                simple_forms = [
+                    'partner',
+                    'communication_record',
+                    'outreach_record',
+                ]
+                for form_name in simple_forms:
+                    if form_name in forms:
+                        forms[form_name] = simplify(forms[form_name])
+                if 'contacts' in forms:
+                    for i, root in enumerate(forms['contacts']):
+                        forms['contacts'][i] = simplify(root)
+
+            abbreviated_content = json.dumps(abbreviated_parsed, 2)
+        except ValueError:
+            pass
         self.assertEqual(response.status_code, expected_code,
                          msg="request failed, expected status %s, got %s, "
                              "reponse content was: %s" %
                              (expected_code, response.status_code,
-                              response.content))
+                              abbreviated_content))
 
         objects_created, objects_missing = self.check_objects_created()
 

@@ -1,15 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import {map} from 'lodash-compat/collection';
-import {assign} from 'lodash-compat/object';
 import RemoteFormField from 'common/ui/RemoteFormField';
 import Card from './Card';
 
 class Form extends Component {
-  getValue(formContents, fieldName) {
-    const valueData = formContents[fieldName] || {};
-    return valueData.value;
-  }
-
   render() {
     const {
       form,
@@ -20,17 +14,12 @@ class Form extends Component {
       onEdit,
     } = this.props;
 
-    const errors = assign({},
-      ...map(formContents, (v, k) =>
-        ({[k]: v.errors})));
-    const localForm = {...form, errors};
-
-    const fields = map(localForm.orderedFields, fieldName => (
+    const fields = map(form.ordered_fields, fieldName => (
       <RemoteFormField
         key={fieldName}
-        form={localForm}
+        form={form}
         fieldName={fieldName}
-        value={this.getValue(formContents, fieldName) || ''}
+        value={formContents[fieldName] || ''}
         onChange={e => onEdit(fieldName, e.target.value)}/>
     ));
 

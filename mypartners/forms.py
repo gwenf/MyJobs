@@ -9,7 +9,7 @@ import pytz
 from postajob.location_data import states
 from myprofile.forms import generate_custom_widgets
 from mypartners.models import (Contact, Partner, ContactRecord, PRMAttachment,
-                               Status, Tag, Location,
+                               Status, Tag, Location, OutreachRecord,
                                ADDITION, CHANGE, MAX_ATTACHMENT_MB)
 from mypartners.helpers import (log_change, get_attachment_link,
                                 prm_worthy, tag_get_or_create)
@@ -511,3 +511,88 @@ class LocationForm(NormalizedModelForm):
                    action_type=new_or_change)
 
         return instance
+
+
+def set_tag_choices(field, company):
+    field.choices = [
+        (t.pk, t.name)
+        for t in company.tag_set.all()
+    ]
+
+class NuoPartnerForm(NormalizedModelForm):
+    """
+    Form for adding partners via NUO.
+    """
+    class Meta:
+        form_name = "Partner"
+        model = Partner
+        fields = ['name', 'data_source', 'uri', 'tags']
+    tags = forms.MultipleChoiceField(required=False, label='Tags')
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')
+        super(NuoPartnerForm, self).__init__(*args, **kwargs)
+        set_tag_choices(self.fields['tags'], company)
+
+
+class NuoContactForm(NormalizedModelForm):
+    """
+    Form for adding contacts via NUO.
+    """
+    class Meta:
+        form_name = "Contact"
+        model = Contact
+        fields = ['name', 'email', 'phone', 'tags', 'notes']
+    tags = forms.MultipleChoiceField(required=False, label='Tags')
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')
+        super(NuoContactForm, self).__init__(*args, **kwargs)
+        set_tag_choices(self.fields['tags'], company)
+
+
+class NuoLocationForm(NormalizedModelForm):
+    """
+    Form for adding locations via NUO.
+    """
+    class Meta:
+        form_name = "Location"
+        model = Location
+        fields = [
+            'address_line_one',
+            'address_line_two',
+            'city',
+            'state',
+            'postal_code',
+            'label',
+        ]
+
+
+class NuoCommunicationRecordForm(NormalizedModelForm):
+    """
+    Form for adding communication records via NUO.
+    """
+    class Meta:
+        form_name = "Communication Record"
+        model = ContactRecord
+        fields = ('contact_type',
+                  'contact_email', 'contact_phone', 'location',
+                  'length', 'subject', 'date_time', 'job_id',
+                  'job_applications', 'job_interviews', 'job_hires',
+                  'tags', 'notes')
+    tags = forms.MultipleChoiceField(required=False, label='Tags')
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')
+        super(NuoCommunicationRecordForm, self).__init__(*args, **kwargs)
+        set_tag_choices(self.fields['tags'], company)
+
+
+class NuoOutreachRecordForm(NormalizedModelForm):
+    """
+    Form for editing outreach records via NUO.
+    """
+    class Meta:
+        form_name = "Outreach Record"
+        model = OutreachRecord
+        fields = ('current_workflow_state',)

@@ -22,8 +22,8 @@ describe('processEmailReducer', () => {
       summary: 'some title',
       body: 'some info',
     };
-    const states = [{1: 2}];
-    const result = reducer({}, resetProcessAction(2, outreach, states));
+    const blankForms = [{1: 2}];
+    const result = reducer({}, resetProcessAction(outreach, blankForms));
 
     it('should set the default state.', () => {
       expect(result.state).toEqual('SELECT_PARTNER');
@@ -33,26 +33,23 @@ describe('processEmailReducer', () => {
       expect(result.outreach).toDiffEqual(outreach);
     });
 
-    it('should remember the given outreach Id', () => {
-      expect(result.outreachId).toDiffEqual(2);
-    });
-
-    it('should remember the given workflow states', () => {
-      expect(result.workflowStates).toDiffEqual(states);
+    it('should remember the given workflow blankForms', () => {
+      expect(result.blankForms).toDiffEqual(blankForms);
     });
   });
 
   describe('handling choosePartnerAction', () => {
-    const result = reducer(
-      {record: {partner: {}}},
-      choosePartnerAction(4, 'acme'));
+    const result = reducer({
+      record: {partner: {}},
+      forms: {},
+    }, choosePartnerAction(4, 'acme'));
 
     it('should have the partner id', () => {
-      expect(result.record.partner.pk.value).toEqual(4);
+      expect(result.record.partner.pk).toEqual(4);
     });
 
     it('should have the partner name', () => {
-      expect(result.record.partner.name.value).toEqual('acme');
+      expect(result.record.partner.name).toEqual('acme');
     });
   });
 
@@ -60,12 +57,15 @@ describe('processEmailReducer', () => {
     const state = {
       record: {
         partner: {
-          pk: {value: 4},
-          name: {value: 'acme'},
+          pk: 4,
+          name: 'acme',
         },
         contacts: [
-          {pk: {value: 99}},
+          {pk: 99},
         ],
+      },
+      forms: {
+        contacts: [],
       },
     };
     const result = reducer(state, chooseContactAction(3, 'bob'));
@@ -75,15 +75,19 @@ describe('processEmailReducer', () => {
     });
 
     it('should have the contact id', () => {
-      expect(result.record.contacts[1].pk.value).toEqual(3);
+      expect(result.record.contacts[1].pk).toEqual(3);
     });
 
     it('should have the contact name', () => {
-      expect(result.record.contacts[1].name.value).toEqual('bob');
+      expect(result.record.contacts[1].name).toEqual('bob');
     });
 
     it('should retain the partner', () => {
       expect(result.record.partner).toEqual(state.record.partner);
+    });
+
+    it('places a null placeholder in the forms', () => {
+      expect(result.forms.contacts[0]).toBe(null);
     });
   });
 
@@ -92,6 +96,9 @@ describe('processEmailReducer', () => {
       record: {
         contacts: [{pk: {value: 3}}],
         partner: {pk: {value: 4}},
+      },
+      blankForms: {
+        partner: {3: 4},
       },
     };
     const result = reducer(state, newPartnerAction('Partner Name Inc.'));
@@ -105,11 +112,11 @@ describe('processEmailReducer', () => {
     });
 
     it('should have a blank partnerId', () => {
-      expect(result.record.partner.pk.value).toEqual('');
+      expect(result.record.partner.pk).toEqual('');
     });
 
     it('should have a partner name', () => {
-      expect(result.record.partner.name.value).toEqual('Partner Name Inc.');
+      expect(result.record.partner.name).toEqual('Partner Name Inc.');
     });
 
   });
@@ -120,27 +127,33 @@ describe('processEmailReducer', () => {
         contacts: [{pk: {value: 3}}],
         partner: {pk: {value: 4}},
       },
+      forms: {
+        contacts: [],
+      },
+      blankForms: {
+        contacts: {3: 4},
+      },
     };
     const result = reducer(state, newContactAction('Some Person'));
 
-    it('should set the right state', () => {
+    it('set the right state', () => {
       expect(result.state).toEqual('NEW_CONTACT');
       expect(result.contactIndex).toEqual(1);
     });
 
-    it('should have a blank contactId', () => {
-      expect(result.record.contacts[1].pk.value).toEqual('');
+    it('have a blank contactId', () => {
+      expect(result.record.contacts[1].pk).toEqual('');
     });
 
-    it('should have a contact name', () => {
-      expect(result.record.contacts[1].name.value).toEqual('Some Person');
+    it('have a contact name', () => {
+      expect(result.record.contacts[1].name).toEqual('Some Person');
     });
 
-    it('should keep the previous contacts', () => {
+    it('keep the previous contacts', () => {
       expect(result.record.contacts[0]).toEqual(state.record.contacts[0]);
     });
 
-    it('should keep the partner', () => {
+    it('keep the partner', () => {
       expect(result.record.partner).toEqual(state.record.partner);
     });
   });
@@ -150,23 +163,20 @@ describe('processEmailReducer', () => {
     describe('unindexed', () => {
       const action = editFormAction('partner', 'name', 'Bob');
 
-      it('should create and store the field', () => {
+      it('create and store the field', () => {
         const result = reducer({}, action);
 
-        expect(result.record.partner.name.value).toEqual('Bob');
+        expect(result.record.partner.name).toEqual('Bob');
       });
 
-      it('should preserve other values', () => {
+      it('preserve other values', () => {
         const initialFormContents = {
           partner: {
-            city: {value: 'somewhere'},
-            suffix: {
-              value: 'jr',
-              errors: ['some error'],
-            },
+            city: 'somewhere',
+            suffix: 'jr',
           },
           other: {
-            a: {value: 'b'},
+            a: 'b',
           },
         };
 
@@ -176,15 +186,12 @@ describe('processEmailReducer', () => {
 
         expect(result.record).toDiffEqual({
           partner: {
-            city: {value: 'somewhere'},
-            name: {value: 'Bob'},
-            suffix: {
-              value: 'sr',
-              errors: ['some error'],
-            },
+            city: 'somewhere',
+            name: 'Bob',
+            suffix: 'sr',
           },
           other: {
-            a: {value: 'b'},
+            a: 'b',
           },
         });
       });
@@ -192,33 +199,27 @@ describe('processEmailReducer', () => {
 
     describe('indexed', () => {
 
-      it('should create and store the field', () => {
+      it('create and store the field', () => {
         const action = editFormAction('contacts', 'name', 'Bob', 0);
         const result = reducer({}, action);
 
-        expect(result.record.contacts[0].name.value).toEqual('Bob');
+        expect(result.record.contacts[0].name).toEqual('Bob');
       });
 
-      it('should should leave other indexed objects alone', () => {
+      it('should leave other indexed objects alone', () => {
         const initialFormContents = {
           contacts: [
             {
-              city: {value: 'somewhere'},
-              suffix: {
-                value: 'jr',
-                errors: ['some error'],
-              },
+              city: 'somewhere',
+              suffix: 'jr',
             },
             {
-              city: {value: 'elsewhere'},
-              suffix: {
-                value: 'jr',
-                errors: ['some error'],
-              },
+              city: 'elsewhere',
+              suffix: 'jr',
             },
           ],
           other: {
-            a: {value: 'b'},
+            a: 'b',
           },
         };
         const action = editFormAction('contacts', 'city', 'elsewhere2', 1);
@@ -227,22 +228,16 @@ describe('processEmailReducer', () => {
         expect(result.record).toDiffEqual({
           contacts: [
             {
-              city: {value: 'somewhere'},
-              suffix: {
-                value: 'jr',
-                errors: ['some error'],
-              },
+              city: 'somewhere',
+              suffix: 'jr',
             },
             {
-              city: {value: 'elsewhere2'},
-              suffix: {
-                value: 'jr',
-                errors: ['some error'],
-              },
+              city: 'elsewhere2',
+              suffix: 'jr',
             },
           ],
           other: {
-            a: {value: 'b'},
+            a: 'b',
           },
         });
       });
@@ -251,9 +246,17 @@ describe('processEmailReducer', () => {
 });
 
 describe('handling noteFormsAction', () => {
+  const result = reducer({
+    record: {3: 4},
+    forms: {5: 6},
+  }, noteFormsAction({record: {1: 2}, forms: {6: 7}}));
+
   it('should replace the whole record', () => {
-    const result = reducer({record: {3: 4}}, noteFormsAction({1: 2}));
     expect(result.record).toEqual({1: 2});
+  });
+
+  it('should replace the forms', () => {
+    expect(result.forms).toEqual({6: 7});
   });
 });
 
@@ -333,23 +336,18 @@ describe('handling deletePartnerAction', () => {
 });
 
 describe('handling deleteCommunicationRecordAction', () => {
-  const result = reducer({record: {communicationrecord: {stuff:'stuff'}}},
+  const result = reducer({record: {communication_record: {stuff:'stuff'}}},
     deleteCommunicationRecordAction());
 
   it ('should delete communication record', () => {
-    expect(result.record.communicationrecord).toEqual({});
+    expect(result.record.communication_record).toEqual({});
   });
 });
 
 describe('handling determineProcessStateAction', () => {
-  let originalState = {
-      partner: {pk:1},
-      contacts: [{pk:1}, {pk:2}],
-      communicationrecord: {this:'that'},
-  }
   describe('without a partner' , () => {
     const result = reducer(
-      {record: {...originalState, partner:{}}},
+      {record: {}},
       determineProcessStateAction());
 
     it ('should direct to SELECT_PARTNER', () => {
@@ -358,7 +356,7 @@ describe('handling determineProcessStateAction', () => {
   });
   describe('without any contacts but with a partner' , () => {
     const result = reducer(
-      {record: {...originalState, contacts:[]}},
+      {record: {partner: {pk: 1}}},
       determineProcessStateAction());
 
     it ('should direct to SELECT_CONTACT', () => {
@@ -366,12 +364,17 @@ describe('handling determineProcessStateAction', () => {
     })
   });
   describe('without a comm rec but with a partner and contacts' , () => {
-    const result = reducer(
-      {record: {...originalState, communicationrecord:{}}},
-      determineProcessStateAction());
+    const result = reducer({
+      record: {partner: {pk: 1}, contacts: [{pk: 1}]},
+      blankForms: {communication_record: {3: 4}},
+    }, determineProcessStateAction());
 
     it ('should direct to NEW_COMMUNICATIONRECORD', () => {
       expect(result.state).toEqual('NEW_COMMUNICATIONRECORD');
+    });
+
+    it ('should set up a blank form', () => {
+      expect(result.forms.communication_record).toEqual({3: 4});
     })
   });
 });

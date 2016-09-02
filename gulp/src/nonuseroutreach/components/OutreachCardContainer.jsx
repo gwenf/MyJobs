@@ -17,7 +17,7 @@ class OutreachCardContainer extends Component {
   handlePartnerNav() {
     const {dispatch, partner} = this.props;
 
-    if (!get(partner, 'pk.value')) {
+    if (!get(partner, 'pk')) {
       dispatch(editPartnerAction());
     }
   }
@@ -39,7 +39,7 @@ class OutreachCardContainer extends Component {
         (contact, i) => this.renderContact(contact, i));
     case 'partner':
       return this.renderPartner(stateObject);
-    case 'communicationrecord':
+    case 'communicationRecord':
       return this.renderCommunicationRecord(stateObject);
     default:
       break;
@@ -51,13 +51,13 @@ class OutreachCardContainer extends Component {
   }
 
   renderContact(contact, index) {
-    const {dispatch} = this.props;
+    const {dispatch, contactsErrors} = this.props;
 
     return (
       <OutreachCard
-        hasErrors={this.hasErrors(contact)}
+        hasErrors={contactsErrors[index]}
         key={index}
-        displayText={get(contact, 'name.value')}
+        displayText={get(contact, 'name')}
         type="contact"
         onNav={() => dispatch(editContactAction(index))}
         onDel={() => {
@@ -68,14 +68,14 @@ class OutreachCardContainer extends Component {
   }
 
   renderPartner(partner) {
-    const {dispatch} = this.props;
+    const {dispatch, partnerErrors} = this.props;
 
     return (
       <OutreachCard
-        hasErrors={this.hasErrors(partner)}
+        hasErrors={partnerErrors}
         key="partner"
         type="partner"
-        displayText={get(partner, 'name.value')}
+        displayText={get(partner, 'name')}
         onNav={() => this.handlePartnerNav()}
         onDel={() => {
           dispatch(deletePartnerAction());
@@ -85,12 +85,16 @@ class OutreachCardContainer extends Component {
   }
 
   renderCommunicationRecord() {
-    const {dispatch, communicationrecord} = this.props;
+    const {
+      dispatch,
+      communicationRecord,
+      communicationRecordErrors,
+    } = this.props;
 
     return (
       <OutreachCard
-        hasErrors={this.hasErrors(communicationrecord)}
-        displayText={get(communicationrecord, 'contact_type.value', 'unknown')}
+        hasErrors={communicationRecordErrors}
+        displayText={get(communicationRecord, 'contact_type', 'unknown')}
         type="communicationrecord"
         onNav={() =>
           dispatch(editCommunicationRecordAction())}
@@ -116,12 +120,28 @@ OutreachCardContainer.defaultProps = {
 OutreachCardContainer.propTypes = {
   dispatch: PropTypes.func.isRequired,
   partner: PropTypes.object,
+  partnerErrors: PropTypes.bool.isRequired,
   contacts: PropTypes.array,
-  communicationrecord: PropTypes.object,
+  contactsErrors: PropTypes.arrayOf(PropTypes.bool.isRequired).isRequired,
+  communicationRecord: PropTypes.object,
+  communicationRecordErrors: PropTypes.bool.isRequired,
 };
+
+function getErrorsForForm(forms, key) {
+  return !isEmpty(get(forms, [key, 'errors']));
+}
+
+function getErrorsForForms(forms, key) {
+  return map(get(forms, key), f => !isEmpty(get(f, 'errors')));
+}
 
 export default connect(state => ({
   partner: state.process.record.partner,
+  partnerErrors: getErrorsForForm(state.process.forms, 'partner'),
   contacts: state.process.record.contacts,
-  communicationrecord: state.process.record.communicationrecord,
+  contactsErrors: getErrorsForForms(state.process.forms, 'contacts'),
+  communicationRecord: state.process.record.communication_record,
+  communicationRecordErrors: getErrorsForForm(
+    state.process.forms,
+    'communication_record'),
 }))(OutreachCardContainer);

@@ -16,6 +16,8 @@ nuo_api = patterns('mypartners.views',
         name='api_update_nuo_inbox'),
     url(r'^workflowstate$', 'api_get_workflow_states',
         name='api_get_workflow_states'),
+    url(r'^forms$', 'api_get_nuo_forms',
+        name='api_get_nuo_forms'),
 )
 
 api = patterns('mypartners.views',
